@@ -1,8 +1,8 @@
 # Mindset Approved
 
 Scan a food label and get a verdict (Approved, Caution, Not Approved, or Can't verify), with the exact
-ingredients behind it. This repo holds the foundation of the MVP: the rules engine, the starter rules,
-and the Supabase schema. The Expo app and the admin dashboard come next (see `apps/`).
+ingredients behind it. This repo holds the rules engine, the starter rules, the Supabase schema and the
+admin dashboard. The Expo app comes next (see `apps/mobile`).
 
 Verdicts reflect Mindset's ingredient preferences. They are not health or safety findings.
 
@@ -11,8 +11,10 @@ Verdicts reflect Mindset's ingredient preferences. They are not health or safety
 | Path | What it is |
 |---|---|
 | `data/starter-rules.json` | **Source of truth** for the 37 PRD rules, their aliases and E-numbers, plus everyday neutral ingredients |
-| `packages/rules-engine` | Pure TypeScript engine: isolate → split → match → settings → verdict. Has no runtime dependencies and is safe for React Native |
-| `supabase/migrations` | Schema, RLS, and RPCs (`log_unmatched`, `submit_product`, `delete_my_data`, `export_rules`, `publish_rule_version`) |
+| `packages/rules-engine` | Pure TypeScript engine: isolate → split → match → settings → verdict, plus `compileBundle`, `diffBundles`, `runFixtures` and `preparePublish`. Has no runtime dependencies and is safe for React Native |
+| `apps/admin` | Next.js admin: test bench, ingredients and aliases editor, unmatched and reports queues, publish, products, stats ([README](apps/admin/README.md)) |
+| `supabase/functions/publish-bundle` | Edge Function: compile → diff → regression → upload `rules-bundle.v{n}.json.gz` → `publish_rule_version()` |
+| `supabase/migrations` | Schema, RLS, and RPCs (`log_unmatched`, `submit_product`, `delete_my_data`, `export_rules`, `publish_rule_version`, `map_unmatched`, `admin_stats`) |
 | `supabase/seed.sql` | Generated from the JSON. Don't edit it by hand |
 | `scripts/` | Seed generator, bundle compiler, OFF taxonomy importer, SQL checks |
 
@@ -25,11 +27,14 @@ pnpm test            # engine (321 tests) + scripts
 pnpm seed:build      # data/starter-rules.json -> supabase/seed.sql
 pnpm bundle:build    # -> dist/rules-bundle.v1.json(.gz)
 pnpm check:sql       # applies migrations + seed to a throwaway local Postgres and runs RLS checks
+pnpm deno:shared     # re-bundle the engine for Edge Functions after engine changes (a test checks it's current)
+pnpm --filter admin dev
 pnpm off:import --file additives.txt   # OFF taxonomy -> inactive, untiered rows (supabase/off-import.sql)
 ```
 
-To change a rule, edit `data/starter-rules.json` and run `pnpm seed:build`. A test fails if `seed.sql` is stale.
-After launch the admin edits rules in Supabase instead, and publishes with `export_rules()` → `compileBundle()`.
+Before launch, change the starter rules in `data/starter-rules.json` and run `pnpm seed:build` (a test fails if `seed.sql` is stale).
+After the database is live, edit rules in the admin and press Publish. Phones download the new bundle on their next open.
+If a rule change intentionally changes a regression label's verdict, update `packages/rules-engine/test/fixtures/labels.json`.
 
 ## Using the engine
 

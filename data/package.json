@@ -1,0 +1,8 @@
+{
+  "name": "@mindset/rules-data",
+  "version": "0.1.0",
+  "private": true,
+  "exports": {
+    "./starter-rules.json": "./starter-rules.json"
+  }
+}

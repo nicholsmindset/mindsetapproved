@@ -19,10 +19,10 @@ PSQL=("${RUN_AS[@]}" "$PG_BIN/psql" -h "$WORK" -p "$PORT" -U postgres -d postgre
 "${PSQL[@]}" -f - < "$ROOT/supabase/tests/supabase-stubs.sql"
 for f in "$ROOT"/supabase/migrations/*.sql; do echo "apply $(basename "$f")"; "${PSQL[@]}" -f - < "$f"; done
 echo "apply seed.sql"; "${PSQL[@]}" -f - < "$ROOT/supabase/seed.sql"
+"${PSQL[@]}" -At -c "select alias_norm from public.aliases order by 1" | LC_ALL=C sort > "$WORK/sql-keys.txt"
 "${PSQL[@]}" -f - < "$ROOT/supabase/tests/rls-checks.sql"
 
 # The SQL norm_key()/e_code() must agree with the engine's normKey()/eCode() for every seeded alias.
-"${PSQL[@]}" -At -c "select alias_norm from public.aliases where ingredient_id <> 'ponceau_4r' order by 1" | LC_ALL=C sort > "$WORK/sql-keys.txt"
 (cd "$ROOT" && npx tsx -e "
 import { compileBundle, rowsFromSource } from './packages/rules-engine/src/index.ts';
 import src from './data/starter-rules.json' with { type: 'json' };

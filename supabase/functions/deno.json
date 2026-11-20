@@ -1,0 +1,4 @@
+{
+  "compilerOptions": { "strict": true },
+  "lint": { "exclude": ["_shared/rules-engine.js"] }
+}

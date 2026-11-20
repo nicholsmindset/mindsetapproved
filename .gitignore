@@ -3,5 +3,11 @@ dist/
 *.log
 .env
 .env.*
+!.env.example
 coverage/
 supabase/off-import.sql
+.next/
+next-env.d.ts
+*.tsbuildinfo
+supabase/.temp/
+supabase/.branches/

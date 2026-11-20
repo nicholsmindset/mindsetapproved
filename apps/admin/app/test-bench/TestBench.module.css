@@ -1,0 +1,6 @@
+.layout { display: grid; grid-template-columns: minmax(300px, 420px) minmax(0, 1fr); gap: 20px; align-items: start; }
+.fieldset { border: 1px solid var(--border); border-radius: 8px; padding: 8px 12px 10px; margin: 0; }
+.fieldset legend { font-size: 0.85rem; color: var(--muted); padding: 0 4px; }
+.checks { display: flex; flex-wrap: wrap; padding: 6px 0; }
+.range { width: 100%; accent-color: var(--accent); }
+@media (max-width: 900px) { .layout { grid-template-columns: minmax(0, 1fr); } }

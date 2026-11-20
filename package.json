@@ -9,10 +9,12 @@
     "seed:build": "tsx scripts/build-seed.ts",
     "bundle:build": "tsx scripts/compile-bundle.ts",
     "off:import": "tsx scripts/import-off-taxonomy/index.ts",
-    "check:sql": "scripts/check-sql.sh"
+    "check:sql": "scripts/check-sql.sh",
+    "deno:shared": "tsx scripts/build-deno-shared.ts"
   },
   "devDependencies": {
     "@types/node": "^22.10.0",
+    "esbuild": "0.25.12",
     "tsx": "^4.19.2",
     "typescript": "^5.7.2",
     "vitest": "^2.1.8"

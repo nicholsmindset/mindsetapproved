@@ -108,6 +108,47 @@ begin
   exception when invalid_parameter_value then null;
   end;
 end $$;
+-- admin: unmatched mapping and stats
+insert into public.scans (verdict, source, matched) values
+  ('not_approved', 'off', '[{"ingredientId": "canola_oil", "tier": "bad"}, {"ingredientId": "salt", "tier": "neutral"}]'),
+  ('caution', 'label', '[{"ingredientId": "added_sugar", "tier": "borderline"}]'),
+  ('not_approved', 'label', '[{"ingredientId": "canola_oil", "tier": "bad"}]');
+select public.map_unmatched('zzqx powder', 'salt');
+select public.map_unmatched('E471', 'lecithin');
+do $$
+declare s jsonb := public.admin_stats(30);
+begin
+  assert (select status from public.unmatched_terms where term_norm = 'zzqx powder') = 'added', 'map_unmatched status';
+  assert (select ingredient_id from public.aliases where alias_norm = 'zzqx powder') = 'salt', 'map_unmatched alias';
+  assert (select kind from public.aliases where alias_norm = 'e471') = 'e_number', 'map_unmatched code';
+  begin
+    perform public.map_unmatched('canola oil', 'salt');
+    raise exception 'remapped an existing alias';
+  exception when unique_violation then null;
+  end;
+  perform public.map_unmatched('canola oil', 'canola_oil'); -- same ingredient: no-op
+  assert (s ->> 'scans_total')::int >= 3, 'stats total';
+  assert (s -> 'top_flagged' -> 0 ->> 'ingredient_id') = 'canola_oil', 'stats top flagged';
+  assert (s -> 'top_flagged' -> 0 ->> 'count')::int = 2, 'stats top flagged count';
+  assert (s -> 'source_mix' ->> 'label')::int = 2, 'stats source mix';
+  assert (s ->> 'latest_version')::int = 2, 'stats latest version';
+end $$;
+reset role;
+
+set role authenticated;
+set request.jwt.claims = '{"sub": "00000000-0000-0000-0000-000000000001", "role": "authenticated"}';
+do $$ begin
+  begin
+    perform public.admin_stats(30);
+    raise exception 'non-admin read stats';
+  exception when insufficient_privilege then null;
+  end;
+  begin
+    perform public.map_unmatched('x', 'salt');
+    raise exception 'non-admin mapped a term';
+  exception when insufficient_privilege then null;
+  end;
+end $$;
 reset role;
 
 set role anon;

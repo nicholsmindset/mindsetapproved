@@ -1,0 +1,15 @@
+.nav { display: flex; flex-direction: column; gap: 2px; }
+.link {
+  padding: 7px 12px;
+  border-radius: 8px;
+  text-decoration: none;
+  color: var(--muted);
+  font-size: 0.92rem;
+}
+.link:hover { background: var(--surface-2); color: var(--text); }
+.link[aria-current='page'] { background: var(--surface-2); color: var(--text); font-weight: 600; }
+
+@media (max-width: 760px) {
+  .nav { flex-direction: row; overflow-x: auto; min-width: 0; gap: 4px; padding-bottom: 2px; }
+  .link { white-space: nowrap; }
+}
