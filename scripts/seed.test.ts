@@ -2,7 +2,7 @@ import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { buildSeedSql } from './build-seed.ts';
-import { buildBundle } from './compile-bundle.ts';
+import { buildBundle, MOBILE_STARTER, starterBundle } from './compile-bundle.ts';
 import { readStarter, ROOT } from './lib.ts';
 
 describe('generated files', () => {
@@ -11,6 +11,9 @@ describe('generated files', () => {
   });
   it('escapes quotes in SQL literals', () => {
     expect(buildSeedSql(readStarter())).toContain(`'"Vegetable oil" doesn''t say which oil is used`);
+  });
+  it('apps/mobile starter bundle is up to date (run pnpm bundle:build)', () => {
+    expect(readFileSync(MOBILE_STARTER, 'utf8')).toBe(`${JSON.stringify(starterBundle())}\n`);
   });
   it('builds a bundle from an export_rules() payload', () => {
     const b = buildBundle({});

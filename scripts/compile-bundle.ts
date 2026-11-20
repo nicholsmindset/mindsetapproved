@@ -11,6 +11,14 @@ import { gzipSync } from 'node:zlib';
 import { compileBundle, rowsFromSource, type CompileInput, type RulesBundle } from '../packages/rules-engine/src/index.ts';
 import { arg, readStarter, ROOT } from './lib.ts';
 
+/** The bundle shipped inside the mobile app, so the first scan works offline. Deterministic for the freshness test. */
+export const MOBILE_STARTER = resolve(ROOT, 'apps/mobile/src/data/starter-bundle.json');
+
+export function starterBundle(): RulesBundle {
+  const src = readStarter();
+  return compileBundle({ ...rowsFromSource(src), version: src.version, generatedAt: 'shipped-with-app' });
+}
+
 export function buildBundle(opts: { fromExport?: string; version?: number }): RulesBundle {
   if (opts.fromExport) {
     const exp = JSON.parse(readFileSync(opts.fromExport, 'utf8')) as Omit<CompileInput, 'version'>;
@@ -31,6 +39,10 @@ if (import.meta.url === `file://${process.argv[1]}`) {
   const base = resolve(outDir, `rules-bundle.v${bundle.version}`);
   writeFileSync(`${base}.json`, json);
   writeFileSync(`${base}.json.gz`, gz);
+  if (!arg('from-export')) {
+    writeFileSync(MOBILE_STARTER, `${JSON.stringify(starterBundle())}\n`);
+    console.log(`Wrote ${MOBILE_STARTER}`);
+  }
   console.log(
     `Rules bundle v${bundle.version}: ${bundle.ingredients.length} ingredients, ` +
       `${Object.keys(bundle.aliases).length} aliases, ${Object.keys(bundle.eNumbers).length} E-numbers; ` +

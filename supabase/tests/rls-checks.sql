@@ -156,5 +156,29 @@ set request.jwt.claims = '{}';
 do $$ begin
   assert (select version from public.latest_rule_version()) = 2, 'anon reads latest version';
 end $$;
+
+-- mobile: AI limits and delete by install id
+insert into public.scans (id, install_id, verdict) values
+  ('10000000-0000-0000-0000-000000000001', '20000000-0000-0000-0000-000000000001', 'caution'),
+  ('10000000-0000-0000-0000-000000000002', '20000000-0000-0000-0000-000000000002', 'approved');
+insert into public.reports (scan_id, reason) values ('10000000-0000-0000-0000-000000000001', 'wrong');
+do $$ begin
+  assert public.use_ai_recheck('20000000-0000-0000-0000-000000000001', 3) = 2, 'first AI use leaves 2';
+  assert public.use_ai_recheck('20000000-0000-0000-0000-000000000001', 3) = 1, 'second leaves 1';
+  assert public.use_ai_recheck('20000000-0000-0000-0000-000000000001', 3) = 0, 'third leaves 0';
+  assert public.use_ai_recheck('20000000-0000-0000-0000-000000000001', 3) = -1, 'fourth refused';
+  assert public.use_ai_recheck('20000000-0000-0000-0000-000000000002', 3) = 2, 'limits are per install';
+  assert (select count(*) from public.ai_usage) = 0, 'anon cannot read ai_usage';
+  assert public.delete_install_data('20000000-0000-0000-0000-000000000001') = 1, 'deleted one scan';
+end $$;
+reset role;
+do $$ begin
+  assert not exists (select 1 from public.scans where id = '10000000-0000-0000-0000-000000000001'), 'scan deleted';
+  assert not exists (select 1 from public.reports r where r.scan_id = '10000000-0000-0000-0000-000000000001'), 'report cascaded';
+  assert exists (select 1 from public.scans where id = '10000000-0000-0000-0000-000000000002'), 'other install kept';
+  assert (select count from public.ai_usage where subject = 'install:20000000-0000-0000-0000-000000000001') is null, 'usage deleted';
+  assert (select count from public.ai_usage where subject = 'install:20000000-0000-0000-0000-000000000002') = 1, 'other usage kept';
+end $$;
+set role anon;
 reset role;
 \echo 'All SQL checks passed'
