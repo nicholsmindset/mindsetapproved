@@ -1,0 +1,321 @@
+{
+  "version": 1,
+  "notes": "Mindset Approved starter rules. These are Mindset's stated ingredient preferences, not safety findings. Source of truth for supabase/seed.sql (pnpm seed:build) and the starter rules bundle (pnpm bundle:build). Do not hand-edit seed.sql.",
+  "categories": [
+    { "id": "seed_oil", "label": "Seed oils", "toggleable": true },
+    { "id": "trans_fat", "label": "Hydrogenated oils", "toggleable": true },
+    { "id": "fat", "label": "Other fats", "toggleable": true },
+    { "id": "good_fat", "label": "Preferred fats", "toggleable": false },
+    { "id": "dye", "label": "Dyes and colours", "toggleable": true },
+    { "id": "sugar", "label": "Added sugar", "toggleable": true },
+    { "id": "sweetener", "label": "Artificial sweeteners", "toggleable": true },
+    { "id": "flavor", "label": "Flavourings", "toggleable": true },
+    { "id": "flavor_enhancer", "label": "Flavour enhancers", "toggleable": true },
+    { "id": "preservative", "label": "Preservatives", "toggleable": true },
+    { "id": "emulsifier", "label": "Emulsifiers", "toggleable": true },
+    { "id": "thickener", "label": "Gums and thickeners", "toggleable": true },
+    { "id": "animal_derived", "label": "Animal-derived", "toggleable": true },
+    { "id": "basic", "label": "Everyday ingredients", "toggleable": false }
+  ],
+  "ingredients": [
+    {
+      "id": "canola_oil", "display_name": "Canola / rapeseed oil", "short_name": "canola oil",
+      "category": "seed_oil", "tier": "bad", "strict_tier": "bad",
+      "reason_short": "Canola oil is an industrial seed oil. Mindset rules avoid seed oils; this is a Mindset preference, not a safety finding.",
+      "aliases": ["canola oil", "rapeseed oil", "colza oil", "canola", "low erucic acid rapeseed oil"],
+      "sources": { "regulator": [], "preference": ["Mindset seed-oil preference"] }
+    },
+    {
+      "id": "soybean_oil", "display_name": "Soybean oil", "short_name": "soybean oil",
+      "category": "seed_oil", "tier": "bad", "strict_tier": "bad",
+      "reason_short": "Soybean oil is an industrial seed oil. Mindset rules avoid seed oils; this is a Mindset preference, not a safety finding.",
+      "aliases": ["soybean oil", "soya oil", "soy oil", "soya bean oil", "soyabean oil", "soy bean oil"],
+      "sources": { "regulator": [], "preference": ["Mindset seed-oil preference"] }
+    },
+    {
+      "id": "corn_oil", "display_name": "Corn oil", "short_name": "corn oil",
+      "category": "seed_oil", "tier": "bad", "strict_tier": "bad",
+      "reason_short": "Corn oil is an industrial seed oil. Mindset rules avoid seed oils; this is a Mindset preference, not a safety finding.",
+      "aliases": ["corn oil", "maize oil"],
+      "sources": { "regulator": [], "preference": ["Mindset seed-oil preference"] }
+    },
+    {
+      "id": "cottonseed_oil", "display_name": "Cottonseed oil", "short_name": "cottonseed oil",
+      "category": "seed_oil", "tier": "bad", "strict_tier": "bad",
+      "reason_short": "Cottonseed oil is an industrial seed oil. Mindset rules avoid seed oils; this is a Mindset preference, not a safety finding.",
+      "aliases": ["cottonseed oil", "cotton seed oil"],
+      "sources": { "regulator": [], "preference": ["Mindset seed-oil preference"] }
+    },
+    {
+      "id": "sunflower_oil", "display_name": "Sunflower / safflower oil", "short_name": "sunflower oil",
+      "category": "seed_oil", "tier": "bad", "strict_tier": "bad",
+      "reason_short": "Sunflower and safflower oils are industrial seed oils. Mindset rules avoid seed oils; this is a Mindset preference, not a safety finding.",
+      "aliases": ["sunflower oil", "safflower oil", "sunflower seed oil", "safflower seed oil"],
+      "sources": { "regulator": [], "preference": ["Mindset seed-oil preference"] }
+    },
+    {
+      "id": "high_oleic_oil", "display_name": "High-oleic sunflower / safflower oil", "short_name": "high-oleic sunflower oil",
+      "category": "seed_oil", "tier": "borderline", "strict_tier": "bad",
+      "reason_short": "High-oleic oils are bred to contain mostly monounsaturated fat. Mindset rules treat them as borderline, and you can allow them in Rules.",
+      "aliases": ["high oleic sunflower oil", "high oleic safflower oil", "high oleic sunflower seed oil"],
+      "sources": { "regulator": [], "preference": ["Mindset seed-oil preference"] }
+    },
+    {
+      "id": "grapeseed_oil", "display_name": "Grapeseed / rice bran oil", "short_name": "grapeseed oil",
+      "category": "seed_oil", "tier": "bad", "strict_tier": "bad",
+      "reason_short": "Grapeseed and rice bran oils are industrial seed oils. Mindset rules avoid seed oils; this is a Mindset preference, not a safety finding.",
+      "aliases": ["grapeseed oil", "grape seed oil", "rice bran oil", "ricebran oil"],
+      "sources": { "regulator": [], "preference": ["Mindset seed-oil preference"] }
+    },
+    {
+      "id": "vegetable_oil", "display_name": "Vegetable oil (unspecified)", "short_name": "vegetable oil",
+      "category": "seed_oil", "tier": "borderline", "strict_tier": "bad",
+      "reason_short": "\"Vegetable oil\" doesn't say which oil is used, and it is often a seed oil. Mindset rules treat it as borderline.",
+      "aliases": ["vegetable oil", "vegetable fat", "vegetable shortening", "vegetable oil blend", "refined vegetable oil", "edible vegetable oil", "edible oil", "plant oil", "vegetable oil and fat"],
+      "sources": { "regulator": [], "preference": ["Mindset seed-oil preference"] }
+    },
+    {
+      "id": "partially_hydrogenated_oil", "display_name": "Partially hydrogenated oil", "short_name": "partially hydrogenated oil",
+      "category": "trans_fat", "tier": "bad", "strict_tier": "bad",
+      "reason_short": "Partially hydrogenated oils are the main source of artificial trans fat. The US FDA no longer recognises them as safe for use in food.",
+      "aliases": ["partially hydrogenated oil", "partially hydrogenated vegetable oil", "partially hydrogenated", "hydrogenated vegetable oil", "hydrogenated vegetable fat", "hydrogenated oil", "hydrogenated", "shortening"],
+      "sources": { "regulator": ["US FDA final determination on partially hydrogenated oils (2015)"], "preference": [] }
+    },
+    {
+      "id": "palm_oil", "display_name": "Palm oil", "short_name": "palm oil",
+      "category": "fat", "tier": "borderline", "strict_tier": "borderline",
+      "reason_short": "Palm oil is a refined tropical fat. Mindset rules treat it as borderline.",
+      "aliases": ["palm oil", "palm kernel oil", "palmolein", "palm olein", "palm fat", "palm kernel fat", "palm stearin", "refined palm oil"],
+      "sources": { "regulator": [], "preference": ["Mindset fat preference"] }
+    },
+    {
+      "id": "avocado_oil", "display_name": "Avocado oil", "short_name": "avocado oil",
+      "category": "good_fat", "tier": "good", "strict_tier": "good",
+      "reason_short": "Avocado oil is pressed from the fruit. Mindset rules highlight it as a preferred fat.",
+      "aliases": ["avocado oil"],
+      "sources": { "regulator": [], "preference": ["Mindset fat preference"] }
+    },
+    {
+      "id": "olive_oil", "display_name": "Olive oil", "short_name": "olive oil",
+      "category": "good_fat", "tier": "good", "strict_tier": "good",
+      "reason_short": "Olive oil is pressed from the fruit. Mindset rules highlight it as a preferred fat.",
+      "aliases": ["extra virgin olive oil", "olive oil", "virgin olive oil"],
+      "sources": { "regulator": [], "preference": ["Mindset fat preference"] }
+    },
+    {
+      "id": "coconut_oil", "display_name": "Coconut oil", "short_name": "coconut oil",
+      "category": "good_fat", "tier": "good", "strict_tier": "good",
+      "reason_short": "Coconut oil is pressed from the fruit. Mindset rules highlight it as a preferred fat.",
+      "aliases": ["coconut oil", "virgin coconut oil", "extra virgin coconut oil"],
+      "sources": { "regulator": [], "preference": ["Mindset fat preference"] }
+    },
+    {
+      "id": "butter_ghee_tallow", "display_name": "Butter / ghee / tallow", "short_name": "butter",
+      "category": "good_fat", "tier": "good", "strict_tier": "good",
+      "reason_short": "Butter, ghee and tallow are traditional animal fats. Mindset rules highlight them as preferred fats.",
+      "aliases": ["butter", "ghee", "beef tallow", "tallow", "clarified butter", "unsalted butter", "salted butter", "anhydrous milk fat", "butterfat", "butter oil"],
+      "sources": { "regulator": [], "preference": ["Mindset fat preference"] }
+    },
+    {
+      "id": "red_40", "display_name": "Red 40", "short_name": "Red 40",
+      "category": "dye", "tier": "bad", "strict_tier": "bad",
+      "reason_short": "Red 40 is a synthetic dye. The EU requires a warning label on foods that contain it.",
+      "e_numbers": ["E129"],
+      "aliases": ["allura red ac", "allura red", "fd&c red no. 40", "fd&c red 40", "red 40", "red no. 40", "red 40 lake", "ci 16035"],
+      "sources": { "regulator": ["EU Regulation (EC) No 1333/2008, Annex V (warning label)"], "preference": [] }
+    },
+    {
+      "id": "yellow_5", "display_name": "Yellow 5 (tartrazine)", "short_name": "Yellow 5",
+      "category": "dye", "tier": "bad", "strict_tier": "bad",
+      "reason_short": "Tartrazine (Yellow 5) is a synthetic dye. The EU requires a warning label on foods that contain it.",
+      "e_numbers": ["E102"],
+      "aliases": ["tartrazine", "fd&c yellow no. 5", "fd&c yellow 5", "yellow 5", "yellow no. 5", "yellow 5 lake", "ci 19140"],
+      "sources": { "regulator": ["EU Regulation (EC) No 1333/2008, Annex V (warning label)"], "preference": [] }
+    },
+    {
+      "id": "yellow_6", "display_name": "Yellow 6 (sunset yellow)", "short_name": "Yellow 6",
+      "category": "dye", "tier": "bad", "strict_tier": "bad",
+      "reason_short": "Sunset yellow (Yellow 6) is a synthetic dye. The EU requires a warning label on foods that contain it.",
+      "e_numbers": ["E110"],
+      "aliases": ["sunset yellow fcf", "sunset yellow", "fd&c yellow no. 6", "fd&c yellow 6", "yellow 6", "yellow no. 6", "yellow 6 lake", "ci 15985"],
+      "sources": { "regulator": ["EU Regulation (EC) No 1333/2008, Annex V (warning label)"], "preference": [] }
+    },
+    {
+      "id": "blue_1_2", "display_name": "Blue 1 / Blue 2", "short_name": "Blue 1",
+      "category": "dye", "tier": "bad", "strict_tier": "bad",
+      "reason_short": "Brilliant blue (Blue 1) and indigo carmine (Blue 2) are synthetic dyes. Mindset rules avoid synthetic dyes.",
+      "e_numbers": ["E133", "E132"],
+      "aliases": ["brilliant blue fcf", "brilliant blue", "fd&c blue no. 1", "fd&c blue 1", "blue 1", "blue no. 1", "blue 1 lake", "ci 42090", "indigo carmine", "indigotine", "fd&c blue no. 2", "fd&c blue 2", "blue 2", "blue no. 2", "blue 2 lake", "ci 73015"],
+      "sources": { "regulator": [], "preference": ["Mindset synthetic-dye preference"] }
+    },
+    {
+      "id": "red_3", "display_name": "Red 3 (erythrosine)", "short_name": "Red 3",
+      "category": "dye", "tier": "bad", "strict_tier": "bad",
+      "reason_short": "Erythrosine (Red 3) is a synthetic dye. In January 2025 the US FDA revoked its authorisation for use in food, effective 2027.",
+      "e_numbers": ["E127"],
+      "aliases": ["erythrosine", "erythrosin", "fd&c red no. 3", "fd&c red 3", "red 3", "red no. 3", "ci 45430"],
+      "sources": { "regulator": ["US FDA order revoking authorisation of FD&C Red No. 3 in food (January 2025)"], "preference": [] }
+    },
+    {
+      "id": "titanium_dioxide", "display_name": "Titanium dioxide", "short_name": "titanium dioxide",
+      "category": "dye", "tier": "bad", "strict_tier": "bad",
+      "reason_short": "Titanium dioxide is a white colouring. The EU stopped authorising it as a food additive in 2022.",
+      "e_numbers": ["E171"],
+      "aliases": ["titanium dioxide", "ci 77891"],
+      "sources": { "regulator": ["Commission Regulation (EU) 2022/63"], "preference": [] }
+    },
+    {
+      "id": "caramel_color", "display_name": "Caramel colour", "short_name": "caramel colour",
+      "category": "dye", "tier": "borderline", "strict_tier": "bad",
+      "reason_short": "Caramel colour is a processed colouring, often made with ammonia or sulphites (E150c, E150d). Mindset rules treat it as borderline.",
+      "e_numbers": ["E150c", "E150d"],
+      "aliases": ["caramel color", "caramel colour", "caramel coloring", "caramel colouring", "ammonia caramel", "sulphite ammonia caramel", "sulfite ammonia caramel"],
+      "sources": { "regulator": [], "preference": ["Mindset dye preference"] }
+    },
+    {
+      "id": "hfcs", "display_name": "High-fructose corn syrup", "short_name": "high-fructose corn syrup",
+      "category": "sugar", "tier": "bad", "strict_tier": "bad",
+      "reason_short": "High-fructose corn syrup is a refined sweetener made from corn starch. Mindset rules avoid it.",
+      "aliases": ["high fructose corn syrup", "high-fructose corn syrup", "hfcs", "glucose-fructose syrup", "fructose-glucose syrup", "isoglucose", "high fructose maize syrup"],
+      "sources": { "regulator": [], "preference": ["Mindset sugar preference"] }
+    },
+    {
+      "id": "added_sugar", "display_name": "Added sugar", "short_name": "added sugar",
+      "category": "sugar", "tier": "borderline", "strict_tier": "bad",
+      "reason_short": "This is an added sugar. Mindset rules treat added sugars as borderline, and strict mode treats them as not approved.",
+      "aliases": ["sugar", "cane sugar", "dextrose", "glucose syrup", "corn syrup", "maltodextrin", "brown sugar", "raw sugar", "icing sugar", "powdered sugar", "invert sugar", "invert sugar syrup", "glucose", "fructose", "sucrose", "maltose", "corn syrup solids", "glucose syrup solids", "dried glucose syrup", "evaporated cane juice", "cane juice", "cane syrup", "rice syrup", "brown rice syrup", "rice malt syrup", "malt syrup", "tapioca syrup", "golden syrup", "molasses", "coconut sugar", "palm sugar", "gula melaka", "rock sugar", "demerara sugar", "muscovado sugar", "agave syrup", "agave nectar", "caramel", "sugar syrup"],
+      "sources": { "regulator": [], "preference": ["Mindset sugar preference"] }
+    },
+    {
+      "id": "aspartame", "display_name": "Aspartame", "short_name": "aspartame",
+      "category": "sweetener", "tier": "bad", "strict_tier": "bad",
+      "reason_short": "Aspartame is an artificial sweetener. Mindset rules avoid artificial sweeteners.",
+      "e_numbers": ["E951"],
+      "aliases": ["aspartame"],
+      "sources": { "regulator": [], "preference": ["Mindset sweetener preference"] }
+    },
+    {
+      "id": "sucralose", "display_name": "Sucralose", "short_name": "sucralose",
+      "category": "sweetener", "tier": "bad", "strict_tier": "bad",
+      "reason_short": "Sucralose is an artificial sweetener. Mindset rules avoid artificial sweeteners.",
+      "e_numbers": ["E955"],
+      "aliases": ["sucralose"],
+      "sources": { "regulator": [], "preference": ["Mindset sweetener preference"] }
+    },
+    {
+      "id": "acesulfame_k", "display_name": "Acesulfame K", "short_name": "acesulfame K",
+      "category": "sweetener", "tier": "bad", "strict_tier": "bad",
+      "reason_short": "Acesulfame K is an artificial sweetener. Mindset rules avoid artificial sweeteners.",
+      "e_numbers": ["E950"],
+      "aliases": ["acesulfame k", "acesulfame potassium", "acesulfame-k", "ace-k", "acesulfame"],
+      "sources": { "regulator": [], "preference": ["Mindset sweetener preference"] }
+    },
+    {
+      "id": "saccharin", "display_name": "Saccharin", "short_name": "saccharin",
+      "category": "sweetener", "tier": "bad", "strict_tier": "bad",
+      "reason_short": "Saccharin is an artificial sweetener. Mindset rules avoid artificial sweeteners.",
+      "e_numbers": ["E954"],
+      "aliases": ["saccharin", "sodium saccharin"],
+      "sources": { "regulator": [], "preference": ["Mindset sweetener preference"] }
+    },
+    {
+      "id": "artificial_flavors", "display_name": "Artificial flavours", "short_name": "artificial flavours",
+      "category": "flavor", "tier": "bad", "strict_tier": "bad",
+      "reason_short": "Artificial flavours are made synthetically. Mindset rules avoid them.",
+      "aliases": ["artificial flavor", "artificial flavour", "artificial flavoring", "artificial flavouring", "nature identical flavouring", "nature identical flavoring", "nature identical flavour", "artificial vanilla flavor", "artificial vanilla flavour"],
+      "sources": { "regulator": [], "preference": ["Mindset flavouring preference"] }
+    },
+    {
+      "id": "natural_flavors", "display_name": "Natural flavours", "short_name": "natural flavours",
+      "category": "flavor", "tier": "borderline", "strict_tier": "bad",
+      "reason_short": "\"Natural flavours\" can cover many substances, and the label doesn't say which. Mindset rules treat them as borderline.",
+      "aliases": ["natural flavor", "natural flavour", "natural flavoring", "natural flavouring", "flavor", "flavour", "flavoring", "flavouring", "natural flavors and spices"],
+      "sources": { "regulator": [], "preference": ["Mindset flavouring preference"] }
+    },
+    {
+      "id": "bha_bht_tbhq", "display_name": "BHA / BHT / TBHQ", "short_name": "BHT",
+      "category": "preservative", "tier": "bad", "strict_tier": "bad",
+      "reason_short": "BHA, BHT and TBHQ are synthetic antioxidant preservatives. Mindset rules avoid them.",
+      "e_numbers": ["E320", "E321", "E319"],
+      "aliases": ["bha", "bht", "tbhq", "butylated hydroxyanisole", "butylated hydroxytoluene", "tert-butylhydroquinone", "tertiary butylhydroquinone", "tert butyl hydroquinone"],
+      "sources": { "regulator": [], "preference": ["Mindset preservative preference"] }
+    },
+    {
+      "id": "nitrites_nitrates", "display_name": "Sodium nitrite / nitrate", "short_name": "sodium nitrite",
+      "category": "preservative", "tier": "bad", "strict_tier": "bad",
+      "reason_short": "Nitrites and nitrates are curing salts used in processed meats. Mindset rules avoid them.",
+      "e_numbers": ["E249", "E250", "E251", "E252"],
+      "aliases": ["sodium nitrite", "sodium nitrate", "potassium nitrite", "potassium nitrate"],
+      "sources": { "regulator": [], "preference": ["Mindset preservative preference"] }
+    },
+    {
+      "id": "sodium_benzoate", "display_name": "Sodium benzoate", "short_name": "sodium benzoate",
+      "category": "preservative", "tier": "borderline", "strict_tier": "bad",
+      "reason_short": "Sodium benzoate is a synthetic preservative. Mindset rules treat it as borderline.",
+      "e_numbers": ["E211", "E212", "E210"],
+      "aliases": ["sodium benzoate", "potassium benzoate", "benzoic acid"],
+      "sources": { "regulator": [], "preference": ["Mindset preservative preference"] }
+    },
+    {
+      "id": "msg", "display_name": "MSG", "short_name": "MSG",
+      "category": "flavor_enhancer", "tier": "borderline", "strict_tier": "bad",
+      "reason_short": "MSG (monosodium glutamate) is a flavour enhancer. Mindset rules treat it as borderline.",
+      "e_numbers": ["E621"],
+      "aliases": ["monosodium glutamate", "msg", "monosodium l-glutamate"],
+      "sources": { "regulator": [], "preference": ["Mindset flavour-enhancer preference"] }
+    },
+    {
+      "id": "carrageenan", "display_name": "Carrageenan", "short_name": "carrageenan",
+      "category": "emulsifier", "tier": "borderline", "strict_tier": "bad",
+      "reason_short": "Carrageenan is a seaweed-derived thickener. Mindset rules treat it as borderline.",
+      "e_numbers": ["E407", "E407a"],
+      "aliases": ["carrageenan", "processed eucheuma seaweed"],
+      "sources": { "regulator": [], "preference": ["Mindset emulsifier preference"] }
+    },
+    {
+      "id": "polysorbate_80", "display_name": "Polysorbate 80", "short_name": "polysorbate 80",
+      "category": "emulsifier", "tier": "borderline", "strict_tier": "bad",
+      "reason_short": "Polysorbate 80 is a synthetic emulsifier. Mindset rules treat it as borderline.",
+      "e_numbers": ["E433"],
+      "aliases": ["polysorbate 80"],
+      "sources": { "regulator": [], "preference": ["Mindset emulsifier preference"] }
+    },
+    {
+      "id": "gelatin", "display_name": "Gelatin", "short_name": "gelatin",
+      "category": "animal_derived", "tier": "borderline", "strict_tier": "borderline",
+      "reason_short": "Gelatin is made from animal collagen. Turn on \"No gelatin\" in Rules to treat it as not approved.",
+      "e_numbers": ["E441"],
+      "aliases": ["gelatin", "gelatine", "bovine gelatin", "bovine gelatine", "pork gelatin", "pork gelatine", "beef gelatin", "fish gelatin"],
+      "sources": { "regulator": [], "preference": ["Shown for personal choice"] }
+    },
+    {
+      "id": "gums", "display_name": "Gums", "short_name": "gums",
+      "category": "thickener", "tier": "neutral", "strict_tier": "borderline",
+      "reason_short": "Gums are thickeners, mostly from plants or fermentation. They're fine under standard rules; strict mode treats them as borderline.",
+      "e_numbers": ["E415", "E412", "E418", "E414", "E410"],
+      "aliases": ["xanthan gum", "guar gum", "gellan gum", "gum arabic", "acacia gum", "locust bean gum", "carob bean gum"],
+      "sources": { "regulator": [], "preference": ["Mindset thickener preference"] }
+    },
+
+    { "id": "water", "display_name": "Water", "short_name": "water", "category": "basic", "tier": "neutral", "strict_tier": "neutral", "aliases": ["water", "filtered water", "purified water", "carbonated water", "drinking water"] },
+    { "id": "salt", "display_name": "Salt", "short_name": "salt", "category": "basic", "tier": "neutral", "strict_tier": "neutral", "aliases": ["salt", "sea salt", "iodized salt", "iodised salt", "himalayan salt", "rock salt"] },
+    { "id": "flour", "display_name": "Flour", "short_name": "flour", "category": "basic", "tier": "neutral", "strict_tier": "neutral", "aliases": ["flour", "wheat flour", "whole wheat flour", "wholemeal flour", "enriched flour", "enriched wheat flour", "unbleached flour", "rice flour", "oat flour", "almond flour", "wheat", "whole grain wheat", "semolina", "durum wheat semolina"] },
+    { "id": "flour_enrichment", "display_name": "Added vitamins and minerals", "short_name": "vitamins", "category": "basic", "tier": "neutral", "strict_tier": "neutral", "aliases": ["niacin", "reduced iron", "iron", "thiamine mononitrate", "thiamin mononitrate", "riboflavin", "folic acid", "vitamin c", "vitamin d", "vitamin d3", "vitamin a", "vitamin b12", "calcium carbonate", "zinc oxide"] },
+    { "id": "eggs", "display_name": "Eggs", "short_name": "eggs", "category": "basic", "tier": "neutral", "strict_tier": "neutral", "aliases": ["eggs", "egg", "whole eggs", "egg yolk", "egg white", "egg whites", "whole egg powder"] },
+    { "id": "dairy", "display_name": "Milk and dairy", "short_name": "milk", "category": "basic", "tier": "neutral", "strict_tier": "neutral", "aliases": ["milk", "whole milk", "skim milk", "skimmed milk", "milk powder", "whole milk powder", "skimmed milk powder", "skim milk powder", "cream", "whey", "whey powder", "cheese", "cheddar cheese", "parmesan cheese", "buttermilk", "yogurt", "yoghurt", "milk solids", "milk protein", "lactose", "cultures", "enzymes", "bacterial cultures", "rennet"] },
+    { "id": "grains", "display_name": "Grains", "short_name": "grains", "category": "basic", "tier": "neutral", "strict_tier": "neutral", "aliases": ["oats", "oat", "oat flakes", "whole grain oats", "rolled oats", "rice", "brown rice", "white rice", "corn", "whole grain corn", "ground corn", "corn masa flour", "barley", "quinoa", "buckwheat", "rye"] },
+    { "id": "starches", "display_name": "Starches", "short_name": "starch", "category": "basic", "tier": "neutral", "strict_tier": "neutral", "aliases": ["corn starch", "cornstarch", "tapioca starch", "potato starch", "rice starch", "wheat starch", "starch", "tapioca", "arrowroot"] },
+    { "id": "vegetables", "display_name": "Vegetables", "short_name": "vegetables", "category": "basic", "tier": "neutral", "strict_tier": "neutral", "aliases": ["potatoes", "potato", "tomatoes", "tomato", "tomato paste", "tomato puree", "onion", "onions", "onion powder", "garlic", "garlic powder", "carrots", "celery", "spinach", "cabbage", "mushrooms", "peas", "chickpeas", "lentils", "beans", "black beans", "kidney beans", "beet juice", "beetroot", "chilli", "chili", "chilli pepper", "red pepper", "bell pepper", "ginger", "shallots", "lemongrass", "seaweed", "nori"] },
+    { "id": "fruit", "display_name": "Fruit", "short_name": "fruit", "category": "basic", "tier": "neutral", "strict_tier": "neutral", "aliases": ["apples", "apple", "bananas", "banana", "strawberries", "blueberries", "raisins", "dates", "lemon juice", "lime juice", "orange juice", "apple juice", "mango", "coconut", "desiccated coconut", "coconut milk", "coconut cream", "dried cranberries", "fruit puree"] },
+    { "id": "nuts_seeds", "display_name": "Nuts and seeds", "short_name": "nuts", "category": "basic", "tier": "neutral", "strict_tier": "neutral", "aliases": ["peanuts", "almonds", "cashews", "hazelnuts", "walnuts", "pecans", "pistachios", "macadamia nuts", "sesame seeds", "sesame", "sunflower seeds", "pumpkin seeds", "chia seeds", "flaxseed", "flax seeds", "peanut butter", "almond butter", "nut butter", "tahini"] },
+    { "id": "cocoa", "display_name": "Cocoa", "short_name": "cocoa", "category": "basic", "tier": "neutral", "strict_tier": "neutral", "aliases": ["cocoa", "cocoa powder", "cocoa butter", "cocoa mass", "cocoa liquor", "chocolate liquor", "cocoa solids", "cacao", "cacao butter", "unsweetened chocolate", "cocoa processed with alkali"] },
+    { "id": "meat_fish", "display_name": "Meat and fish", "short_name": "meat", "category": "basic", "tier": "neutral", "strict_tier": "neutral", "aliases": ["chicken", "beef", "pork", "lamb", "turkey", "fish", "salmon", "tuna", "anchovies", "shrimp", "prawns", "chicken breast", "mechanically separated chicken"] },
+    { "id": "soy_foods", "display_name": "Soy foods", "short_name": "soy", "category": "basic", "tier": "neutral", "strict_tier": "neutral", "aliases": ["soybeans", "soy sauce", "soya sauce", "light soy sauce", "dark soy sauce", "tofu", "miso", "soy protein isolate", "soy protein", "soy flour", "fermented soybean"] },
+    { "id": "lecithin", "display_name": "Lecithin", "short_name": "lecithin", "category": "basic", "tier": "neutral", "strict_tier": "neutral", "e_numbers": ["E322"], "aliases": ["lecithin", "soy lecithin", "soya lecithin", "sunflower lecithin", "lecithins"] },
+    { "id": "spices_herbs", "display_name": "Spices and herbs", "short_name": "spices", "category": "basic", "tier": "neutral", "strict_tier": "neutral", "aliases": ["spices", "spice", "herbs", "paprika", "turmeric", "black pepper", "white pepper", "pepper", "cinnamon", "cumin", "coriander", "oregano", "basil", "parsley", "rosemary", "thyme", "nutmeg", "cloves", "star anise", "five spice powder", "curry powder", "mustard", "mustard seed", "vanilla", "vanilla extract", "vanilla bean", "vanilla beans", "dill", "chives", "spice extracts", "paprika extract", "rosemary extract", "turmeric extract", "annatto", "annatto extract"] },
+    { "id": "vinegars_acids", "display_name": "Vinegar and natural acids", "short_name": "vinegar", "category": "basic", "tier": "neutral", "strict_tier": "neutral", "e_numbers": ["E330", "E300", "E270", "E306", "E440", "E500", "E296"], "aliases": ["vinegar", "distilled vinegar", "white vinegar", "apple cider vinegar", "rice vinegar", "citric acid", "ascorbic acid", "lactic acid", "malic acid", "tocopherols", "mixed tocopherols", "vitamin e", "pectin", "fruit pectin"] },
+    { "id": "leavening", "display_name": "Yeast and raising agents", "short_name": "yeast", "category": "basic", "tier": "neutral", "strict_tier": "neutral", "aliases": ["yeast", "yeast extract", "baking soda", "sodium bicarbonate", "baking powder", "cream of tartar", "sourdough culture", "leavening"] },
+    { "id": "honey_maple", "display_name": "Honey and maple syrup", "short_name": "honey", "category": "basic", "tier": "neutral", "strict_tier": "neutral", "aliases": ["honey", "raw honey", "maple syrup", "pure maple syrup"] },
+    { "id": "tea_coffee", "display_name": "Tea and coffee", "short_name": "tea", "category": "basic", "tier": "neutral", "strict_tier": "neutral", "aliases": ["tea", "green tea", "black tea", "coffee", "instant coffee", "tea extract", "green tea extract", "matcha"] }
+  ]
+}
