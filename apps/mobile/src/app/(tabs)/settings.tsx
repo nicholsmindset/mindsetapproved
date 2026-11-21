@@ -1,7 +1,9 @@
 import { useState } from 'react';
 import { Alert, Linking, Platform, View } from 'react-native';
 import { useApp } from '@/state/app';
+import { AccountCard } from '@/ui/AccountCard';
 import { CORRECTIONS_EMAIL, DISCLAIMER, OFF_ATTRIBUTION } from '@/ui/copy';
+import { supabase } from '@/platform/supabase';
 import { Button, Card, H2, P, Screen, Title } from '@/ui/kit';
 import { space } from '@/ui/theme';
 
@@ -23,6 +25,13 @@ export default function Settings() {
   return (
     <Screen>
       <Title>Settings</Title>
+
+      {supabase ? (
+        <>
+          <H2>Account</H2>
+          <AccountCard />
+        </>
+      ) : null}
 
       <H2>About the verdicts</H2>
       <Card>
@@ -55,7 +64,7 @@ export default function Settings() {
           icon="trash-outline"
           label="Delete my data"
           onPress={async () => {
-            if (!(await confirm('Delete my data?', 'This removes your history, settings and the scans sent from this phone. It can’t be undone.'))) return;
+            if (!(await confirm('Delete my data?', 'This removes your history, settings, shared links and the scans sent from this phone (and your account’s data if you’re signed in). It can’t be undone.'))) return;
             const r = await app.deleteMyData();
             setMsg(r.ok ? 'Your data was deleted.' : `Could not delete server data: ${r.error}`);
           }}

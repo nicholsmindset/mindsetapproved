@@ -181,4 +181,54 @@ do $$ begin
 end $$;
 set role anon;
 reset role;
+-- shares and accounts
+insert into public.scans (id, install_id, verdict, barcode, matched) values
+  ('30000000-0000-0000-0000-000000000001', '40000000-0000-0000-0000-000000000001', 'not_approved', '9556001234567',
+   '[{"ingredientId": "canola_oil", "tier": "bad"}, {"ingredientId": "salt", "tier": "neutral"}, {"ingredientId": "avocado_oil", "tier": "good"}, {"ingredientId": "made_up", "tier": "bad"}]');
+insert into public.products (barcode, name, ingredients_raw, source, verified) values ('9556001234567', 'Wafers', 'x', 'user', false)
+  on conflict (barcode) do update set name = 'Wafers', verified = false, source = 'user';
+set role anon;
+set request.jwt.claims = '{}';
+do $$
+declare c text; c2 text; v jsonb;
+begin
+  begin
+    perform public.share_verdict('30000000-0000-0000-0000-000000000001', '40000000-0000-0000-0000-000000000009');
+    raise exception 'shared someone else''s scan';
+  exception when no_data_found then null;
+  end;
+  c := public.share_verdict('30000000-0000-0000-0000-000000000001', '40000000-0000-0000-0000-000000000001');
+  c2 := public.share_verdict('30000000-0000-0000-0000-000000000001', '40000000-0000-0000-0000-000000000001');
+  assert c = c2 and length(c) = 8, 'share code stable and 8 chars';
+  v := public.get_shared_verdict(c);
+  assert v ->> 'verdict' = 'not_approved', 'share verdict';
+  assert jsonb_array_length(v -> 'chips') = 2, format('neutral and unknown ids dropped: %s', v -> 'chips');
+  assert v -> 'chips' -> 0 ->> 'name' = 'Canola / rapeseed oil', 'bad first, with name';
+  assert v ->> 'product_name' is null, 'unverified product name hidden';
+  assert (select count(*) from public.shared_verdicts) = 0, 'anon cannot list shares';
+  assert public.get_shared_verdict('nope') is null, 'unknown code';
+end $$;
+reset role;
+update public.products set verified = true where barcode = '9556001234567';
+set role anon;
+do $$ begin
+  assert public.get_shared_verdict((select public.share_verdict('30000000-0000-0000-0000-000000000001', '40000000-0000-0000-0000-000000000001'))) ->> 'product_name' = 'Wafers', 'verified name shown';
+  begin
+    perform public.claim_install('40000000-0000-0000-0000-000000000001');
+    raise exception 'anon claimed scans';
+  exception when insufficient_privilege then null;
+  end;
+end $$;
+reset role;
+set role authenticated;
+set request.jwt.claims = '{"sub": "00000000-0000-0000-0000-000000000001", "role": "authenticated"}';
+do $$ begin
+  assert public.claim_install('40000000-0000-0000-0000-000000000001') = 1, 'claimed one scan';
+  assert (select count(*) from public.scans where id = '30000000-0000-0000-0000-000000000001') = 1, 'user now reads the claimed scan';
+end $$;
+select public.delete_my_data();
+reset role;
+do $$ begin
+  assert not exists (select 1 from public.shared_verdicts where scan_id = '30000000-0000-0000-0000-000000000001'), 'delete-my-data removes shares';
+end $$;
 \echo 'All SQL checks passed'

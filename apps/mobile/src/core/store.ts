@@ -21,6 +21,8 @@ export interface HistoryEntry {
   /** scans.id on the server, for reports. */
   remoteScanId?: string;
   reported?: boolean;
+  /** Code of the public share page (/v/<code>), once shared. */
+  shareCode?: string;
 }
 
 export interface CachedProduct {

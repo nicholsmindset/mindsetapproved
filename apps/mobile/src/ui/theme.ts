@@ -48,6 +48,8 @@ export type Colors = typeof light;
 export function useColors(): Colors {
   return useColorScheme() === 'dark' ? dark : light;
 }
+/** Fixed light palette, e.g. for share images. */
+useColors.light = light;
 
 export function verdictStyle(c: Colors, v: Verdict) {
   switch (v) {

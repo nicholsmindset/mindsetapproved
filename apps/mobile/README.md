@@ -7,6 +7,10 @@ Expo (SDK 58) app for iOS and Android: scan a barcode or a label, and get Approv
 - **Label** (Flow B): photo → ML Kit text recognition on the device → the rules engine. If the barcode wasn't known, the confirmed text is saved to `products`.
 - **Verdicts are decided on the phone** by `@mindset/rules-engine` against a cached rules bundle. The app ships with the starter bundle, so the first scan works offline. On each app open it checks `latest_rule_version()` and downloads newer rules in the background.
 - **Re-check with AI** sends the photo to the `ocr-fallback` Edge Function, which returns text only. The verdict is still computed on the phone. Photos are never stored.
+- **Share:** the result screen renders a verdict card. It can be shared as an image (on a phone) or as a link to `/v/<code>` on the
+  admin site (`EXPO_PUBLIC_SHARE_BASE_URL`).
+- **Optional account:** email a 6-digit code to sign in, with no passwords or deep links. Rules sync through `user_settings`, and this phone's
+  anonymous scans are attached to the account (`claim_install`).
 - History, favourites and settings live on the phone (MMKV). Scans are sent anonymously, tied to a random install id, so "Delete my data" can remove them.
 
 | Path | What |

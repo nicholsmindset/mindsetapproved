@@ -1,16 +1,19 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { analyze } from '@mindset/rules-engine';
 import { Stack, useLocalSearchParams } from 'expo-router';
-import { useMemo, useState } from 'react';
+import { type ComponentRef, useMemo, useRef, useState } from 'react';
 import { ActivityIndicator, Pressable, Text, TextInput, View } from 'react-native';
 import { consume, FREE_LIMITS, remaining } from '@/core/limits';
 import { aiToText } from '@/core/ocr-text';
 import { aiAvailable, aiRecheck } from '@/platform/ai';
 import { prepareForAi } from '@/platform/image';
+import { canShareImage, copyLink, shareCardImage, shareLink } from '@/platform/share';
+import { SHARE_BASE_URL, supabase } from '@/platform/supabase';
 import { photoByEntry, useApp } from '@/state/app';
 import { IngredientChip } from '@/ui/chips';
 import { REPORT_REASONS } from '@/ui/copy';
 import { Button, Card, H2, P, Screen } from '@/ui/kit';
+import { ShareCard } from '@/ui/ShareCard';
 import { radius, space, tierStyle, useColors, verdictStyle } from '@/ui/theme';
 
 function detail(summary: string): string {
@@ -36,6 +39,9 @@ export default function ResultScreen() {
   const [comment, setComment] = useState('');
   const [status, setStatus] = useState<{ text: string; tone: 'ok' | 'error' } | null>(null);
   const [aiBusy, setAiBusy] = useState(false);
+  const [sharing, setSharing] = useState(false);
+  const [shareBusy, setShareBusy] = useState(false);
+  const cardRef = useRef<ComponentRef<typeof View>>(null);
 
   if (!entry || !result) {
     return (
@@ -69,6 +75,34 @@ export default function ResultScreen() {
       setStatus({ text: (e as Error).message, tone: 'error' });
     } finally {
       setAiBusy(false);
+    }
+  }
+
+  async function linkFor(): Promise<string | null> {
+    const r = await app.shareCode(entry!.id);
+    if (!r.code) {
+      setStatus({ text: r.error ?? 'Could not create a link.', tone: 'error' });
+      return null;
+    }
+    return `${SHARE_BASE_URL}/v/${r.code}`;
+  }
+
+  async function onShareLink(copyOnly: boolean) {
+    setShareBusy(true);
+    try {
+      const url = await linkFor();
+      if (!url) return;
+      if (copyOnly) {
+        await copyLink(url);
+        setStatus({ text: 'Link copied.', tone: 'ok' });
+      } else {
+        const how = await shareLink(`${result!.summary} Checked with Mindset Approved:`, url);
+        if (how === 'copied') setStatus({ text: 'Link copied.', tone: 'ok' });
+      }
+    } catch (e) {
+      setStatus({ text: (e as Error).message, tone: 'error' });
+    } finally {
+      setShareBusy(false);
     }
   }
 
@@ -137,8 +171,32 @@ export default function ResultScreen() {
             onPress={() => void runAi()}
           />
         ) : null}
+        <Button icon="share-outline" label="Share" onPress={() => setSharing(!sharing)} />
         {aiBusy ? <ActivityIndicator color={c.accent} /> : null}
       </View>
+
+      {sharing ? (
+        <Card style={{ marginTop: space.md, gap: space.md }}>
+          <ShareCard ref={cardRef} result={result} productName={entry.productName} />
+          <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: space.sm }}>
+            {canShareImage ? (
+              <Button
+                kind="primary"
+                icon="image-outline"
+                label="Share image"
+                onPress={() => void shareCardImage(cardRef).catch((e: Error) => setStatus({ text: e.message, tone: 'error' }))}
+              />
+            ) : null}
+            {SHARE_BASE_URL && supabase && entry.remoteScanId ? (
+              <>
+                <Button kind={canShareImage ? 'secondary' : 'primary'} icon="link-outline" label="Share link" disabled={shareBusy} onPress={() => void onShareLink(false)} />
+                <Button icon="copy-outline" label="Copy link" disabled={shareBusy} onPress={() => void onShareLink(true)} />
+              </>
+            ) : null}
+          </View>
+          <P muted style={{ fontSize: 13 }}>The link shows the verdict and the ingredients behind it, never your history or photos.</P>
+        </Card>
+      ) : null}
 
       {editing ? (
         <Card style={{ marginTop: space.md, gap: space.sm }}>

@@ -3,7 +3,7 @@ import { NextResponse, type NextRequest } from 'next/server';
 
 const URL_ = process.env.NEXT_PUBLIC_SUPABASE_URL ?? '';
 const KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? '';
-const PUBLIC_PATHS = ['/login', '/auth', '/setup'];
+const PUBLIC_PATHS = ['/login', '/auth', '/setup', '/v'];
 
 /** Refreshes the Supabase session and keeps non-admins out of every page but /login. */
 export async function proxy(request: NextRequest) {

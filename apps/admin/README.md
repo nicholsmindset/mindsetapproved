@@ -13,6 +13,10 @@ Next.js 16 admin dashboard for growing and publishing the rules database without
 | Products | Correct the cached barcode → ingredients text, and mark products verified |
 | Stats | Scans, cache and AI-fallback rates, report rate, verdict mix, top flagged ingredients |
 
+**Public pages:** `/v/<code>` is a shared verdict, with a generated social preview image. It is built server-side from the
+sharer's own scan by `share_verdict()`, never from text the phone sends. A product name appears only when an admin has
+verified that product. Shared pages are `noindex`. Every other route is admin-only.
+
 Access needs a Supabase user with `app_metadata.role = "admin"`, which is the same claim as `public.is_admin()`. Everything
 goes through RLS as that user, and no service key is used. With no Supabase env vars, the admin runs in **offline mode**, where only the test bench works,
 against `data/starter-rules.json`.
