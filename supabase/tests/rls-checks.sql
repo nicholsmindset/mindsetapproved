@@ -336,5 +336,19 @@ select public.review_product_submission((select id from public.product_submissio
 reset role;
 do $$ begin
   assert (select verified from public.products where barcode = '9556009999992'), 'accepted submission is verified';
+  assert (select count(*) from public.product_submissions where barcode = '9556009999991' and status = 'pending') = 0, 'corroborated submissions leave the queue';
+end $$;
+-- accepting one submission settles the ones that agree with it and rejects the rest
+insert into public.product_submissions (barcode, submitter, ingredients_raw, text_norm) values
+  ('9556009999993', 'q1', 'Sugar, salt', public.norm_key('Sugar, salt')),
+  ('9556009999993', 'q2', 'sugar,  salt', public.norm_key('sugar,  salt')),
+  ('9556009999993', 'q3', 'canola oil', public.norm_key('canola oil'));
+set role authenticated;
+set request.jwt.claims = '{"sub": "00000000-0000-0000-0000-000000000002", "role": "authenticated", "app_metadata": {"role": "admin"}}';
+select public.review_product_submission((select id from public.product_submissions where submitter = 'q1'), true);
+reset role;
+do $$ begin
+  assert (select status from public.product_submissions where submitter = 'q2') = 'accepted', 'agreeing submission accepted too';
+  assert (select status from public.product_submissions where submitter = 'q3') = 'rejected', 'conflicting submission rejected';
 end $$;
 \echo 'All SQL checks passed'

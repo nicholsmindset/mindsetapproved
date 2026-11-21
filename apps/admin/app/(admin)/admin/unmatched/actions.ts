@@ -27,3 +27,14 @@ export async function setStatus(form: FormData) {
   revalidatePath('/admin/unmatched');
   back('ok', status === 'ignored' ? `Ignored "${term}".` : `Moved "${term}" back to the queue.`);
 }
+
+/** Ignores every ticked term in one go (junk such as "france" or "origin france"). */
+export async function bulkIgnore(form: FormData) {
+  const { supabase } = await requireAdmin();
+  const terms = [...new Set(form.getAll('term').map(String).filter(Boolean))].slice(0, 200);
+  if (terms.length === 0) back('error', 'Tick at least one term to ignore.');
+  const { error } = await supabase.from('unmatched_terms').update({ status: 'ignored' }).in('term_norm', terms).eq('status', 'new');
+  if (error) back('error', error.message);
+  revalidatePath('/admin/unmatched');
+  back('ok', `Ignored ${terms.length} term${terms.length === 1 ? '' : 's'}.`);
+}

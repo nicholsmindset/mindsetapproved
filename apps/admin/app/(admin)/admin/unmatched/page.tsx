@@ -1,7 +1,9 @@
 import Link from 'next/link';
 import { Flash } from '@/components/Flash';
 import { requireAdmin } from '@/lib/auth';
-import { mapTerm, setStatus } from './actions';
+import { loadDraft } from '@/lib/rules';
+import { buildSuggestIndex, suggestMatches, type SuggestIndex } from '@/lib/suggest';
+import { bulkIgnore, mapTerm, setStatus } from './actions';
 
 export const dynamic = 'force-dynamic';
 
@@ -26,6 +28,15 @@ export default async function Unmatched({ searchParams }: { searchParams: Promis
     supabase.from('ingredients').select('id, display_name').order('display_name'),
   ]);
   const terms = (data ?? []) as Term[];
+  let index: SuggestIndex | null = null;
+  if (status === 'new' && terms.length) {
+    try {
+      const draft = await loadDraft(supabase);
+      index = buildSuggestIndex(draft.ingredients, draft.aliases);
+    } catch {
+      index = null; // suggestions are a convenience; the page works without them
+    }
+  }
 
   return (
     <div>
@@ -53,9 +64,16 @@ export default async function Unmatched({ searchParams }: { searchParams: Promis
         <div className="card muted">Nothing here.</div>
       ) : (
         <div className="table-wrap">
+          {status === 'new' ? (
+            <form id="bulk" action={bulkIgnore} className="row" style={{ marginBottom: 8 }}>
+              <button type="submit">Ignore ticked</button>
+              <span className="muted small">Tick junk terms (place names, label noise) and ignore them together.</span>
+            </form>
+          ) : null}
           <table>
             <thead>
               <tr>
+                {status === 'new' ? <th aria-label="Select" /> : null}
                 <th>Term</th>
                 <th>Seen</th>
                 <th>Example label</th>
@@ -65,6 +83,11 @@ export default async function Unmatched({ searchParams }: { searchParams: Promis
             <tbody>
               {terms.map((t) => (
                 <tr key={t.term_norm}>
+                  {status === 'new' ? (
+                    <td>
+                      <input type="checkbox" name="term" value={t.term_norm} form="bulk" aria-label={`Select ${t.term_norm}`} />
+                    </td>
+                  ) : null}
                   <td>
                     <code>{t.term_norm}</code>
                   </td>
@@ -77,6 +100,7 @@ export default async function Unmatched({ searchParams }: { searchParams: Promis
                   <td style={{ minWidth: 280 }}>
                     {t.status === 'new' ? (
                       <div className="stack">
+                        {index ? <Suggestions term={t.term_norm} index={index} /> : null}
                         <form action={mapTerm} className="row">
                           <input type="hidden" name="term" value={t.term_norm} />
                           <div className="grow">
@@ -117,6 +141,25 @@ export default async function Unmatched({ searchParams }: { searchParams: Promis
           </table>
         </div>
       )}
+    </div>
+  );
+}
+
+function Suggestions({ term, index }: { term: string; index: SuggestIndex }) {
+  const list = suggestMatches(term, index);
+  if (list.length === 0) return null;
+  return (
+    <div className="row" aria-label="Suggested matches">
+      <span className="muted small">Suggested:</span>
+      {list.map((s) => (
+        <form key={s.ingredientId} action={mapTerm}>
+          <input type="hidden" name="term" value={term} />
+          <input type="hidden" name="ingredient_id" value={s.ingredientId} />
+          <button type="submit" title={`Closest name: ${s.alias} (${Math.round(s.score * 100)}%)`}>
+            {s.name}
+          </button>
+        </form>
+      ))}
     </div>
   );
 }
