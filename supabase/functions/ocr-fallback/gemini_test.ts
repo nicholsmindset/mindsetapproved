@@ -1,4 +1,4 @@
-import { assertEquals, assertThrows } from 'jsr:@std/assert@1.0.13';
+import { assertEquals, assertThrows } from '@std/assert';
 import { geminiRequest, parseGemini } from './gemini.ts';
 
 const wrap = (text: string) => ({ candidates: [{ content: { parts: [{ text }] } }] });

@@ -7,7 +7,8 @@ import { mergeRemote, REMOTE_SCAN_COLUMNS, type RemoteScan } from '@/core/histor
 import { resolveOnSignIn, toRow, type SettingsRow } from '@/core/settings-sync';
 import { checkForUpdate, initialRules, type LatestVersion } from '@/core/rules-sync';
 import { recheckEdited, runScan, type ScanEffects, type ScanInput, type ScanOutcome } from '@/core/scan-pipeline';
-import { createStore, type Store } from '@/core/store';
+import { createOutbox, isPermanent, PermanentError, type Job } from '@/core/outbox';
+import { createStore, type HistoryEntry, type Store } from '@/core/store';
 import starter from '@/data/starter-bundle.json';
 import { downloadBundle } from '@/platform/gunzip';
 import { deviceKV } from '@/platform/kv';
@@ -21,14 +22,15 @@ interface AppCtx {
   online: boolean;
   onboarded: boolean;
   completeOnboarding(): void;
-  /** Bumps when history changes, so lists re-read the store. */
-  historyVersion: number;
+  /** Scan history, newest first (re-read from the store after every change). */
+  history: HistoryEntry[];
+  /** Re-reads history after a direct store change. */
   touchHistory(): void;
   scan(input: ScanInput): ScanOutcome;
   recheck(entryId: string, text: string): ScanOutcome | null;
   lookup(barcode: string): Promise<ProductHit | null>;
   syncRules(): Promise<void>;
-  report(entryId: string, reason: string, comment?: string): Promise<{ ok: boolean; error?: string }>;
+  report(entryId: string, reason: string, comment?: string): Promise<{ ok: boolean; queued?: boolean; error?: string }>;
   deleteMyData(): Promise<{ ok: boolean; error?: string }>;
   /** Signed-in email, or null. Accounts are optional: they only sync rules and history across devices. */
   account: string | null;
@@ -46,23 +48,68 @@ const Ctx = createContext<AppCtx | null>(null);
 
 const store = createStore(deviceKV, randomUUID);
 
+/** Sends one queued job; server errors that retrying can't fix become PermanentError so the outbox drops them. */
+async function sendJob(job: Job): Promise<void> {
+  if (!supabase) throw new PermanentError('no server configured');
+  const check = (error: { code?: string; message: string } | null) => {
+    if (!error) return;
+    throw isPermanent(error.code) ? new PermanentError(error.message) : new Error(error.message);
+  };
+  switch (job.kind) {
+    case 'scan': {
+      const { data } = await supabase.auth.getSession();
+      const uid = data.session?.user.id ?? null;
+      // Signed in: keep the ingredient text with the scan so history can follow the account to other devices.
+      const ocr = (job.row.ocr_text as string | null) ?? (uid ? job.text.slice(0, 8000) : null);
+      const { error } = await supabase.from('scans').insert({ ...job.row, user_id: uid, ocr_text: ocr });
+      // A retried insert that already landed is fine.
+      if (error?.code === '23505') return;
+      return check(error);
+    }
+    case 'unmatched':
+      return check((await supabase.rpc('log_unmatched', { terms: job.terms, example: job.example })).error);
+    case 'product':
+      // Shared with other users only once a second install submits the same text (or an admin accepts it).
+      return check(
+        (
+          await supabase.rpc('submit_product', {
+            p_barcode: job.barcode,
+            p_ingredients_raw: job.text,
+            p_install_id: store.installId(),
+            p_name: job.name ?? null,
+            p_brand: job.brand ?? null,
+          })
+        ).error,
+      );
+    case 'report': {
+      const { error } = await supabase.from('reports').insert({ scan_id: job.scanId, reason: job.reason, comment: job.comment || null });
+      if (error?.code === '23505') return; // already reported
+      return check(error);
+    }
+    case 'scanUpdate': {
+      const { data } = await supabase.auth.getSession();
+      if (!data.session) throw new PermanentError('signed out');
+      return check(
+        (
+          await supabase.rpc('update_my_scan', {
+            p_scan_id: job.scanId,
+            p_favourite: job.favourite ?? null,
+            p_ocr_text: job.text ?? null,
+            p_verdict: job.verdict ?? null,
+          })
+        ).error,
+      );
+    }
+  }
+}
+
+const outbox = createOutbox(deviceKV, randomUUID, sendJob);
+
 const effects: ScanEffects | null = supabase
   ? {
-      insertScan: async (row, fullText) => {
-        const { data } = await supabase!.auth.getSession();
-        const uid = data.session?.user.id ?? null;
-        // Signed in: keep the ingredient text with the scan so history can follow the account to other devices.
-        const { error } = await supabase!.from('scans').insert({ ...row, user_id: uid, ocr_text: row.ocr_text ?? (uid ? fullText.slice(0, 8000) : null) });
-        if (error) throw error;
-      },
-      logUnmatched: async (terms, example) => {
-        const { error } = await supabase!.rpc('log_unmatched', { terms, example });
-        if (error) throw error;
-      },
-      submitProduct: async (barcode, text, name, brand) => {
-        const { error } = await supabase!.rpc('submit_product', { p_barcode: barcode, p_ingredients_raw: text, p_name: name ?? null, p_brand: brand ?? null });
-        if (error) throw error;
-      },
+      insertScan: (row, fullText) => outbox.enqueue({ kind: 'scan', row, text: fullText }),
+      logUnmatched: (terms, example) => outbox.enqueue({ kind: 'unmatched', terms, example }),
+      submitProduct: (barcode, text, name, brand) => outbox.enqueue({ kind: 'product', barcode, text, name, brand }),
     }
   : null;
 
@@ -71,7 +118,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [settings, setSettingsState] = useState<UserSettings>(() => store.getSettings());
   const [online, setOnline] = useState(true);
   const [onboarded, setOnboarded] = useState(() => store.isOnboarded());
-  const [historyVersion, setHistoryVersion] = useState(0);
+  const [history, setHistory] = useState<HistoryEntry[]>(() => store.getHistory());
+  const refreshHistory = useCallback(() => setHistory(store.getHistory()), []);
   const [account, setAccount] = useState<string | null>(null);
   const userId = useRef<string | null>(null);
 
@@ -81,9 +129,9 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     if (error || !data) return 0;
     const { merged, added } = mergeRemote(store.getHistory(), data as RemoteScan[]);
     store.setHistory(merged);
-    setHistoryVersion((v) => v + 1);
+    refreshHistory();
     return added;
-  }, []);
+  }, [refreshHistory]);
 
   useEffect(() => {
     if (!supabase) return;
@@ -97,9 +145,13 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       setAccount(session?.user.email ?? null);
     });
     return () => sub.subscription.unsubscribe();
-  }, []);
+  }, [pullHistory]);
+
+  // Background sync reads the latest rules without re-creating the callback.
   const rulesRef = useRef(rules);
-  rulesRef.current = rules;
+  useEffect(() => {
+    rulesRef.current = rules;
+  }, [rules]);
 
   const syncRules = useCallback(async () => {
     if (!supabase) return;
@@ -119,8 +171,12 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   // PRD: check for newer rules on each app open, in the background.
   useEffect(() => {
     void syncRules();
+    void outbox.flush();
     const sub = AppState.addEventListener('change', (s) => {
-      if (s === 'active') void syncRules();
+      if (s === 'active') {
+        void syncRules();
+        void outbox.flush(); // send anything queued while offline
+      }
     });
     return () => sub.remove();
   }, [syncRules]);
@@ -136,7 +192,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         store.setOnboarded();
         setOnboarded(true);
       },
-      historyVersion,
+      history,
       setSettings(s) {
         store.setSettings(s);
         setSettingsState(s);
@@ -177,36 +233,35 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         const entry = store.getEntry(entryId);
         if (!supabase || !entry?.remoteScanId) return { error: 'Sharing needs an internet connection.' };
         if (entry.shareCode) return { code: entry.shareCode };
+        // The scan must be on the server before it can be shared.
+        const { remaining } = await outbox.flush();
+        if (remaining > 0) return { error: 'You’re offline. Try sharing again when you’re back online.' };
         const { data, error } = await supabase.rpc('share_verdict', { p_scan_id: entry.remoteScanId, p_install_id: store.installId() });
         if (error || !data) return { error: error?.message ?? 'Could not create a link.' };
         store.updateEntry(entryId, { shareCode: data as string });
         return { code: data as string };
       },
-      touchHistory: () => setHistoryVersion((v) => v + 1),
+      touchHistory: refreshHistory,
       scan(input) {
         const out = runScan(input, { rules, settings, store, effects });
-        setHistoryVersion((v) => v + 1);
+        refreshHistory();
         return out;
       },
       recheck(entryId, text) {
         const out = recheckEdited(entryId, text, { rules, settings, store, effects });
-        setHistoryVersion((v) => v + 1);
+        refreshHistory();
         const remoteId = out?.entry.remoteScanId;
         if (out && remoteId && supabase && userId.current) {
-          supabase
-            .rpc('update_my_scan', { p_scan_id: remoteId, p_ocr_text: text, p_verdict: out.result.verdict })
-            .then(({ error }) => error && console.warn('history sync failed', error.message));
+          void outbox.enqueue({ kind: 'scanUpdate', scanId: remoteId, text, verdict: out.result.verdict });
         }
         return out;
       },
       setFavourite(entryId, favourite) {
         store.updateEntry(entryId, { favourite });
-        setHistoryVersion((v) => v + 1);
+        refreshHistory();
         const remoteId = store.getEntry(entryId)?.remoteScanId;
         if (remoteId && supabase && userId.current) {
-          supabase
-            .rpc('update_my_scan', { p_scan_id: remoteId, p_favourite: favourite })
-            .then(({ error }) => error && console.warn('favourite sync failed', error.message));
+          void outbox.enqueue({ kind: 'scanUpdate', scanId: remoteId, favourite });
         }
       },
       pullHistory,
@@ -224,12 +279,12 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       syncRules,
       async report(entryId, reason, comment) {
         const entry = store.getEntry(entryId);
-        if (!entry?.remoteScanId || !supabase) return { ok: false, error: 'Reports need an internet connection.' };
-        const { error } = await supabase.from('reports').insert({ scan_id: entry.remoteScanId, reason, comment: comment || null });
-        if (error) return { ok: false, error: error.message };
+        if (!entry?.remoteScanId || !supabase) return { ok: false, error: 'Reports aren’t available for this scan.' };
+        // Queued like every other server write: sent now if online, otherwise as soon as the app is back online.
+        const sent = await outbox.enqueue({ kind: 'report', scanId: entry.remoteScanId, reason, comment });
         store.updateEntry(entryId, { reported: true });
-        setHistoryVersion((v) => v + 1);
-        return { ok: true };
+        refreshHistory();
+        return { ok: true, queued: !sent };
       },
       async deleteMyData() {
         if (supabase) {
@@ -242,14 +297,15 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
             userId.current = null;
           }
         }
+        outbox.clear();
         store.wipe();
         setSettingsState(store.getSettings());
         setOnboarded(false);
-        setHistoryVersion((v) => v + 1);
+        refreshHistory();
         return { ok: true };
       },
     }),
-    [rules, settings, online, onboarded, historyVersion, account, syncRules, pullHistory],
+    [rules, settings, online, onboarded, history, account, syncRules, pullHistory, refreshHistory],
   );
 
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;
@@ -261,5 +317,12 @@ export function useApp(): AppCtx {
   return c;
 }
 
-/** Label photos stay in memory only (for "Re-check with AI"); they are never saved to history. */
-export const photoByEntry = new Map<string, string>();
+/** Label photos stay in memory only (for "Re-check with AI"); they are never saved to history. Last 20 kept. */
+class PhotoMemory extends Map<string, string> {
+  override set(key: string, value: string) {
+    super.set(key, value);
+    while (this.size > 20) this.delete(this.keys().next().value as string);
+    return this;
+  }
+}
+export const photoByEntry = new PhotoMemory();

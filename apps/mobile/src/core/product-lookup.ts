@@ -16,6 +16,8 @@ export interface LookupDeps {
   timeoutMs?: number;
 }
 
+export const PRODUCT_TTL_MS = 30 * 24 * 60 * 60 * 1000;
+
 export const OFF_USER_AGENT = 'MindsetApproved/0.1 (food ingredient scanner)';
 
 export function normalizeBarcode(raw: string): string | null {
@@ -59,7 +61,9 @@ export async function lookupProduct(rawBarcode: string, deps: LookupDeps): Promi
   const timeout = deps.timeoutMs ?? 3000;
 
   const local = deps.store.getProduct(barcode);
-  if (local) return { barcode, name: local.name, brand: local.brand, text: local.text, source: 'cache' };
+  // Refresh after 30 days, so corrections made since then reach this phone.
+  const fresh = local && Date.now() - Date.parse(local.at) < PRODUCT_TTL_MS;
+  if (local && fresh) return { barcode, name: local.name, brand: local.brand, text: local.text, source: 'cache' };
 
   try {
     const row = await withTimeout(deps.fetchServerProduct(barcode), timeout);
@@ -75,11 +79,11 @@ export async function lookupProduct(rawBarcode: string, deps: LookupDeps): Promi
   try {
     const url = `https://world.openfoodfacts.org/api/v2/product/${barcode}.json?fields=product_name,product_name_en,brands,ingredients_text,ingredients_text_en`;
     const res = await withTimeout(deps.fetch(url, { headers: { 'User-Agent': OFF_USER_AGENT } }), timeout);
-    if (!res.ok) return null;
+    if (!res.ok) return staleOrNull();
     const body = (await res.json()) as { status?: number; product?: OffProduct };
-    if (body.status !== 1 || !body.product) return null;
+    if (body.status !== 1 || !body.product) return staleOrNull();
     const text = offIngredients(body.product);
-    if (!text) return null;
+    if (!text) return staleOrNull();
     const hit: ProductHit = {
       barcode,
       name: body.product.product_name_en || body.product.product_name || undefined,
@@ -90,6 +94,11 @@ export async function lookupProduct(rawBarcode: string, deps: LookupDeps): Promi
     deps.store.putProduct({ ...hit, at: new Date().toISOString() });
     return hit;
   } catch {
-    return null;
+    return staleOrNull();
+  }
+
+  /** Offline or nothing newer: an expired local copy is still better than asking for a photo. */
+  function staleOrNull(): ProductHit | null {
+    return local ? { barcode: barcode!, name: local.name, brand: local.brand, text: local.text, source: 'cache' } : null;
   }
 }

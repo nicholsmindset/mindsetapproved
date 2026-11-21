@@ -9,7 +9,7 @@ import { P, VerdictBadge } from '@/ui/kit';
 import { MAX_WIDTH, radius, space, useColors } from '@/ui/theme';
 
 type Filter = 'all' | 'favourites' | Verdict;
-const FILTERS: Array<[Filter, string]> = [
+const FILTERS: [Filter, string][] = [
   ['all', 'All'],
   ['favourites', 'Favourites'],
   ['approved', 'Approved'],
@@ -22,11 +22,11 @@ export default function History() {
   const c = useColors();
   const [filter, setFilter] = useState<Filter>('all');
   const list = useMemo(() => {
-    const all = app.store.getHistory();
+    const all = app.history;
     if (filter === 'all') return all;
     if (filter === 'favourites') return all.filter((e) => e.favourite);
     return all.filter((e) => e.verdict === filter);
-  }, [app.store, app.historyVersion, filter]);
+  }, [app.history, filter]);
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: c.bg }} edges={['top']}>

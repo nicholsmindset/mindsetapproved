@@ -1,11 +1,11 @@
 /** The subset of ML Kit's TextRecognitionResult the app uses. */
 export interface OcrResult {
   text: string;
-  blocks: Array<{
+  blocks: {
     text: string;
     frame?: { top: number; left: number; width: number; height: number };
-    lines: Array<{ text: string; elements: Array<{ text: string }> }>;
-  }>;
+    lines: { text: string; elements: { text: string }[] }[];
+  }[];
 }
 
 const WORDISH = /^[\p{L}][\p{L}'’-]*[\p{L}]?[.,;:)\]]*$|^\(?[\p{L}]+|^[eE]?\d{3,4}[a-z]?[),.]*$|^\(?\d+(?:[.,]\d+)?%[),.]*$/u;

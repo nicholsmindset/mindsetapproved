@@ -4,7 +4,7 @@ export const PREMIUM_PLANS = [
   { id: 'monthly', label: 'Monthly', price: 'US$2.99 / month', note: 'Cancel any time.' },
 ] as const;
 
-export const PLAN_FEATURES: Array<{ feature: string; free: string; premium: string }> = [
+export const PLAN_FEATURES: { feature: string; free: string; premium: string }[] = [
   { feature: 'Barcode scans', free: 'Unlimited', premium: 'Unlimited' },
   { feature: 'Label scans', free: '10 a day', premium: 'Unlimited' },
   { feature: 'AI re-checks', free: '3 a day', premium: 'Unlimited' },

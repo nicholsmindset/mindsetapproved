@@ -20,7 +20,11 @@ Everything in the repo is built and tested locally. These are the steps that nee
    npx supabase functions deploy publish-bundle
    npx supabase functions deploy ocr-fallback
    ```
-7. In the admin: **Publish v1** (Admin → Publish). Phones download it on their next open.
+7. **Corrections secret:** generate one with `openssl rand -hex 32` and store it in the database, then put the same value in the website's `CORRECTIONS_SECRET` (section 2):
+   ```sql
+   insert into public.app_secrets (name, value) values ('corrections', '<secret>');
+   ```
+8. In the admin: **Publish v1** (Admin → Publish). Phones download it on their next open.
 
 ## 2. Website and admin (Vercel)
 1. Import the GitHub repo. Set the root directory to `apps/admin`; the framework is Next.js.
@@ -31,6 +35,7 @@ Everything in the repo is built and tested locally. These are the steps that nee
    | `NEXT_PUBLIC_SUPABASE_URL` | project URL |
    | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | anon/publishable key |
    | `NEXT_PUBLIC_SITE_URL` | `https://<your domain>` |
+   | `CORRECTIONS_SECRET` | the secret from Supabase step 7 (server-only, not `NEXT_PUBLIC_`) |
 
 3. Add the domain. The site serves `/`, `/rules`, `/corrections`, `/privacy`, `/terms` and the share pages `/v/<code>`; the admin is at `/admin`.
 

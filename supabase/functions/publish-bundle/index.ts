@@ -3,7 +3,7 @@
 //
 // POST { "dryRun"?: boolean, "acceptFailures"?: boolean, "notes"?: string }
 // The caller's own JWT is forwarded, so RLS and is_admin() decide; no service key is used.
-import { createClient } from 'npm:@supabase/supabase-js@2.119.2';
+import { createClient } from '@supabase/supabase-js';
 import { preparePublish } from '../_shared/rules-engine.js';
 import fixtures from '../_shared/fixtures.json' with { type: 'json' };
 

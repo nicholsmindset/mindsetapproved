@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
-import { consume, dayKey, FREE_LIMITS, remaining } from '../src/core/limits';
+import { consume, dayKey, FREE_LIMITS, refund, remaining } from '../src/core/limits';
 import { aiToText, estimateConfidence, ocrToText } from '../src/core/ocr-text';
 import { lookupProduct, normalizeBarcode, offIngredients } from '../src/core/product-lookup';
 import { checkForUpdate, initialRules } from '../src/core/rules-sync';
@@ -130,11 +130,32 @@ describe('product lookup', () => {
   });
   it('checks the local cache first', async () => {
     const s = testStore();
-    s.putProduct({ barcode: '9556001234567', text: 'salt', source: 'off', at: '2026-01-01' });
+    s.putProduct({ barcode: '9556001234567', text: 'salt', source: 'off', at: new Date().toISOString() });
     const f = vi.fn();
     const hit = await lookupProduct('9556001234567', { store: s, fetchServerProduct: f, fetch: f as never });
     expect(hit).toMatchObject({ text: 'salt', source: 'cache' });
     expect(f).not.toHaveBeenCalled();
+  });
+  it('refreshes a cached product after 30 days, and falls back to it offline', async () => {
+    const s = testStore();
+    s.putProduct({ barcode: '9556001234567', text: 'old text', source: 'off', at: new Date(Date.now() - 31 * 864e5).toISOString() });
+    const fresh = await lookupProduct('9556001234567', {
+      store: s,
+      fetchServerProduct: async () => ({ name: null, brand: null, ingredients_raw: 'new text' }),
+      fetch: vi.fn() as never,
+    });
+    expect(fresh?.text).toBe('new text');
+    s.putProduct({ barcode: '9556001234568', text: 'stale but known', source: 'off', at: new Date(Date.now() - 31 * 864e5).toISOString() });
+    const offline = await lookupProduct('9556001234568', {
+      store: s,
+      fetchServerProduct: async () => {
+        throw new Error('offline');
+      },
+      fetch: (async () => {
+        throw new Error('offline');
+      }) as never,
+    });
+    expect(offline?.text).toBe('stale but known');
   });
   it('then the Supabase products cache', async () => {
     const s = testStore();
@@ -281,5 +302,17 @@ describe('premium', () => {
     expect(remaining(s, 'ai')).toBe(Number.POSITIVE_INFINITY);
     s.setPremium(false);
     expect(remaining(s, 'label')).toBe(FREE_LIMITS.label);
+  });
+});
+
+describe('refund', () => {
+  it('gives back one use, never below zero', () => {
+    const s = testStore();
+    consume(s, 'ai');
+    expect(remaining(s, 'ai')).toBe(FREE_LIMITS.ai - 1);
+    refund(s, 'ai');
+    expect(remaining(s, 'ai')).toBe(FREE_LIMITS.ai);
+    refund(s, 'ai');
+    expect(remaining(s, 'ai')).toBe(FREE_LIMITS.ai);
   });
 });

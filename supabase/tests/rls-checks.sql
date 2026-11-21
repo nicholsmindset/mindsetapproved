@@ -23,10 +23,10 @@ do $$ begin
 end $$;
 insert into public.scans (verdict, ocr_text, rules_version) values ('caution', 'sugar, salt', 1);
 select public.log_unmatched(array['Zzqx Powder', 'zzqx powder', 'E1520'], 'zzqx powder, sugar');
-select public.submit_product('9556001234567', 'sugar, salt, palm oil', 'Test biscuit', 'Brand');
+select public.submit_product('9556001234567', 'sugar, salt, palm oil', '60000000-0000-0000-0000-000000000001', 'Test biscuit', 'Brand');
 do $$ begin
   assert (select count(*) from public.scans) = 0, 'anon must not read scans back';
-  assert (select count(*) from public.products) = 1, 'anon reads active products';
+  assert (select count(*) from public.products) = 0, 'one install''s submission is not served to others';
 end $$;
 do $$ begin
   begin
@@ -164,11 +164,31 @@ insert into public.scans (id, install_id, verdict) values
   ('10000000-0000-0000-0000-000000000002', '20000000-0000-0000-0000-000000000002', 'approved');
 insert into public.reports (scan_id, reason) values ('10000000-0000-0000-0000-000000000001', 'wrong');
 do $$ begin
+  begin
+    perform public.use_ai_recheck('20000000-0000-0000-0000-000000000001', 3);
+    raise exception 'anon spent AI quota directly';
+  exception when insufficient_privilege then null;
+  end;
+  begin
+    perform public.refund_ai_recheck('20000000-0000-0000-0000-000000000001');
+    raise exception 'anon refunded AI quota';
+  exception when insufficient_privilege then null;
+  end;
+end $$;
+reset role;
+set role service_role;
+do $$ begin
   assert public.use_ai_recheck('20000000-0000-0000-0000-000000000001', 3) = 2, 'first AI use leaves 2';
   assert public.use_ai_recheck('20000000-0000-0000-0000-000000000001', 3) = 1, 'second leaves 1';
+  perform public.refund_ai_recheck('20000000-0000-0000-0000-000000000001');
+  assert public.use_ai_recheck('20000000-0000-0000-0000-000000000001', 3) = 1, 'refund gave one back';
   assert public.use_ai_recheck('20000000-0000-0000-0000-000000000001', 3) = 0, 'third leaves 0';
   assert public.use_ai_recheck('20000000-0000-0000-0000-000000000001', 3) = -1, 'fourth refused';
   assert public.use_ai_recheck('20000000-0000-0000-0000-000000000002', 3) = 2, 'limits are per install';
+end $$;
+reset role;
+set role anon;
+do $$ begin
   assert (select count(*) from public.ai_usage) = 0, 'anon cannot read ai_usage';
   assert public.delete_install_data('20000000-0000-0000-0000-000000000001') = 1, 'deleted one scan';
 end $$;
@@ -233,22 +253,34 @@ do $$ begin
   assert not exists (select 1 from public.shared_verdicts where scan_id = '30000000-0000-0000-0000-000000000001'), 'delete-my-data removes shares';
 end $$;
 -- corrections and history sync
+insert into public.app_secrets values ('corrections', 'test-secret-0123456789abcdef0123456789abcdef');
 set role anon;
 set request.jwt.claims = '{}';
 do $$
-declare i int;
+declare
+  i int;
+  h1 text := 'abcdef0123456789abcdef';
+  h2 text := 'fedcba9876543210fedcba';
+  sig1 text := encode(extensions.hmac(h1, 'test-secret-0123456789abcdef0123456789abcdef', 'sha256'), 'hex');
+  sig2 text := encode(extensions.hmac(h2, 'test-secret-0123456789abcdef0123456789abcdef', 'sha256'), 'hex');
 begin
+  assert (select count(*) from public.app_secrets) = 0, 'anon cannot read secrets';
+  begin
+    perform public.submit_correction('shopper', 'X', 'Forged sender rotating hashes.', 'aaaaaaaaaaaaaaaaaaaa', 'not-a-valid-signature');
+    raise exception 'forged signature accepted';
+  exception when insufficient_privilege then null;
+  end;
   for i in 1..5 loop
-    perform public.submit_correction('manufacturer', 'Crunchy Corn Chips', 'Our recipe changed in 2026; it no longer contains Red 40.', 'abcdef0123456789abcdef', '9556001000017', 'qa@example.test');
+    perform public.submit_correction('manufacturer', 'Crunchy Corn Chips', 'Our recipe changed in 2026; it no longer contains Red 40.', h1, sig1, '9556001000017', 'qa@example.test');
   end loop;
   begin
-    perform public.submit_correction('shopper', 'X', 'This is the sixth message.', 'abcdef0123456789abcdef');
+    perform public.submit_correction('shopper', 'X', 'This is the sixth message.', h1, sig1);
     raise exception 'rate limit not enforced';
   exception when raise_exception then null;
   end;
-  perform public.submit_correction('shopper', 'Y', 'Another sender is fine.', 'fedcba9876543210fedcba');
+  perform public.submit_correction('shopper', 'Y', 'Another sender is fine.', h2, sig2);
   begin
-    perform public.submit_correction('shopper', 'Y', 'short', 'fedcba9876543210fedcba');
+    perform public.submit_correction('shopper', 'Y', 'short', h2, sig2);
     raise exception 'short message accepted';
   exception when check_violation then null;
   end;
@@ -273,5 +305,36 @@ select public.update_my_scan('50000000-0000-0000-0000-000000000001', true, 'Ingr
 reset role;
 do $$ begin
   assert (select favourite and verdict = 'approved' from public.scans where id = '50000000-0000-0000-0000-000000000001'), 'own scan updated';
+end $$;
+-- products: vandalism, consensus, admin review
+insert into public.products (barcode, name, ingredients_raw, source, verified) values ('9556001000017', 'Crunchy Corn Chips', 'Corn, canola oil, salt', 'admin', true)
+  on conflict (barcode) do nothing;
+set role anon;
+set request.jwt.claims = '{}';
+do $$ begin
+  assert public.submit_product('9556009999991', 'water, canola oil, red 40', '70000000-0000-0000-0000-000000000001') = 'pending', 'first submission pending';
+  assert (select count(*) from public.products where barcode = '9556009999991') = 0, 'single submission not served';
+  assert public.submit_product('9556009999991', 'water, canola oil, red 40', '70000000-0000-0000-0000-000000000001') = 'pending', 'same install twice still pending';
+  assert public.submit_product('9556009999991', 'Water, Canola Oil, Red 40', '70000000-0000-0000-0000-000000000002') = 'corroborated', 'two installs agreeing';
+  assert (select count(*) from public.products where barcode = '9556009999991') = 1, 'corroborated product served';
+  assert public.submit_product('9556001000017', 'vandalised text', '70000000-0000-0000-0000-000000000003') = 'exists', 'verified product untouched';
+  assert public.submit_product('9556009999992', 'water, salt', '70000000-0000-0000-0000-000000000004') = 'pending', 'second barcode pending';
+  assert (select count(*) from public.product_submissions) = 0, 'anon cannot read submissions';
+  begin
+    insert into public.scans (verdict, barcode) values ('approved', 'not-a-barcode');
+    raise exception 'bad barcode accepted on scans';
+  exception when check_violation then null;
+  end;
+end $$;
+reset role;
+do $$ begin
+  assert (select ingredients_raw from public.products where barcode = '9556001000017') <> 'vandalised text', 'verified text intact';
+end $$;
+set role authenticated;
+set request.jwt.claims = '{"sub": "00000000-0000-0000-0000-000000000002", "role": "authenticated", "app_metadata": {"role": "admin"}}';
+select public.review_product_submission((select id from public.product_submissions where barcode = '9556009999992'), true);
+reset role;
+do $$ begin
+  assert (select verified from public.products where barcode = '9556009999992'), 'accepted submission is verified';
 end $$;
 \echo 'All SQL checks passed'

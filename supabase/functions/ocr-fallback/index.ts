@@ -3,9 +3,10 @@
 // The photo is processed in memory and never stored.
 //
 // POST { "image": "<base64 jpeg>", "mimeType"?: "image/jpeg", "installId": "<uuid>" }
-// Secrets: GEMINI_API_KEY. Optional: GEMINI_MODEL (default gemini-2.5-flash-lite), AI_DAILY_LIMIT (default 3),
+// Secrets: GEMINI_API_KEY. SUPABASE_SERVICE_ROLE_KEY is provided by Supabase and used only for the
+// daily-limit bookkeeping (phones cannot spend or refund quota themselves). Optional: GEMINI_MODEL (default gemini-2.5-flash-lite), AI_DAILY_LIMIT (default 3),
 // GEMINI_BASE_URL (tests only).
-import { createClient } from 'npm:@supabase/supabase-js@2.119.2';
+import { createClient } from '@supabase/supabase-js';
 import { geminiRequest, parseGemini } from './gemini.ts';
 
 const CORS = {
@@ -30,32 +31,45 @@ Deno.serve(async (req) => {
   const mimeType = body.mimeType === 'image/png' ? 'image/png' : 'image/jpeg';
   if ((body.image.length * 3) / 4 > MAX_IMAGE_BYTES) return json({ error: 'Image too large; send at most 4 MB' }, 413);
 
-  // Count this use first (per install, or per user when signed in), with the caller's own credentials.
-  const supabase = createClient(Deno.env.get('SUPABASE_URL')!, Deno.env.get('SUPABASE_ANON_KEY')!, {
-    global: { headers: { Authorization: req.headers.get('Authorization') ?? `Bearer ${Deno.env.get('SUPABASE_ANON_KEY')}` } },
+  // Count this use first; refunded below if the AI call fails, so a failure never costs the user a re-check.
+  const service = createClient(Deno.env.get('SUPABASE_URL')!, Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!, {
     auth: { persistSession: false },
   });
   const limit = Number(Deno.env.get('AI_DAILY_LIMIT') ?? 3);
-  const { data: left, error: limitError } = await supabase.rpc('use_ai_recheck', { p_install_id: body.installId, p_limit: limit });
+  const { data: left, error: limitError } = await service.rpc('use_ai_recheck', { p_install_id: body.installId, p_limit: limit });
   if (limitError) return json({ error: limitError.message }, 500);
   if (left === -1) return json({ error: `You've used today's ${limit} AI re-checks.`, remaining: 0 }, 429);
+  const refund = async () => {
+    const { error } = await service.rpc('refund_ai_recheck', { p_install_id: body.installId });
+    if (error) console.error(`refund failed: ${error.message}`);
+  };
 
   const model = Deno.env.get('GEMINI_MODEL') ?? 'gemini-2.5-flash-lite';
   const base = Deno.env.get('GEMINI_BASE_URL') ?? 'https://generativelanguage.googleapis.com';
-  const res = await fetch(`${base}/v1beta/models/${model}:generateContent`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'x-goog-api-key': Deno.env.get('GEMINI_API_KEY') ?? '' },
-    body: JSON.stringify(geminiRequest(body.image, mimeType)),
-  });
+  let res: Response;
+  try {
+    res = await fetch(`${base}/v1beta/models/${model}:generateContent`, {
+      signal: AbortSignal.timeout(20_000),
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-goog-api-key': Deno.env.get('GEMINI_API_KEY') ?? '' },
+      body: JSON.stringify(geminiRequest(body.image, mimeType)),
+    });
+  } catch (e) {
+    console.error(`gemini request failed: ${(e as Error).message}`);
+    await refund();
+    return json({ error: 'The AI service didn’t respond. Try again or edit the text.' }, 504);
+  }
   if (!res.ok) {
     const detail = await res.text().catch(() => '');
     console.error(`gemini ${res.status}: ${detail.slice(0, 500)}`);
+    await refund();
     return json({ error: 'The AI service could not read this photo. Try again or edit the text.' }, 502);
   }
   try {
     return json({ ...parseGemini(await res.json()), remaining: left });
   } catch (e) {
     console.error(`gemini parse: ${(e as Error).message}`);
+    await refund();
     return json({ error: 'The AI answer was not usable. Try again or edit the text.' }, 502);
   }
 });

@@ -20,7 +20,7 @@ export interface ScanEffects {
     ocr_text: string | null;
     ocr_confidence: number;
     verdict: string;
-    matched: Array<{ ingredientId: string; tier: string; possible: boolean }>;
+    matched: { ingredientId: string; tier: string; possible: boolean }[];
     rules_version: number;
     source: ScanSource;
     product_name: string | null;

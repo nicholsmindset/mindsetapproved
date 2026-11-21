@@ -3,7 +3,7 @@ import { analyze } from '@mindset/rules-engine';
 import { Stack, useLocalSearchParams } from 'expo-router';
 import { type ComponentRef, useMemo, useRef, useState } from 'react';
 import { ActivityIndicator, Pressable, Text, TextInput, View } from 'react-native';
-import { consume, FREE_LIMITS, remaining } from '@/core/limits';
+import { consume, FREE_LIMITS, refund, remaining } from '@/core/limits';
 import { aiToText } from '@/core/ocr-text';
 import { aiAvailable, aiRecheck } from '@/platform/ai';
 import { prepareForAi } from '@/platform/image';
@@ -25,8 +25,7 @@ export default function ResultScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const app = useApp();
   const c = useColors();
-  // historyVersion makes this re-read after edits, favourites and reports.
-  const entry = useMemo(() => app.store.getEntry(id), [app.store, id, app.historyVersion]);
+  const entry = useMemo(() => app.history.find((e) => e.id === id), [app.history, id]);
   const result = useMemo(
     () => (entry ? analyze(entry.text, app.rules, app.settings, { ocrConfidence: entry.ocrConfidence }) : null),
     [entry, app.rules, app.settings],
@@ -72,6 +71,7 @@ export default function ResultScreen() {
       app.touchHistory();
       setStatus({ text: 'Re-checked with AI. The rules decided the verdict on your phone.', tone: 'ok' });
     } catch (e) {
+      refund(app.store, 'ai'); // a failed re-check doesn't count (the server refunds too)
       setStatus({ text: (e as Error).message, tone: 'error' });
     } finally {
       setAiBusy(false);
@@ -109,7 +109,11 @@ export default function ResultScreen() {
   async function sendReport() {
     const r = await app.report(entry!.id, reason, comment.trim());
     setReporting(false);
-    setStatus(r.ok ? { text: 'Thanks. We review every report.', tone: 'ok' } : { text: r.error ?? 'Could not send the report.', tone: 'error' });
+    setStatus(
+      r.ok
+        ? { text: r.queued ? 'Saved. Your report will be sent when you’re back online.' : 'Thanks. We review every report.', tone: 'ok' }
+        : { text: r.error ?? 'Could not send the report.', tone: 'error' },
+    );
   }
 
   return (

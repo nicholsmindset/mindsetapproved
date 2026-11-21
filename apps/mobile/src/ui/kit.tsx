@@ -4,7 +4,7 @@ import { Pressable, ScrollView, StyleSheet, Switch, Text, View, type PressablePr
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MAX_WIDTH, radius, space, useColors, verdictStyle } from './theme';
 
-export function Screen({ children, scroll = true, edges }: { children: React.ReactNode; scroll?: boolean; edges?: Array<'top' | 'bottom'> }) {
+export function Screen({ children, scroll = true, edges }: { children: React.ReactNode; scroll?: boolean; edges?: ('top' | 'bottom')[] }) {
   const c = useColors();
   const body = <View style={styles.inner}>{children}</View>;
   return (

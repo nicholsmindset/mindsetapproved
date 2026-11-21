@@ -5,9 +5,12 @@ import { useColors } from '@/ui/theme';
 
 export default function TabsLayout() {
   const c = useColors();
-  const icon =
-    (name: keyof typeof Ionicons.glyphMap) =>
-    ({ color, size }: { color: ColorValue; size: number }) => <Ionicons name={name} color={color as string} size={size} />;
+  const icon = (name: keyof typeof Ionicons.glyphMap) => {
+    function TabIcon({ color, size }: { color: ColorValue; size: number }) {
+      return <Ionicons name={name} color={color as string} size={size} />;
+    }
+    return TabIcon;
+  };
   return (
     <Tabs
       screenOptions={{

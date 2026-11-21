@@ -1,10 +1,11 @@
 import Link from 'next/link';
 import { hasSupabase } from '@/lib/env';
+import { safeNextPath } from '@/lib/safe-path';
 import { LoginForm } from './LoginForm';
 
 export default async function Login({ searchParams }: { searchParams: Promise<Record<string, string | undefined>> }) {
   const sp = await searchParams;
-  const next = sp.next?.startsWith('/') ? sp.next : '/admin/test-bench';
+  const next = safeNextPath(sp.next, '/admin/test-bench');
   return (
     <div className="card stack" style={{ maxWidth: 420, margin: '40px auto' }}>
       <h1>Sign in</h1>

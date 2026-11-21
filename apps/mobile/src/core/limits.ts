@@ -26,3 +26,10 @@ export function consume(store: Store, kind: LimitKind, now = new Date()): boolea
   store.setLimits({ ...base, [kind]: base[kind] + 1 });
   return true;
 }
+
+/** Gives back one use (e.g. the AI call failed), never below zero. */
+export function refund(store: Store, kind: LimitKind, now = new Date()): void {
+  const l = store.getLimits();
+  if (l.day !== dayKey(now) || l[kind] <= 0) return;
+  store.setLimits({ ...l, [kind]: l[kind] - 1 });
+}
