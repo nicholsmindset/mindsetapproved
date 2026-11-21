@@ -43,7 +43,17 @@ const K = {
   rules: 'rules.bundle',
   limits: 'limits.v1',
   premium: 'premium.v1',
+  labelScript: 'label-script.v1',
 } as const;
+
+/** Which ML Kit model reads label photos. Each non-Latin model also reads Latin text. */
+export type LabelScript = 'latin' | 'chinese' | 'japanese' | 'korean';
+export const LABEL_SCRIPTS: { id: LabelScript; label: string }[] = [
+  { id: 'latin', label: 'English / Malay' },
+  { id: 'chinese', label: '中文' },
+  { id: 'japanese', label: '日本語' },
+  { id: 'korean', label: '한국어' },
+];
 
 export const HISTORY_CAP = 500;
 export const PRODUCTS_CAP = 300;
@@ -116,6 +126,11 @@ export function createStore(kv: KV, newId: () => string) {
     setCachedBundle: (b: RulesBundle) => kv.set(K.rules, JSON.stringify(b)),
 
     /** Set by the purchases adapter (RevenueCat) when an active entitlement exists. */
+    getLabelScript: (): LabelScript => {
+      const v = kv.getString(K.labelScript);
+      return LABEL_SCRIPTS.some((x) => x.id === v) ? (v as LabelScript) : 'latin';
+    },
+    setLabelScript: (v: LabelScript) => kv.set(K.labelScript, v),
     isPremium: () => kv.getString(K.premium) === '1',
     setPremium: (on: boolean) => (on ? kv.set(K.premium, '1') : kv.remove(K.premium)),
 

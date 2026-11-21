@@ -21,3 +21,11 @@ Two accuracy decisions were made in code, not data:
 - **“Non-hydrogenated vegetable oil”** counts as vegetable oil.
 
 Everything else added during the benchmark is either a translation or label spelling of an existing rule (for example *sucre*, *rapsolje*, *aroma*), or an everyday ingredient the rules don’t flag (vitamins, live cultures, leavening agents, fruit, spices, Indian staples such as maida and atta).
+
+## Translations to review
+Translated names were added for Chinese, Japanese, Korean and Malay labels. They map to existing rules and don't change any tier. Worth a check by a native reader:
+
+- **Japanese dye numbers:** Japanese labels number dyes differently from the US. 黄色4号 is tartrazine (US Yellow 5), 黄色5号 is sunset yellow (US Yellow 6), and 赤色40号 is Allura Red (US Red 40).
+- **Unqualified flavouring** (香料 in Japanese, 香精/食用香精 in Chinese, 향료 in Korean, *perisa* in Malay) is treated like plain "flavouring" in English: natural flavours, borderline. Only names that say *synthetic* or *artificial* (合成香料, 人工香精, 합성향료, *perisa tiruan*) count as artificial flavours.
+- **Left out on purpose:** a bare "caramel" (焦糖, キャラメル, 캐러멜, karamel) is food, not caramel colour. 调味剂 ("seasoning agent") is not a flavouring.
+- **Malay *air*** means water. It is only matched as a whole item.

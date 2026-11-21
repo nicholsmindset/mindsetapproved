@@ -54,6 +54,9 @@ export function buildSeedSql(src: RuleSource): string {
   for (const ing of src.ingredients) {
     const rows = [
       ...ing.aliases.map((a) => `(${lit(a)}, ${lit(ing.id)}, 'en', 'name'::public.alias_kind)`),
+      ...[...Object.entries(ing.local_aliases ?? {}), ...Object.entries(ing.i18n_aliases ?? {})].flatMap(([lang, names]) =>
+        names.map((a) => `(${lit(a)}, ${lit(ing.id)}, ${lit(lang)}, 'name'::public.alias_kind)`),
+      ),
       ...(ing.e_numbers ?? []).map((e) => `(${lit(e)}, ${lit(ing.id)}, 'en', 'e_number'::public.alias_kind)`),
     ];
     if (!rows.length) continue;

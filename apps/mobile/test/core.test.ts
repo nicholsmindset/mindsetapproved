@@ -316,3 +316,23 @@ describe('refund', () => {
     expect(remaining(s, 'ai')).toBe(FREE_LIMITS.ai);
   });
 });
+
+describe('label language', () => {
+  it('defaults to Latin and remembers the choice', () => {
+    const store = testStore();
+    expect(store.getLabelScript()).toBe('latin');
+    store.setLabelScript('korean');
+    expect(store.getLabelScript()).toBe('korean');
+  });
+
+  it('ignores an unknown stored value', () => {
+    const store = testStore();
+    store.kv.set('label-script.v1', 'klingon');
+    expect(store.getLabelScript()).toBe('latin');
+  });
+
+  it('scores CJK label text as readable when it has a header', () => {
+    expect(estimateConfidence('配料：小麦粉，白砂糖，棕榈油，食用盐')).toBeGreaterThanOrEqual(0.8);
+    expect(estimateConfidence('원재료명: 밀가루, 설탕, 팜유, 정제염')).toBeGreaterThanOrEqual(0.8);
+  });
+});

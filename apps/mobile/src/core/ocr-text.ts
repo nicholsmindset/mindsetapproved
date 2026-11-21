@@ -19,7 +19,7 @@ export function estimateConfidence(text: string): number {
   if (tokens.length === 0) return 0;
   const good = tokens.filter((t) => WORDISH.test(t)).length;
   let score = good / tokens.length;
-  if (!/ingredi|komposisi|bahan/i.test(text)) score *= 0.9;
+  if (!/ingredi|komposisi|bahan|ramuan|配料|原材料|原料|成分|원재료|원료/i.test(text)) score *= 0.9;
   if (tokens.length < 4) score *= 0.8;
   return Math.round(score * 100) / 100;
 }

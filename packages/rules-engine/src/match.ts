@@ -1,6 +1,6 @@
 import { eCode, type Rules } from './bundle';
 import { fuzzyLookup } from './fuzzy';
-import { isNoiseKey, normKey, pluralVariants, stripFiller, stripPercent } from './normalize';
+import { hasCJK, isNoiseKey, normKey, pluralVariants, stripFiller, stripPercent } from './normalize';
 import type { RawItem } from './split';
 import type { IngredientMatch, ParsedItem } from './types';
 
@@ -22,6 +22,18 @@ const CLASS_NAMES = new Set(
     'humectants', 'firming agent', 'gelling agent', 'gelling agents', 'anti caking agent', 'anticaking agent',
     'glazing agent', 'glazing agents', 'emulsifying salt', 'emulsifying salts', 'flour treatment agent', 'modified starch',
     'seasoning', 'seasonings', 'spices',
+    // Chinese
+    '着色剂', '色素', '食用色素', '防腐剂', '乳化剂', '稳定剂', '增稠剂', '稳定剂和增稠剂', '酸度调节剂', '增味剂', '甜味剂',
+    '膨松剂', '抗氧化剂', '食品添加剂', '水分保持剂', '凝固剂', '被膜剂', '抗结剂', '调味料', '香辛料', '着色劑', '防腐劑',
+    '乳化劑', '穩定劑', '增稠劑', '酸度調節劑', '甜味劑', '膨鬆劑', '抗氧化劑', '食品添加物',
+    // Japanese
+    '着色料', '保存料', '乳化剤', '増粘剤', '安定剤', '増粘安定剤', 'ゲル化剤', '酸味料', '調味料', '甘味料', '膨張剤',
+    '酸化防止剤', 'ｐｈ調整剤', 'ph調整剤', '光沢剤', '香辛料抽出物',
+    // Korean
+    '착색료', '보존료', '유화제', '안정제', '증점제', '산도조절제', '향미증진제', '감미료', '팽창제', '산화방지제', '식품첨가물',
+    // Malay
+    'pewarna', 'pewarna makanan', 'pengawet', 'pengemulsi', 'penstabil', 'pemekat', 'pengatur keasidan', 'penambah perisa',
+    'pemanis', 'agen penaik', 'antioksidan', 'bahan tambah makanan',
   ].map(normKey),
 );
 
@@ -58,6 +70,31 @@ function lookupCode(code: string, rules: Rules): string | null {
   return rules.eNumbers.get(code) ?? rules.eNumbers.get(code.replace(/[a-z]$/, '')) ?? null;
 }
 
+/**
+ * CJK/Hangul text has no spaces between words: scan a token for the longest known aliases ("白砂糖" contains
+ * "砂糖"). Single-character aliases ("盐" salt, "油" oil) only match a whole token, never inside a longer word.
+ */
+function cjkScan(token: string, rules: Rules, kind: IngredientMatch['kind']): IngredientMatch[] {
+  const whole = rules.aliases.get(token);
+  if (whole) return [{ ingredientId: whole, matched: token, kind, possible: false }];
+  const chars = [...token];
+  const out: IngredientMatch[] = [];
+  let i = 0;
+  outer: while (i < chars.length) {
+    for (let len = Math.min(rules.maxCjkLen, chars.length - i); len >= 2; len--) {
+      const sub = chars.slice(i, i + len).join('');
+      const id = rules.aliases.get(sub);
+      if (id) {
+        out.push({ ingredientId: id, matched: sub, kind, possible: false });
+        i += len;
+        continue outer;
+      }
+    }
+    i++;
+  }
+  return out;
+}
+
 /** Longest-first n-gram scan over the tokens of one item, plus E/INS codes. */
 function scan(key: string, rules: Rules, kind: IngredientMatch['kind'] = 'alias', allowBare = false): ScanResult {
   const tokens = key.split(' ').filter(Boolean);
@@ -67,6 +104,21 @@ function scan(key: string, rules: Rules, kind: IngredientMatch['kind'] = 'alias'
   outer: while (i < tokens.length) {
     // E-number pass: "e129", "e 129", "ins 129", "ins no 129", "e150 d"
     const t = tokens[i]!;
+    if (hasCJK(t)) {
+      // Spaced names first ("적색 40호", "黄色 4号"): try the longest run of tokens, spaced or joined.
+      for (let n = Math.min(4, tokens.length - i); n >= 2; n--) {
+        const run = tokens.slice(i, i + n);
+        const id = rules.aliases.get(run.join(' ')) ?? rules.aliases.get(run.join(''));
+        if (id) {
+          matches.push({ ingredientId: id, matched: run.join(' '), kind, possible: false });
+          i += n;
+          continue outer;
+        }
+      }
+      matches.push(...cjkScan(t, rules, kind));
+      i++;
+      continue;
+    }
     let codeLen = 0;
     let code: string | null = null;
     if (/^(?:e|ins)\d{3,4}[a-z]*$/.test(t)) {

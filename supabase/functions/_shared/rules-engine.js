@@ -3,8 +3,14 @@
 
 // packages/rules-engine/src/normalize.ts
 var TRANSLIT = { \u00F8: "o", \u00D8: "O", \u00E6: "ae", \u00C6: "AE", \u0153: "oe", \u0152: "OE", \u00DF: "ss", \u0142: "l", \u0141: "L", \u0111: "d", \u0110: "D", \u00FE: "th", \u00DE: "TH", \u0131: "i" };
+var CJK_RANGES = "\\u3040-\\u30fa\\u30fc-\\u30ff\\u3400-\\u4dbf\\u4e00-\\u9fff\\uac00-\\ud7af\\uf900-\\ufaff";
+var NOT_KEPT = new RegExp(`[^a-z0-9${CJK_RANGES}]+`, "g");
+var CJK_CHAR = new RegExp(`[${CJK_RANGES}]`);
+function hasCJK(s) {
+  return CJK_CHAR.test(s);
+}
 function normKey(input) {
-  return input.replace(/[øØæÆœŒßłŁđĐþÞı]/g, (ch) => TRANSLIT[ch] ?? ch).normalize("NFKD").replace(/[̀-ͯ]/g, "").toLowerCase().replace(/['’`]/g, "").replace(/[^a-z0-9]+/g, " ").trim();
+  return input.replace(/[øØæÆœŒßłŁđĐþÞı]/g, (ch) => TRANSLIT[ch] ?? ch).normalize("NFKD").replace(/[\u0300-\u036f]/g, "").normalize("NFC").toLowerCase().replace(/['’`]/g, "").replace(NOT_KEPT, " ").trim();
 }
 function pluralVariants(key) {
   const i = key.lastIndexOf(" ");
@@ -20,7 +26,7 @@ function pluralVariants(key) {
 }
 var ENTITIES = { quot: '"', amp: "&", apos: "'", "#39": "'", lt: "<", gt: ">", nbsp: " " };
 function cleanLabelText(raw) {
-  return raw.replace(/&(quot|amp|apos|#39|lt|gt|nbsp);/g, (_m, e) => ENTITIES[e] ?? " ").normalize("NFKC").replace(/(\w)-[ \t]*\r?\n[ \t]*(\w)/g, "$1$2").replace(/[\r\n\t]+/g, " ").replace(/[;·•|]/g, ",").replace(/[“”]/g, '"').replace(/\s+/g, " ").trim();
+  return raw.replace(/&(quot|amp|apos|#39|lt|gt|nbsp);/g, (_m, e) => ENTITIES[e] ?? " ").normalize("NFKC").replace(/[、・､]/g, ",").replace(/[。｡]/g, ". ").replace(/[【〔〘]/g, "[").replace(/[】〕〙]/g, "]").replace(/(\w)-[ \t]*\r?\n[ \t]*(\w)/g, "$1$2").replace(/[\r\n\t]+/g, " ").replace(/[;·•|]/g, ",").replace(/[“”]/g, '"').replace(/\s+/g, " ").trim();
 }
 var FILLER = [
   /\b(?:contains?\s+)?(?:less than\s+)?\d+(?:\.\d+)?\s?%\s+(?:or less\s+)?of\s*(?:the following\s*)?:?/gi,
@@ -67,7 +73,7 @@ function isNoiseKey(key) {
   const hasUnit = tokens.some((t) => UNIT_OR_FILLER.has(t) || /^\d+(?:mg|g|ml|kg|l|mcg)$/.test(t));
   return tokens.every((t) => {
     if (/^\d{3,4}[a-z]?$/.test(t)) return hasUnit;
-    return /^\d+[a-z]{0,3}$/.test(t) || UNIT_OR_FILLER.has(t) || t.length === 1;
+    return /^\d+[a-z]{0,3}$/.test(t) || UNIT_OR_FILLER.has(t) || t.length === 1 && !hasCJK(t);
   });
 }
 
@@ -102,6 +108,9 @@ function rowsFromSource(src) {
       is_active: true
     });
     for (const a of ing.aliases) aliases.push({ alias: a, ingredient_id: ing.id, kind: "name", lang: "en" });
+    for (const [lang, names] of [...Object.entries(ing.local_aliases ?? {}), ...Object.entries(ing.i18n_aliases ?? {})]) {
+      for (const a of names) aliases.push({ alias: a, ingredient_id: ing.id, kind: "name", lang });
+    }
     for (const e of ing.e_numbers ?? []) aliases.push({ alias: e, ingredient_id: ing.id, kind: "e_number", lang: "en" });
   }
   return { version: src.version, categories: src.categories, ingredients, aliases };
@@ -171,19 +180,24 @@ function loadRules(bundle) {
   if (bundle.schema !== 1) throw new Error(`Unsupported rules bundle schema ${String(bundle.schema)}`);
   const aliases = new Map(Object.entries(bundle.aliases));
   let maxAliasWords = 1;
-  for (const k of aliases.keys()) maxAliasWords = Math.max(maxAliasWords, k.split(" ").length);
+  let maxCjkLen = 0;
+  for (const k of aliases.keys()) {
+    maxAliasWords = Math.max(maxAliasWords, k.split(" ").length);
+    if (hasCJK(k) && !k.includes(" ")) maxCjkLen = Math.max(maxCjkLen, [...k].length);
+  }
   return {
     bundle,
     byId: new Map(bundle.ingredients.map((i) => [i.id, i])),
     categories: new Map(bundle.categories.map((c) => [c.id, c])),
     aliases,
     eNumbers: new Map(Object.entries(bundle.eNumbers)),
-    maxAliasWords
+    maxAliasWords,
+    maxCjkLen
   };
 }
 
 // packages/rules-engine/src/isolate.ts
-var HEADER_COLON = /\b(?:ingredients?|ingredient list|ingr[ée]dients|bahan(?:-bahan)?|komposisi)\s*[:：]/i;
+var HEADER_COLON = /(?:\b(?:ingredients?|ingredient list|ingr[ée]dients|bahan(?:-bahan)?|ramuan|komposisi)|配料表?|原材料名?|原料|(?<!营养|營養|栄養)成分|원재료명?|원료명?|재료명)\s*[:：]/i;
 var HEADER_WORD = /\bingredients?\b/i;
 var END_MARKERS = new RegExp(
   [
@@ -205,8 +219,12 @@ var END_MARKERS = new RegExp(
     String.raw`\bmade in (?!a\b|an\b|the same\b|our\b)`,
     String.raw`\bserving size\b`,
     String.raw`\bdirections\b`,
-    // a second ingredient list in another language (bilingual Canadian, EU and Nordic packs)
-    String.raw`\b(?:ingr[ée]dients|ingredientes|ingredienti|zutaten|ingredienser|ingrediënten|ainesosat|sk[łl]adniki)\s*[:：]`
+    // a second ingredient list in another language (bilingual Canadian, EU, Nordic and Asian packs)
+    String.raw`\b(?:ingr[ée]dients|ingredientes|ingredienti|zutaten|ingredienser|ingrediënten|ainesosat|sk[łl]adniki|ingredients?|bahan(?:-bahan)?|ramuan)\s*[:：]`,
+    String.raw`(?:配料表?|原材料名?|原料|원재료명?|원료명?)\s*[:：]`,
+    // CJK and Malay section headings: nutrition, storage, shelf life, allergens, net content, maker, origin
+    String.raw`营养成分|營養成分|營養標示|保质期|保存期限|貯存|贮存|储存|储藏|生产日期|生產日期|致敏|过敏原|過敏原|净含量|淨含量|产地|產地|生产商|製造商|制造商|内容量|賞味期限|消費期限|保存方法|栄養成分|영양정보|영양성분|보관방법|알레르기|내용량|유통기한|소비기한|제조원|제조사`,
+    String.raw`\bmaklumat pemakanan\b|\btarikh luput\b|\bsimpan di\b|\bdibuat di\b|\bmengandungi\s*:`
   ].join("|"),
   "i"
 );
@@ -401,7 +419,80 @@ var CLASS_NAMES = new Set(
     "modified starch",
     "seasoning",
     "seasonings",
-    "spices"
+    "spices",
+    // Chinese
+    "\u7740\u8272\u5242",
+    "\u8272\u7D20",
+    "\u98DF\u7528\u8272\u7D20",
+    "\u9632\u8150\u5242",
+    "\u4E73\u5316\u5242",
+    "\u7A33\u5B9A\u5242",
+    "\u589E\u7A20\u5242",
+    "\u7A33\u5B9A\u5242\u548C\u589E\u7A20\u5242",
+    "\u9178\u5EA6\u8C03\u8282\u5242",
+    "\u589E\u5473\u5242",
+    "\u751C\u5473\u5242",
+    "\u81A8\u677E\u5242",
+    "\u6297\u6C27\u5316\u5242",
+    "\u98DF\u54C1\u6DFB\u52A0\u5242",
+    "\u6C34\u5206\u4FDD\u6301\u5242",
+    "\u51DD\u56FA\u5242",
+    "\u88AB\u819C\u5242",
+    "\u6297\u7ED3\u5242",
+    "\u8C03\u5473\u6599",
+    "\u9999\u8F9B\u6599",
+    "\u7740\u8272\u5291",
+    "\u9632\u8150\u5291",
+    "\u4E73\u5316\u5291",
+    "\u7A69\u5B9A\u5291",
+    "\u589E\u7A20\u5291",
+    "\u9178\u5EA6\u8ABF\u7BC0\u5291",
+    "\u751C\u5473\u5291",
+    "\u81A8\u9B06\u5291",
+    "\u6297\u6C27\u5316\u5291",
+    "\u98DF\u54C1\u6DFB\u52A0\u7269",
+    // Japanese
+    "\u7740\u8272\u6599",
+    "\u4FDD\u5B58\u6599",
+    "\u4E73\u5316\u5264",
+    "\u5897\u7C98\u5264",
+    "\u5B89\u5B9A\u5264",
+    "\u5897\u7C98\u5B89\u5B9A\u5264",
+    "\u30B2\u30EB\u5316\u5264",
+    "\u9178\u5473\u6599",
+    "\u8ABF\u5473\u6599",
+    "\u7518\u5473\u6599",
+    "\u81A8\u5F35\u5264",
+    "\u9178\u5316\u9632\u6B62\u5264",
+    "\uFF50\uFF48\u8ABF\u6574\u5264",
+    "ph\u8ABF\u6574\u5264",
+    "\u5149\u6CA2\u5264",
+    "\u9999\u8F9B\u6599\u62BD\u51FA\u7269",
+    // Korean
+    "\uCC29\uC0C9\uB8CC",
+    "\uBCF4\uC874\uB8CC",
+    "\uC720\uD654\uC81C",
+    "\uC548\uC815\uC81C",
+    "\uC99D\uC810\uC81C",
+    "\uC0B0\uB3C4\uC870\uC808\uC81C",
+    "\uD5A5\uBBF8\uC99D\uC9C4\uC81C",
+    "\uAC10\uBBF8\uB8CC",
+    "\uD33D\uCC3D\uC81C",
+    "\uC0B0\uD654\uBC29\uC9C0\uC81C",
+    "\uC2DD\uD488\uCCA8\uAC00\uBB3C",
+    // Malay
+    "pewarna",
+    "pewarna makanan",
+    "pengawet",
+    "pengemulsi",
+    "penstabil",
+    "pemekat",
+    "pengatur keasidan",
+    "penambah perisa",
+    "pemanis",
+    "agen penaik",
+    "antioksidan",
+    "bahan tambah makanan"
   ].map(normKey)
 );
 var CONJ = / (?:and or|or|and) /;
@@ -419,6 +510,26 @@ function lookupPhrase(key, rules) {
 function lookupCode(code, rules) {
   return rules.eNumbers.get(code) ?? rules.eNumbers.get(code.replace(/[a-z]$/, "")) ?? null;
 }
+function cjkScan(token, rules, kind) {
+  const whole = rules.aliases.get(token);
+  if (whole) return [{ ingredientId: whole, matched: token, kind, possible: false }];
+  const chars = [...token];
+  const out = [];
+  let i = 0;
+  outer: while (i < chars.length) {
+    for (let len = Math.min(rules.maxCjkLen, chars.length - i); len >= 2; len--) {
+      const sub = chars.slice(i, i + len).join("");
+      const id = rules.aliases.get(sub);
+      if (id) {
+        out.push({ ingredientId: id, matched: sub, kind, possible: false });
+        i += len;
+        continue outer;
+      }
+    }
+    i++;
+  }
+  return out;
+}
 function scan(key, rules, kind = "alias", allowBare = false) {
   const tokens = key.split(" ").filter(Boolean);
   const matches = [];
@@ -426,6 +537,20 @@ function scan(key, rules, kind = "alias", allowBare = false) {
   let i = 0;
   outer: while (i < tokens.length) {
     const t = tokens[i];
+    if (hasCJK(t)) {
+      for (let n = Math.min(4, tokens.length - i); n >= 2; n--) {
+        const run = tokens.slice(i, i + n);
+        const id = rules.aliases.get(run.join(" ")) ?? rules.aliases.get(run.join(""));
+        if (id) {
+          matches.push({ ingredientId: id, matched: run.join(" "), kind, possible: false });
+          i += n;
+          continue outer;
+        }
+      }
+      matches.push(...cjkScan(t, rules, kind));
+      i++;
+      continue;
+    }
     let codeLen = 0;
     let code = null;
     if (/^(?:e|ins)\d{3,4}[a-z]*$/.test(t)) {
@@ -868,6 +993,8 @@ export {
   editDistance,
   effectiveTier,
   fuzzyLookup,
+  hasCJK,
+  isNoiseKey,
   isolateIngredients,
   joinNames,
   loadRules,

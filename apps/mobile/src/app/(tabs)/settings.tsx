@@ -9,6 +9,7 @@ import { exportCsv } from '@/platform/export';
 import { SHARE_BASE_URL, supabase } from '@/platform/supabase';
 import { Button, Card, H2, P, Screen, Title } from '@/ui/kit';
 import { space } from '@/ui/theme';
+import { LABEL_SCRIPTS, type LabelScript } from '@/core/store';
 
 function confirm(title: string, message: string): Promise<boolean> {
   if (Platform.OS === 'web') return Promise.resolve(window.confirm(`${title}\n\n${message}`));
@@ -24,6 +25,7 @@ export default function Settings() {
   const app = useApp();
   const [msg, setMsg] = useState<string | null>(null);
   const [checking, setChecking] = useState(false);
+  const [script, setScript] = useState<LabelScript>(() => app.store.getLabelScript());
 
   return (
     <Screen>
@@ -40,6 +42,24 @@ export default function Settings() {
       <P>{app.store.isPremium() ? 'You have Premium.' : 'Unlimited label scans and AI re-checks, and your full history synced and exportable.'}</P>
       <View style={{ flexDirection: 'row', marginTop: space.sm }}>
         <Button icon="sparkles-outline" label="See Premium" onPress={() => router.push('/upgrade')} />
+      </View>
+
+      <H2>Label language</H2>
+      <P muted>The language of the ingredient lists you photograph. Each option also reads English.</P>
+      <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: space.sm, marginTop: space.sm }} accessibilityRole="radiogroup">
+        {LABEL_SCRIPTS.map((s) => (
+          <Button
+            key={s.id}
+            label={s.label}
+            kind={script === s.id ? 'primary' : 'secondary'}
+            accessibilityRole="radio"
+            accessibilityState={{ selected: script === s.id }}
+            onPress={() => {
+              app.store.setLabelScript(s.id);
+              setScript(s.id);
+            }}
+          />
+        ))}
       </View>
 
       <H2>About the verdicts</H2>

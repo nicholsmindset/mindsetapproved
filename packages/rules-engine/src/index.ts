@@ -1,7 +1,7 @@
 export { analyze } from './analyze';
 export * from './types';
 export * from './bundle';
-export { normKey, cleanLabelText, stripFiller, stripPercent } from './normalize';
+export { normKey, cleanLabelText, stripFiller, stripPercent, hasCJK, isNoiseKey } from './normalize';
 export { isolateIngredients } from './isolate';
 export { splitIngredients } from './split';
 export { matchItems } from './match';

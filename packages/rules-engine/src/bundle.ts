@@ -1,4 +1,4 @@
-import { normKey } from './normalize';
+import { hasCJK, normKey } from './normalize';
 import type { BundleIngredient, Category, RulesBundle, Tier } from './types';
 
 export type AliasKind = 'name' | 'e_number' | 'ocr_misspelling';
@@ -47,6 +47,10 @@ export interface RuleSource {
     reason_long?: string;
     e_numbers?: string[];
     aliases: string[];
+    /** Translated names by language ("zh", "ko", "ja", "ms"), generated from the OFF taxonomy (pnpm i18n:aliases). */
+    i18n_aliases?: Record<string, string[]>;
+    /** Hand-curated names by language (label wording, regional dye numbering); never overwritten by the generator. */
+    local_aliases?: Record<string, string[]>;
     sources?: { regulator: string[]; preference: string[] };
   }>;
 }
@@ -87,6 +91,9 @@ export function rowsFromSource(src: RuleSource): Omit<CompileInput, 'generatedAt
       is_active: true,
     });
     for (const a of ing.aliases) aliases.push({ alias: a, ingredient_id: ing.id, kind: 'name', lang: 'en' });
+    for (const [lang, names] of [...Object.entries(ing.local_aliases ?? {}), ...Object.entries(ing.i18n_aliases ?? {})]) {
+      for (const a of names) aliases.push({ alias: a, ingredient_id: ing.id, kind: 'name', lang });
+    }
     for (const e of ing.e_numbers ?? []) aliases.push({ alias: e, ingredient_id: ing.id, kind: 'e_number', lang: 'en' });
   }
   return { version: src.version, categories: src.categories, ingredients, aliases };
@@ -167,6 +174,8 @@ export interface Rules {
   aliases: Map<string, string>;
   eNumbers: Map<string, string>;
   maxAliasWords: number;
+  /** Longest CJK/Hangul alias (characters), for substring matching of text written without spaces. */
+  maxCjkLen: number;
   /** Lazily built index for fuzzy matching. */
   _trigrams?: Map<string, string[]>;
 }
@@ -175,7 +184,11 @@ export function loadRules(bundle: RulesBundle): Rules {
   if (bundle.schema !== 1) throw new Error(`Unsupported rules bundle schema ${String(bundle.schema)}`);
   const aliases = new Map(Object.entries(bundle.aliases));
   let maxAliasWords = 1;
-  for (const k of aliases.keys()) maxAliasWords = Math.max(maxAliasWords, k.split(' ').length);
+  let maxCjkLen = 0;
+  for (const k of aliases.keys()) {
+    maxAliasWords = Math.max(maxAliasWords, k.split(' ').length);
+    if (hasCJK(k) && !k.includes(' ')) maxCjkLen = Math.max(maxCjkLen, [...k].length);
+  }
   return {
     bundle,
     byId: new Map(bundle.ingredients.map((i) => [i.id, i])),
@@ -183,5 +196,6 @@ export function loadRules(bundle: RulesBundle): Rules {
     aliases,
     eNumbers: new Map(Object.entries(bundle.eNumbers)),
     maxAliasWords,
+    maxCjkLen,
   };
 }

@@ -191,3 +191,34 @@ describe('real-label fixes (from the benchmark)', () => {
   it('does not treat a bare unknown number as a code', () => expect(ids('999')).toEqual([]));
   it('fuzzy does not turn peanut oil into plant oil', () => expect(one('peanut oil').matches.filter((m) => m.ingredientId === 'vegetable_oil')).toEqual([]));
 });
+
+describe('Chinese, Japanese, Korean and Malay labels', () => {
+  it.each([
+    ['棕榈油', ['palm_oil']],
+    ['白砂糖', ['added_sugar']],
+    ['柠檬黄', ['yellow_5']],
+    ['黄色4号', ['yellow_5']],
+    ['黄色5号', ['yellow_6']],
+    ['적색 40호', ['red_40']],
+    ['적색40호', ['red_40']],
+    ['합성향료', ['artificial_flavors']],
+    ['minyak sawit', ['palm_oil']],
+    ['perisa tiruan', ['artificial_flavors']],
+    ['果葡糖浆', ['hfcs']],
+  ])('%s -> %j', (text, want) => expect(ids(text)).toEqual(want));
+
+  it('reads the children of a CJK class name in full-width brackets', () => {
+    const r = analyze('原材料名：着色料（黄色4号、赤色40号）', rules);
+    expect(r.flagged.map((c) => c.ingredientId).sort()).toEqual(['red_40', 'yellow_5']);
+    expect(r.unmatched).toEqual([]);
+  });
+
+  it('does not report a class name as unmatched', () => {
+    const r = analyze('原材料名：砂糖、酸味料、着色料（黄色4号）', rules);
+    expect(r.unmatched).not.toContain('酸味料');
+  });
+
+  it('reads a Malay class prefix', () => expect(ids('pewarna: tartrazin')).toEqual(['yellow_5']));
+
+  it('does not split caramel colour into caramel', () => expect(ids('焦糖色')).toEqual(['caramel_color']));
+});

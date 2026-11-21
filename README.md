@@ -61,6 +61,10 @@ r.suggestAiRecheck;
 3. Head nouns are borrowed from the parent or an "or" list: `vegetable oil (canola, soybean)`, `canola, soybean or sunflower oil`.
 4. OCR fixes (0/O, 1/l, rn↔m) only when the fixed word is a known alias.
 5. Fuzzy matching only for words over 6 letters. A word must keep its first letter and its digits, so "sodium citrate" never becomes "sodium nitrate". A fuzzy match is shown as *possible*, and it never counts toward Approved.
+6. Chinese, Japanese and Korean text has no spaces, so it is matched by the longest known name inside each word (白砂糖, 棕榈油). Spaced names such as `적색 40호` are tried as a whole first. Class names (着色料, 食品添加剂, pewarna) are treated like "Colour" and "Additive" in English.
+
+### Languages
+Labels are read in English, Malay, Chinese (simplified and traditional), Japanese and Korean. Most translated names come from the Open Food Facts taxonomies (`pnpm i18n:aliases`, stored as `i18n_aliases`). Curated names, including the Japanese dye numbering (黄色4号 is tartrazine, Yellow 5 in the US), are in `local_aliases`. In the app, **Settings → Label language** picks the ML Kit model used for label photos. Every model also reads English. The database `norm_key()` keeps the same characters as the engine's `normKey()`, and `pnpm check:sql` checks that the two agree.
 
 ### Verdict
 Any bad ingredient gives Not Approved. Otherwise any borderline ingredient gives Caution. Otherwise the verdict is Approved, but only with at least 3 confidently
@@ -68,7 +72,7 @@ matched items, an OCR confidence of at least 0.8, and no more than half the item
 never affects the verdict.
 
 ## Accuracy
-`pnpm benchmark` runs the engine on 800 popular products, 100 from each of eight English-speaking markets. Currently **93.6%** of ingredient items are recognised (the PRD target is 90%), and every market is at 87.8% or above. The report also lists the label text that triggered each rule, so false positives can be audited. A test fails if coverage drops below 93%.
+`pnpm benchmark` runs the engine on 800 popular products, 100 from each of eight English-speaking markets. Currently **93.8%** of ingredient items are recognised (the PRD target is 90%), and every market is at 87.8% or above. The report also lists the label text that triggered each rule, so false positives can be audited. A test fails if coverage drops below 93%.
 
 ## Data attribution
 Data imported from Open Food Facts is available under the Open Database License (ODbL).

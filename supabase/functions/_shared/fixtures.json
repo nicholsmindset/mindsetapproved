@@ -753,8 +753,11 @@
   {
     "name": "sg malay label",
     "text": "Bahan-bahan: Tepung gandum, gula, minyak sawit, garam.",
-    "verdict": "cant_verify",
-    "flagged": []
+    "verdict": "caution",
+    "flagged": [
+      "added_sugar",
+      "palm_oil"
+    ]
   },
   {
     "name": "sg chinese header only english",
@@ -981,6 +984,73 @@
     "flagged": [],
     "good": [
       "avocado_oil"
+    ]
+  },
+  {
+    "name": "cn label simplified",
+    "text": "配料：小麦粉，白砂糖，棕榈油，食用盐，食品添加剂（碳酸氢钠），食用香精。营养成分表 能量 2000kJ",
+    "verdict": "caution",
+    "flagged": [
+      "added_sugar",
+      "palm_oil",
+      "natural_flavors"
+    ]
+  },
+  {
+    "name": "cn label with dye",
+    "text": "配料表：水、白砂糖、柠檬酸、柠檬黄、日落黄、苯甲酸钠。保质期：12个月",
+    "verdict": "not_approved",
+    "flagged": [
+      "added_sugar",
+      "yellow_5",
+      "yellow_6",
+      "sodium_benzoate"
+    ]
+  },
+  {
+    "name": "cn label clean",
+    "text": "配料：水，大豆，食用盐。",
+    "verdict": "approved",
+    "flagged": []
+  },
+  {
+    "name": "kr label",
+    "text": "원재료명: 밀가루, 설탕, 팜유, 정제염, 탄산수소나트륨, 합성향료. 영양정보 총 내용량",
+    "verdict": "not_approved",
+    "flagged": [
+      "added_sugar",
+      "palm_oil",
+      "artificial_flavors"
+    ]
+  },
+  {
+    "name": "jp label dye numbering",
+    "text": "原材料名：砂糖、水あめ、ゼラチン、酸味料、香料、着色料（黄色4号、赤色40号）",
+    "verdict": "not_approved",
+    "flagged": [
+      "added_sugar",
+      "gelatin",
+      "natural_flavors",
+      "yellow_5",
+      "red_40"
+    ]
+  },
+  {
+    "name": "my label full",
+    "text": "Bahan-bahan: Air, gula, garam, perisa tiruan, pewarna (tartrazin). Maklumat pemakanan: tenaga 200kcal",
+    "verdict": "not_approved",
+    "flagged": [
+      "added_sugar",
+      "artificial_flavors",
+      "yellow_5"
+    ]
+  },
+  {
+    "name": "sg mixed english chinese",
+    "text": "Ingredients: Wheat flour, sugar, salt. 配料：小麦粉，白砂糖，食用盐。",
+    "verdict": "caution",
+    "flagged": [
+      "added_sugar"
     ]
   }
 ]

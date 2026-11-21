@@ -12,7 +12,8 @@
     "check:sql": "scripts/check-sql.sh",
     "deno:shared": "tsx scripts/build-deno-shared.ts",
     "benchmark:fetch": "tsx scripts/benchmark/fetch.ts",
-    "benchmark": "tsx scripts/benchmark/run.ts"
+    "benchmark": "tsx scripts/benchmark/run.ts",
+    "i18n:aliases": "tsx scripts/multilingual/extract.ts"
   },
   "devDependencies": {
     "@types/node": "^22.10.0",

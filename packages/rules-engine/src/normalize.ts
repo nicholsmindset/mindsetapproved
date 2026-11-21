@@ -6,14 +6,28 @@
 /** Letters NFKD can't decompose, transliterated the way Postgres unaccent() does, so both sides agree. */
 const TRANSLIT: Record<string, string> = { ø: 'o', Ø: 'O', æ: 'ae', Æ: 'AE', œ: 'oe', Œ: 'OE', ß: 'ss', ł: 'l', Ł: 'L', đ: 'd', Đ: 'D', þ: 'th', Þ: 'TH', ı: 'i' };
 
+/**
+ * Scripts kept besides a-z/0-9: Japanese kana, CJK ideographs and Korean Hangul. The same explicit set is used by
+ * Postgres norm_key(), so both sides agree regardless of the database locale. Other scripts become spaces.
+ */
+export const CJK_RANGES = '\\u3040-\\u30fa\\u30fc-\\u30ff\\u3400-\\u4dbf\\u4e00-\\u9fff\\uac00-\\ud7af\\uf900-\\ufaff';
+const NOT_KEPT = new RegExp(`[^a-z0-9${CJK_RANGES}]+`, 'g');
+const CJK_CHAR = new RegExp(`[${CJK_RANGES}]`);
+
+/** True when the text contains CJK or Hangul, which is matched by substring (no spaces between words). */
+export function hasCJK(s: string): boolean {
+  return CJK_CHAR.test(s);
+}
+
 export function normKey(input: string): string {
   return input
     .replace(/[øØæÆœŒßłŁđĐþÞı]/g, (ch) => TRANSLIT[ch] ?? ch)
     .normalize('NFKD')
-    .replace(/[̀-ͯ]/g, '')
+    .replace(/[\u0300-\u036f]/g, '')
+    .normalize('NFC') // recompose Hangul syllables and kana after stripping Latin accents
     .toLowerCase()
     .replace(/['’`]/g, '')
-    .replace(/[^a-z0-9]+/g, ' ')
+    .replace(NOT_KEPT, ' ')
     .trim();
 }
 
@@ -38,6 +52,11 @@ export function cleanLabelText(raw: string): string {
   return raw
     .replace(/&(quot|amp|apos|#39|lt|gt|nbsp);/g, (_m, e: string) => ENTITIES[e] ?? ' ')
     .normalize('NFKC')
+    // CJK list punctuation: 、 and ・ separate items, 。 ends a sentence, lenticular brackets act as brackets
+    .replace(/[、・､]/g, ',')
+    .replace(/[。｡]/g, '. ')
+    .replace(/[【〔〘]/g, '[')
+    .replace(/[】〕〙]/g, ']')
     .replace(/(\w)-[ \t]*\r?\n[ \t]*(\w)/g, '$1$2')
     .replace(/[\r\n\t]+/g, ' ')
     .replace(/[;·•|]/g, ',')
@@ -106,6 +125,7 @@ export function isNoiseKey(key: string): boolean {
   return tokens.every((t) => {
     // a 3-4 digit number with no unit next to it may be an E/INS code ("e 102", "471")
     if (/^\d{3,4}[a-z]?$/.test(t)) return hasUnit;
-    return /^\d+[a-z]{0,3}$/.test(t) || UNIT_OR_FILLER.has(t) || t.length === 1;
+    // a single CJK character is a word ("盐" is salt); a single Latin letter is debris
+    return /^\d+[a-z]{0,3}$/.test(t) || UNIT_OR_FILLER.has(t) || (t.length === 1 && !hasCJK(t));
   });
 }

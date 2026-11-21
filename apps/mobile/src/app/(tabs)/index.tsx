@@ -74,7 +74,7 @@ export default function ScanScreen() {
       }
       setBusy('Reading the label…');
       try {
-        const { text, confidence } = await recognizeLabel(uri);
+        const { text, confidence } = await recognizeLabel(uri, app.store.getLabelScript());
         if (!text.trim()) {
           setNotice({ text: 'No text found. Move closer and make sure the label is in focus.', tone: 'error' });
           return;
