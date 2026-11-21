@@ -13,6 +13,9 @@ describe('normKey', () => {
     ["Baker's yeast", 'bakers yeast'],
     ['E150d', 'e150d'],
     ['Monosodium L-Glutamate', 'monosodium l glutamate'],
+    ['Hvitløk', 'hvitlok'],
+    ['Rapsöl', 'rapsol'],
+    ['Straße', 'strasse'],
   ])('%s -> %s', (input, out) => expect(normKey(input)).toBe(out));
 });
 
@@ -59,4 +62,11 @@ describe('stripPercent', () => {
     ['tomatoes [65 %]', 'tomatoes'],
     ['salt 1,5%', 'salt'],
   ])('%s', (input, out) => expect(stripPercent(input)).toBe(out));
+});
+
+import { isNoiseKey } from '../src/normalize';
+
+describe('isNoiseKey', () => {
+  it.each(['2 mg l', '180 g per 100 g', 'min', 'less than', '0 g', 'l', '7'])('%s is noise', (k) => expect(isNoiseKey(k)).toBe(true));
+  it.each(['salt', 'e471', 'e 102', '471', 'vitamin b12', 'b12', '100 whole wheat'])('%s is not noise', (k) => expect(isNoiseKey(k)).toBe(false));
 });

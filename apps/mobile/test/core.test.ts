@@ -205,7 +205,7 @@ describe('scan pipeline', () => {
     );
     expect(result.summary).toBe('Not Approved — contains canola oil.');
     expect(s.getHistory()[0]).toEqual(entry);
-    expect(fx.insertScan).toHaveBeenCalledWith(expect.objectContaining({ id: entry.id, verdict: 'not_approved', source: 'label', ocr_text: expect.stringContaining('canola'), install_id: s.installId() }));
+    expect(fx.insertScan).toHaveBeenCalledWith(expect.objectContaining({ id: entry.id, verdict: 'not_approved', source: 'label', ocr_text: expect.stringContaining('canola'), install_id: s.installId(), product_name: null, brand: null }), expect.stringContaining('canola'));
     expect(fx.logUnmatched).toHaveBeenCalledWith(['zzqx gum'], expect.any(String));
     expect(fx.submitProduct).toHaveBeenCalledWith('9556001234567', expect.any(String), undefined, undefined);
   });
@@ -213,7 +213,7 @@ describe('scan pipeline', () => {
     const s = testStore();
     const fx = fakeEffects();
     runScan({ text: 'water, salt, garlic', source: 'off', ocrConfidence: 1, barcode: '0012345678905' }, { rules, settings: s.getSettings(), store: s, effects: fx });
-    expect(fx.insertScan).toHaveBeenCalledWith(expect.objectContaining({ ocr_text: null, verdict: 'approved' }));
+    expect(fx.insertScan).toHaveBeenCalledWith(expect.objectContaining({ ocr_text: null, verdict: 'approved' }), 'water, salt, garlic');
     expect(fx.submitProduct).not.toHaveBeenCalled();
     expect(fx.logUnmatched).not.toHaveBeenCalled();
   });
@@ -270,5 +270,16 @@ describe('OCR text', () => {
     expect(aiToText({ ingredients: ['sugar', 'chocolate (cocoa, sugar)'], may_contain: ['peanuts'] })).toBe(
       'Ingredients: sugar, chocolate (cocoa, sugar). May contain peanuts.',
     );
+  });
+});
+
+describe('premium', () => {
+  it('lifts the daily limits', () => {
+    const s = testStore();
+    s.setPremium(true);
+    for (let i = 0; i < 20; i++) expect(consume(s, 'label')).toBe(true);
+    expect(remaining(s, 'ai')).toBe(Number.POSITIVE_INFINITY);
+    s.setPremium(false);
+    expect(remaining(s, 'label')).toBe(FREE_LIMITS.label);
   });
 });

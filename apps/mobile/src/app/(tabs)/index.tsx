@@ -8,7 +8,7 @@ import { recognizeLabel } from '@/platform/ocr';
 import { Scanner } from '@/scan/Scanner';
 import type { ScanMode } from '@/scan/types';
 import { photoByEntry, useApp } from '@/state/app';
-import { P } from '@/ui/kit';
+import { Button, P } from '@/ui/kit';
 import { MAX_WIDTH, radius, space, useColors } from '@/ui/theme';
 
 function useAppActive() {
@@ -27,7 +27,7 @@ export default function ScanScreen() {
   const appActive = useAppActive();
   const [mode, setMode] = useState<ScanMode>('barcode');
   const [busy, setBusy] = useState<string | null>(null);
-  const [notice, setNotice] = useState<{ text: string; tone: 'info' | 'error' } | null>(null);
+  const [notice, setNotice] = useState<{ text: string; tone: 'info' | 'error'; premium?: boolean } | null>(null);
   /** A barcode the databases didn't know: the label photo that follows is saved against it. */
   const [pendingBarcode, setPendingBarcode] = useState<string | null>(null);
 
@@ -69,7 +69,7 @@ export default function ScanScreen() {
   const onPhoto = useCallback(
     async (uri: string) => {
       if (!consume(app.store, 'label')) {
-        setNotice({ text: `You've used today's ${FREE_LIMITS.label} free label scans. Barcode scans are unlimited.`, tone: 'error' });
+        setNotice({ text: `You've used today's ${FREE_LIMITS.label} free label scans. Barcode scans are unlimited.`, tone: 'error', premium: true });
         return;
       }
       setBusy('Reading the label…');
@@ -123,6 +123,7 @@ export default function ScanScreen() {
             style={{ padding: space.md, borderRadius: radius.md, backgroundColor: notice.tone === 'error' ? c.badBg : c.borderlineBg }}
           >
             <Text style={{ color: notice.tone === 'error' ? c.bad : c.borderline, fontWeight: '600' }}>{notice.text}</Text>
+            {notice.premium ? <Button style={{ marginTop: space.sm, alignSelf: 'flex-start' }} icon="sparkles-outline" label="See Premium" onPress={() => router.push('/upgrade')} /> : null}
           </View>
         ) : null}
 

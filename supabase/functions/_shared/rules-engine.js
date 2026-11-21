@@ -2,8 +2,9 @@
 // deno-lint-ignore-file
 
 // packages/rules-engine/src/normalize.ts
+var TRANSLIT = { \u00F8: "o", \u00D8: "O", \u00E6: "ae", \u00C6: "AE", \u0153: "oe", \u0152: "OE", \u00DF: "ss", \u0142: "l", \u0141: "L", \u0111: "d", \u0110: "D", \u00FE: "th", \u00DE: "TH", \u0131: "i" };
 function normKey(input) {
-  return input.normalize("NFKD").replace(/[̀-ͯ]/g, "").toLowerCase().replace(/['’`]/g, "").replace(/[^a-z0-9]+/g, " ").trim();
+  return input.replace(/[øØæÆœŒßłŁđĐþÞı]/g, (ch) => TRANSLIT[ch] ?? ch).normalize("NFKD").replace(/[̀-ͯ]/g, "").toLowerCase().replace(/['’`]/g, "").replace(/[^a-z0-9]+/g, " ").trim();
 }
 function pluralVariants(key) {
   const i = key.lastIndexOf(" ");
@@ -17,8 +18,9 @@ function pluralVariants(key) {
   }
   return out.map((v) => head + v);
 }
+var ENTITIES = { quot: '"', amp: "&", apos: "'", "#39": "'", lt: "<", gt: ">", nbsp: " " };
 function cleanLabelText(raw) {
-  return raw.normalize("NFKC").replace(/(\w)-[ \t]*\r?\n[ \t]*(\w)/g, "$1$2").replace(/[\r\n\t]+/g, " ").replace(/[;·•|]/g, ",").replace(/[“”]/g, '"').replace(/\s+/g, " ").trim();
+  return raw.replace(/&(quot|amp|apos|#39|lt|gt|nbsp);/g, (_m, e) => ENTITIES[e] ?? " ").normalize("NFKC").replace(/(\w)-[ \t]*\r?\n[ \t]*(\w)/g, "$1$2").replace(/[\r\n\t]+/g, " ").replace(/[;·•|]/g, ",").replace(/[“”]/g, '"').replace(/\s+/g, " ").trim();
 }
 var FILLER = [
   /\b(?:contains?\s+)?(?:less than\s+)?\d+(?:\.\d+)?\s?%\s+(?:or less\s+)?of\s*(?:the following\s*)?:?/gi,
@@ -26,9 +28,14 @@ var FILLER = [
   /\b(?:one or more|1 or more) of (?:the following)?\s*:?/gi,
   /\b(?:certified\s+)?organic\b/gi,
   /\bnon[- ]?gmo\b/gi,
-  /\bcold[- ]pressed\b/gi
+  /\bcold[- ]pressed\b/gi,
+  // allergen typography notes: "allergens in bold", "for allergens see ingredients in bold"
+  /\b(?:for allergens,?\s+)?(?:see\s+)?(?:allergens?|ingredients)\s+(?:are\s+)?(?:in|shown in|listed in)\s+(?:bold|capitals|underlined)\b/gi,
+  /\bin bold\b/gi
 ];
 var EXPELLER = /\bexpell?er[- ]pressed\b/gi;
+var NON_HYDROGENATED = /\b(?:non[- ]?|un|not\s+)hydrogenated\b/gi;
+var FULLY_HYDROGENATED = /\b(?:fully|completely)[- ]hydrogenated\b/gi;
 function stripFiller(text) {
   const flags = [];
   let t = text;
@@ -37,11 +44,31 @@ function stripFiller(text) {
     t = t.replace(EXPELLER, " ");
   }
   EXPELLER.lastIndex = 0;
+  if (NON_HYDROGENATED.test(t)) {
+    flags.push("non_hydrogenated");
+    t = t.replace(NON_HYDROGENATED, " ");
+  }
+  NON_HYDROGENATED.lastIndex = 0;
+  if (FULLY_HYDROGENATED.test(t)) {
+    flags.push("fully_hydrogenated");
+    t = t.replace(FULLY_HYDROGENATED, " ");
+  }
+  FULLY_HYDROGENATED.lastIndex = 0;
   for (const re of FILLER) t = t.replace(re, " ");
   return { text: t.replace(/\s+/g, " ").trim(), flags };
 }
 function stripPercent(text) {
   return text.replace(/[([]\s*\d+(?:[.,]\d+)?\s?%\s*[)\]]/g, " ").replace(/\d+(?:[.,]\d+)?\s?%/g, " ").replace(/\s+/g, " ").trim();
+}
+var UNIT_OR_FILLER = /* @__PURE__ */ new Set(["mg", "g", "kg", "ml", "l", "mcg", "ug", "iu", "kcal", "kj", "per", "of", "ph", "min", "max", "approx", "approximately", "less", "than", "more", "per100g", "serving"]);
+function isNoiseKey(key) {
+  if (!key) return true;
+  const tokens = key.split(" ");
+  const hasUnit = tokens.some((t) => UNIT_OR_FILLER.has(t) || /^\d+(?:mg|g|ml|kg|l|mcg)$/.test(t));
+  return tokens.every((t) => {
+    if (/^\d{3,4}[a-z]?$/.test(t)) return hasUnit;
+    return /^\d+[a-z]{0,3}$/.test(t) || UNIT_OR_FILLER.has(t) || t.length === 1;
+  });
 }
 
 // packages/rules-engine/src/bundle.ts
@@ -177,7 +204,9 @@ var END_MARKERS = new RegExp(
     String.raw`\bproduct of\b`,
     String.raw`\bmade in (?!a\b|an\b|the same\b|our\b)`,
     String.raw`\bserving size\b`,
-    String.raw`\bdirections\b`
+    String.raw`\bdirections\b`,
+    // a second ingredient list in another language (bilingual Canadian, EU and Nordic packs)
+    String.raw`\b(?:ingr[ée]dients|ingredientes|ingredienti|zutaten|ingredienser|ingrediënten|ainesosat|sk[łl]adniki)\s*[:：]`
   ].join("|"),
   "i"
 );
@@ -197,7 +226,7 @@ function isolateIngredients(raw) {
   });
   const end = END_MARKERS.exec(text);
   if (end) text = text.slice(0, end.index + (end[0].startsWith(".") || end[0].startsWith("!") ? 1 : 0));
-  const block = text.replace(/(?<!\bno)\.(?=\s|$)/gi, ",").replace(/^[\s:,.\-–]+/, "").replace(/[\s,.]+$/, "").replace(/\s*,\s*(?:,\s*)+/g, ", ").trim();
+  const block = text.replace(/(?<!\b(?:no|[a-z]))\.(?=\s|$)/gi, ",").replace(/^[\s:,.\-–]+/, "").replace(/[\s,.]+$/, "").replace(/\s*,\s*(?:,\s*)+/g, ", ").trim();
   return { block, notes, headerFound };
 }
 
@@ -257,7 +286,11 @@ function sameShape(a, b) {
   const wb = b.split(" ");
   if (wa.length !== wb.length) return false;
   if (a.replace(/\D/g, "") !== b.replace(/\D/g, "")) return false;
-  return wa.every((w, i) => w[0] === wb[i][0]);
+  return wa.every((w, i) => {
+    const v = wb[i];
+    if (w[0] !== v[0]) return false;
+    return w === v || editDistance(w, v) <= (Math.max(w.length, v.length) > 6 ? 2 : 1);
+  });
 }
 var FUZZY_MIN_SIMILARITY = 0.85;
 function fuzzyLookup(key, rules) {
@@ -395,7 +428,7 @@ function scan(key, rules, kind = "alias", allowBare = false) {
     const t = tokens[i];
     let codeLen = 0;
     let code = null;
-    if (/^e\d{3,4}[a-z]*$/.test(t)) {
+    if (/^(?:e|ins)\d{3,4}[a-z]*$/.test(t)) {
       code = eCode(t);
       codeLen = 1;
     } else if (allowBare && /^\d{3,4}[a-z]*$/.test(t)) {
@@ -464,19 +497,18 @@ function matchKey(key, ctx, rules) {
     const lastWord = parts[parts.length - 1].split(" ").pop();
     const heads2 = HEADS.has(lastWord) ? [lastWord] : ctx.parentHead ? [ctx.parentHead] : [];
     for (const part of parts) {
-      const r = scan(part, rules);
-      if (r.matches.length === 0) {
-        for (const h of heads2) {
-          const hit = lookupPhrase(`${part} ${h}`, rules);
-          if (hit) {
-            res.matches.push({ ingredientId: hit.id, matched: hit.alias, kind: "alias", possible: false });
-            break;
-          }
-        }
-      } else {
-        res.matches.push(...r.matches);
+      let hit = null;
+      for (const h of heads2) {
+        if (part.endsWith(` ${h}`)) break;
+        hit = lookupPhrase(`${part} ${h}`, rules);
+        if (hit) break;
       }
+      if (hit) res.matches.push({ ingredientId: hit.id, matched: hit.alias, kind: "alias", possible: false });
+      else res.matches.push(...scan(part, rules).matches);
     }
+    res.matches = res.matches.filter(
+      (m, i, all) => !(rules.byId.get(m.ingredientId)?.category === "basic" && all.some((o) => o !== m && o.matched.startsWith(`${m.matched} `)))
+    );
   }
   if (FLAVOR_END.test(key)) {
     const isFlavor = (m) => rules.byId.get(m.ingredientId)?.category === "flavor";
@@ -510,6 +542,10 @@ function matchItems(raw, rules) {
       let key = normKey(name);
       const isClass = !classPrefix && CLASS_NAMES.has(key);
       if ((parentCtx.isClass || classPrefix) && /^\d{3,4}[a-z]*$/.test(key)) key = eCode(`e${key}`) ?? key;
+      else if (/^\d{3,4}\s?[a-f]?(?:\s?(?:i{1,3}|iv|vi?))?$/.test(key)) {
+        const code = eCode(`e${key.replace(/\s/g, "")}`);
+        if (code && (rules.eNumbers.has(code) || rules.eNumbers.has(code.replace(/[a-z]$/, "")))) key = code;
+      }
       const heads = [];
       const wordCount = key.split(" ").length;
       if (wordCount <= 2 && it.children.length === 0) {
@@ -524,7 +560,7 @@ function matchItems(raw, rules) {
           if (sk.split(" ").length > 2 || sib.children.length) break;
         }
       }
-      if (!key && it.children.length === 0) return;
+      if (it.children.length === 0 && isNoiseKey(key)) return;
       const item = {
         text: it.name,
         key,

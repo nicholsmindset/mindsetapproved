@@ -82,15 +82,18 @@ describe('E-number / INS pass', () => {
   it('falls back from a letter suffix to the base code', () => expect(ids('E441a')).toEqual(['gelatin']));
   it('bare numbers under a class label are INS codes', () => expect(ids('Colour (102, 110)')).toEqual(['yellow_5', 'yellow_6']));
   it('bare numbers under a class prefix are INS codes', () => expect(ids('Flavour enhancer: 621')).toEqual(['msg']));
-  it('bare numbers elsewhere are not codes', () => expect(ids('102')).toEqual([]));
+  it('bare numbers elsewhere are codes only when the code is a known rule', () => {
+    expect(ids('102')).toEqual(['yellow_5']);
+    expect(ids('100 g')).toEqual([]);
+  });
   it('logs unknown codes', () => {
-    const r = matchItems(splitIngredients('emulsifier (E471), colour (E124)'), rules);
-    expect(r.unmatched).toEqual(['e471', 'e124']);
+    const r = matchItems(splitIngredients('stabiliser (E1520), glazing agent (E999)'), rules);
+    expect(r.unmatched).toEqual(['e1520', 'e999']);
   });
   it('class label headers are containers, not unmatched', () => {
-    const r = matchItems(splitIngredients('preservatives (calcium propionate)'), rules);
+    const r = matchItems(splitIngredients('preservatives (zzqx agent)'), rules);
     expect(r.items[0]!.container).toBe(true);
-    expect(r.unmatched).toEqual(['calcium propionate']);
+    expect(r.unmatched).toEqual(['zzqx agent']);
   });
   it('strips a class prefix with a colon', () => expect(ids('Emulsifier: soy lecithin')).toEqual(['lecithin']));
 });
@@ -105,7 +108,9 @@ describe('head nouns and alternative lists', () => {
   it('artificial and natural flavours', () => expect(ids('artificial and natural flavours').sort()).toEqual(['artificial_flavors', 'natural_flavors']));
   it('salt and vinegar seasoning', () => expect(ids('salt and vinegar seasoning')).toEqual(['salt', 'vinegars_acids']));
   it('rapeseed and soybean under an oils parent', () =>
-    expect(ids('fully hydrogenated vegetable oils (rapeseed and soybean)')).toEqual(['partially_hydrogenated_oil', 'canola_oil', 'soybean_oil']));
+    expect(ids('hydrogenated vegetable oils (rapeseed and soybean)')).toEqual(['partially_hydrogenated_oil', 'canola_oil', 'soybean_oil']));
+  it('fully hydrogenated oil is judged by the oil, not as trans fat', () =>
+    expect(ids('fully hydrogenated vegetable oils (rapeseed and soybean)')).toEqual(['vegetable_oil', 'canola_oil', 'soybean_oil']));
 });
 
 describe('flavourings', () => {
@@ -131,8 +136,8 @@ describe('OCR fixes and fuzzy pass', () => {
     expect(one('tartrazlne').matches[0]).toMatchObject({ ingredientId: 'yellow_5', kind: 'fuzzy', possible: true });
   });
   it('fuzzy needs more than 6 letters', () => expect(one('sallt').matches).toEqual([]));
-  it('fuzzy keeps first letters', () => expect(one('sodium citrate').matches).toEqual([]));
-  it('fuzzy keeps numbers', () => expect(one('polysorbate 60').matches).toEqual([]));
+  it('fuzzy keeps first letters', () => expect(one('zodium nitrate').matches).toEqual([]));
+  it('fuzzy keeps numbers', () => expect(one('polysorbate 81').matches).toEqual([]));
   it('fuzzy needs the same word count', () => expect(one('canolaoil').matches).toEqual([]));
   it('possible flags still count toward Not Approved', () => {
     const r = analyze('Ingredients: water, salt, sugar, tartrazlne', rules);
@@ -160,4 +165,29 @@ describe('positions and flags', () => {
     const r = analyze('Ingredients: potatoes, expeller pressed canola oil, salt', rules);
     expect(r.flagged[0]!.flags).toEqual(['expeller_pressed']);
   });
+});
+
+describe('real-label fixes (from the benchmark)', () => {
+  it('non-hydrogenated vegetable oil is not hydrogenated oil', () => {
+    expect(ids('non-hydrogenated vegetable oil')).toEqual(['vegetable_oil']);
+    expect(ids('non hydrogenated vegetable oils')).toEqual(['vegetable_oil']);
+  });
+  it('keeps abbreviations together', () => {
+    const r = analyze('Ingredients: milk, cultures (L. bulgaricus, S. thermophilus).', rules);
+    expect(r.items.map((i) => i.text)).toContain('L. bulgaricus');
+  });
+  it('stops at a second-language list', () => {
+    const r = analyze('Ingredients: sugar, salt. Ingrédients : sucre, sel.', rules);
+    expect(r.items.map((i) => i.key)).toEqual(['sugar', 'salt']);
+  });
+  it('ignores stray single characters and small numbers', () => {
+    const r = analyze('Ingredients: water, l, 2, salt, garlic', rules);
+    expect(r.unmatched).toEqual([]);
+  });
+  it('drops "allergens in bold" notes', () => {
+    expect(analyze('Ingredients: water, salt, garlic. Allergens in bold.', rules).unmatched).toEqual([]);
+  });
+  it('matches a bare known code without a class label', () => expect(ids('621')).toEqual(['msg']));
+  it('does not treat a bare unknown number as a code', () => expect(ids('999')).toEqual([]));
+  it('fuzzy does not turn peanut oil into plant oil', () => expect(one('peanut oil').matches.filter((m) => m.ingredientId === 'vegetable_oil')).toEqual([]));
 });

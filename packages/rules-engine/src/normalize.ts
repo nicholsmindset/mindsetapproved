@@ -3,8 +3,12 @@
  * alias keys at compile time and lookup keys at scan time, so they always agree.
  * "FD&C Red No. 40" -> "fd c red no 40"; "Glucose-Fructose Syrup" -> "glucose fructose syrup".
  */
+/** Letters NFKD can't decompose, transliterated the way Postgres unaccent() does, so both sides agree. */
+const TRANSLIT: Record<string, string> = { ø: 'o', Ø: 'O', æ: 'ae', Æ: 'AE', œ: 'oe', Œ: 'OE', ß: 'ss', ł: 'l', Ł: 'L', đ: 'd', Đ: 'D', þ: 'th', Þ: 'TH', ı: 'i' };
+
 export function normKey(input: string): string {
   return input
+    .replace(/[øØæÆœŒßłŁđĐþÞı]/g, (ch) => TRANSLIT[ch] ?? ch)
     .normalize('NFKD')
     .replace(/[̀-ͯ]/g, '')
     .toLowerCase()
@@ -28,8 +32,11 @@ export function pluralVariants(key: string): string[] {
 }
 
 /** First pass on raw OCR/database text: join hyphenated line breaks, flatten lines, unify separators. */
+const ENTITIES: Record<string, string> = { quot: '"', amp: '&', apos: "'", '#39': "'", lt: '<', gt: '>', nbsp: ' ' };
+
 export function cleanLabelText(raw: string): string {
   return raw
+    .replace(/&(quot|amp|apos|#39|lt|gt|nbsp);/g, (_m, e: string) => ENTITIES[e] ?? ' ')
     .normalize('NFKC')
     .replace(/(\w)-[ \t]*\r?\n[ \t]*(\w)/g, '$1$2')
     .replace(/[\r\n\t]+/g, ' ')
@@ -46,9 +53,16 @@ const FILLER: RegExp[] = [
   /\b(?:certified\s+)?organic\b/gi,
   /\bnon[- ]?gmo\b/gi,
   /\bcold[- ]pressed\b/gi,
+  // allergen typography notes: "allergens in bold", "for allergens see ingredients in bold"
+  /\b(?:for allergens,?\s+)?(?:see\s+)?(?:allergens?|ingredients)\s+(?:are\s+)?(?:in|shown in|listed in)\s+(?:bold|capitals|underlined)\b/gi,
+  /\bin bold\b/gi,
 ];
 
 const EXPELLER = /\bexpell?er[- ]pressed\b/gi;
+/** "non-hydrogenated vegetable oil" is vegetable oil, not hydrogenated oil. */
+const NON_HYDROGENATED = /\b(?:non[- ]?|un|not\s+)hydrogenated\b/gi;
+/** "fully hydrogenated" fats are not the trans-fat source "partially hydrogenated" refers to; judge the oil itself. */
+const FULLY_HYDROGENATED = /\b(?:fully|completely)[- ]hydrogenated\b/gi;
 
 /** Removes filler words; returns flags for meaningful ones kept as metadata. */
 export function stripFiller(text: string): { text: string; flags: string[] } {
@@ -59,6 +73,16 @@ export function stripFiller(text: string): { text: string; flags: string[] } {
     t = t.replace(EXPELLER, ' ');
   }
   EXPELLER.lastIndex = 0;
+  if (NON_HYDROGENATED.test(t)) {
+    flags.push('non_hydrogenated');
+    t = t.replace(NON_HYDROGENATED, ' ');
+  }
+  NON_HYDROGENATED.lastIndex = 0;
+  if (FULLY_HYDROGENATED.test(t)) {
+    flags.push('fully_hydrogenated');
+    t = t.replace(FULLY_HYDROGENATED, ' ');
+  }
+  FULLY_HYDROGENATED.lastIndex = 0;
   for (const re of FILLER) t = t.replace(re, ' ');
   return { text: t.replace(/\s+/g, ' ').trim(), flags };
 }
@@ -70,4 +94,18 @@ export function stripPercent(text: string): string {
     .replace(/\d+(?:[.,]\d+)?\s?%/g, ' ')
     .replace(/\s+/g, ' ')
     .trim();
+}
+
+const UNIT_OR_FILLER = new Set(['mg', 'g', 'kg', 'ml', 'l', 'mcg', 'ug', 'iu', 'kcal', 'kj', 'per', 'of', 'ph', 'min', 'max', 'approx', 'approximately', 'less', 'than', 'more', 'per100g', 'serving']);
+
+/** True for leftovers that aren't ingredients: amounts, units and qualifiers ("2 mg l", "180 g per 100 g", "min"). */
+export function isNoiseKey(key: string): boolean {
+  if (!key) return true;
+  const tokens = key.split(' ');
+  const hasUnit = tokens.some((t) => UNIT_OR_FILLER.has(t) || /^\d+(?:mg|g|ml|kg|l|mcg)$/.test(t));
+  return tokens.every((t) => {
+    // a 3-4 digit number with no unit next to it may be an E/INS code ("e 102", "471")
+    if (/^\d{3,4}[a-z]?$/.test(t)) return hasUnit;
+    return /^\d+[a-z]{0,3}$/.test(t) || UNIT_OR_FILLER.has(t) || t.length === 1;
+  });
 }

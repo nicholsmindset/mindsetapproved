@@ -1,9 +1,12 @@
+import { router } from 'expo-router';
 import { useState } from 'react';
 import { Alert, Linking, Platform, View } from 'react-native';
 import { useApp } from '@/state/app';
 import { AccountCard } from '@/ui/AccountCard';
-import { CORRECTIONS_EMAIL, DISCLAIMER, OFF_ATTRIBUTION } from '@/ui/copy';
-import { supabase } from '@/platform/supabase';
+import { DISCLAIMER, OFF_ATTRIBUTION } from '@/ui/copy';
+import { historyToCsv } from '@/core/export';
+import { exportCsv } from '@/platform/export';
+import { SHARE_BASE_URL, supabase } from '@/platform/supabase';
 import { Button, Card, H2, P, Screen, Title } from '@/ui/kit';
 import { space } from '@/ui/theme';
 
@@ -33,6 +36,12 @@ export default function Settings() {
         </>
       ) : null}
 
+      <H2>Premium</H2>
+      <P>{app.store.isPremium() ? 'You have Premium.' : 'Unlimited label scans and AI re-checks, and your full history synced and exportable.'}</P>
+      <View style={{ flexDirection: 'row', marginTop: space.sm }}>
+        <Button icon="sparkles-outline" label="See Premium" onPress={() => router.push('/upgrade')} />
+      </View>
+
       <H2>About the verdicts</H2>
       <Card>
         <P>{DISCLAIMER}</P>
@@ -57,6 +66,22 @@ export default function Settings() {
       </View>
 
       <H2>Your data</H2>
+      <View style={{ flexDirection: 'row', marginBottom: space.sm }}>
+        <Button
+          icon="download-outline"
+          label="Export history (CSV)"
+          onPress={async () => {
+            const list = app.store.getHistory();
+            if (!list.length) return setMsg('No scans to export yet.');
+            try {
+              await exportCsv(historyToCsv(list), `mindset-approved-history-${new Date().toISOString().slice(0, 10)}.csv`);
+              setMsg(`Exported ${list.length} scan${list.length === 1 ? '' : 's'}.`);
+            } catch (e) {
+              setMsg(`Export failed: ${(e as Error).message}`);
+            }
+          }}
+        />
+      </View>
       <P>Scans and favourites are stored on this phone. Label photos are never saved. Anonymous scan results (no photos) help improve the ingredient database.</P>
       <View style={{ flexDirection: 'row', marginTop: space.sm }}>
         <Button
@@ -72,12 +97,14 @@ export default function Settings() {
       </View>
       {msg ? <P muted style={{ marginTop: space.sm }}>{msg}</P> : null}
 
-      {CORRECTIONS_EMAIL ? (
+      {SHARE_BASE_URL ? (
         <>
           <H2>Corrections</H2>
           <P>Manufacturers and shoppers can report wrong ingredient data. We fix errors quickly.</P>
-          <View style={{ flexDirection: 'row', marginTop: space.sm }}>
-            <Button icon="mail-outline" label="Email a correction" onPress={() => void Linking.openURL(`mailto:${CORRECTIONS_EMAIL}?subject=Mindset%20Approved%20correction`)} />
+          <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: space.sm, marginTop: space.sm }}>
+            <Button icon="create-outline" label="Send a correction" onPress={() => void Linking.openURL(`${SHARE_BASE_URL}/corrections`)} />
+            <Button icon="list-outline" label="See all the rules" onPress={() => void Linking.openURL(`${SHARE_BASE_URL}/rules`)} />
+            <Button icon="shield-checkmark-outline" label="Privacy policy" onPress={() => void Linking.openURL(`${SHARE_BASE_URL}/privacy`)} />
           </View>
         </>
       ) : null}

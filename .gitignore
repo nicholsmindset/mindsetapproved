@@ -5,7 +5,7 @@ dist/
 .env.*
 !.env.example
 coverage/
-supabase/off-import.sql
+supabase/off-import*.sql
 .next/
 next-env.d.ts
 *.tsbuildinfo

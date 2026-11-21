@@ -150,10 +150,7 @@ export default function ResultScreen() {
         <Button
           icon={entry.favourite ? 'heart' : 'heart-outline'}
           label={entry.favourite ? 'Favourite' : 'Add to favourites'}
-          onPress={() => {
-            app.store.updateEntry(entry.id, { favourite: !entry.favourite });
-            app.touchHistory();
-          }}
+          onPress={() => app.setFavourite(entry.id, !entry.favourite)}
         />
         <Button
           icon="create-outline"

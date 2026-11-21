@@ -31,6 +31,8 @@ const END_MARKERS = new RegExp(
     String.raw`\bmade in (?!a\b|an\b|the same\b|our\b)`,
     String.raw`\bserving size\b`,
     String.raw`\bdirections\b`,
+    // a second ingredient list in another language (bilingual Canadian, EU and Nordic packs)
+    String.raw`\b(?:ingr[ée]dients|ingredientes|ingredienti|zutaten|ingredienser|ingrediënten|ainesosat|sk[łl]adniki)\s*[:：]`,
   ].join('|'),
   'i',
 );
@@ -58,8 +60,8 @@ export function isolateIngredients(raw: string): IsolatedText {
   if (end) text = text.slice(0, end.index + (end[0].startsWith('.') || end[0].startsWith('!') ? 1 : 0));
 
   const block = text
-    // a sentence break that isn't "No. 40" is a separator
-    .replace(/(?<!\bno)\.(?=\s|$)/gi, ',')
+    // a sentence break is a separator, except in "No. 40" and abbreviations like "L. bulgaricus"
+    .replace(/(?<!\b(?:no|[a-z]))\.(?=\s|$)/gi, ',')
     .replace(/^[\s:,.\-–]+/, '')
     .replace(/[\s,.]+$/, '')
     .replace(/\s*,\s*(?:,\s*)+/g, ', ')

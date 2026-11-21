@@ -17,9 +17,9 @@ vegan:en: yes
 en:E440i, Pectin
 e_number:en: 440i
 
-en:E471, Mono- and diglycerides of fatty acids, mono and diglycerides
-fr:E471, Mono- et diglycérides d'acides gras
-e_number:en: 471
+en:E1520, Propane-1\\,2-diol, propylene glycol
+fr:E1520, Propylène glycol
+e_number:en: 1520
 
 en:E1442, Hydroxy propyl distarch phosphate
 e_number:en: 1442
@@ -29,7 +29,7 @@ en:Sea buckthorn oil\\, cold pressed, sea buckthorn oil
 
 describe('parseTaxonomy', () => {
   const entries = parseTaxonomy(SAMPLE);
-  it('parses entries and skips headers', () => expect(entries.map((e) => e.tag)).toEqual(['en:e129', 'en:e440i', 'en:e471', 'en:e1442', 'en:sea-buckthorn-oil,-cold-pressed']));
+  it('parses entries and skips headers', () => expect(entries.map((e) => e.tag)).toEqual(['en:e129', 'en:e440i', 'en:e1520', 'en:e1442', 'en:sea-buckthorn-oil,-cold-pressed']));
   it('collects names per language', () => {
     expect(entries[0]!.names['en']).toEqual(['E129', 'Allura Red AC', 'FD&C Red 40']);
     expect(entries[0]!.names['fr']).toEqual(['E129', 'Rouge allura AC']);
@@ -43,19 +43,19 @@ describe('planImport', () => {
   const known = loadRules(compileBundle(rowsFromSource(readStarter())));
   const plan = planImport(parseTaxonomy(SAMPLE), { langs: ['en'], known });
   it('skips entries the starter rules already cover', () => {
-    expect(plan.skippedKnown).toBe(2); // E129 (Red 40) and E440 (pectin)
-    expect(plan.entries.map((e) => e.tag)).toEqual(['en:e471', 'en:e1442', 'en:sea-buckthorn-oil,-cold-pressed']);
+    expect(plan.skippedKnown).toBe(3); // E129 (Red 40), E440 (pectin), E1442 (modified starch)
+    expect(plan.entries.map((e) => e.tag)).toEqual(['en:e1520', 'en:sea-buckthorn-oil,-cold-pressed']);
   });
   it('turns E-code names into e_number aliases', () => {
-    const e471 = plan.entries.find((e) => e.tag === 'en:e471')!;
-    expect(e471.aliases).toContainEqual({ alias: 'E471', lang: 'en', kind: 'e_number' });
-    expect(e471.aliases).toContainEqual({ alias: 'mono and diglycerides', lang: 'en', kind: 'name' });
+    const pg = plan.entries.find((e) => e.tag === 'en:e1520')!;
+    expect(pg.aliases).toContainEqual({ alias: 'E1520', lang: 'en', kind: 'e_number' });
+    expect(pg.aliases).toContainEqual({ alias: 'propylene glycol', lang: 'en', kind: 'name' });
   });
-  it('makes stable ids', () => expect(offIngredientId('en:e471')).toBe('off_en_e471'));
+  it('makes stable ids', () => expect(offIngredientId('en:e1520')).toBe('off_en_e1520'));
   it('emits inactive SQL with the ODbL notice', () => {
     const sql = planToSql(plan, 'sample');
     expect(sql).toContain('Open Database License');
-    expect(sql).toContain("'unreviewed', 'en:e471', false");
+    expect(sql).toContain("'unreviewed', 'en:e1520', false");
     expect(sql).toContain("on conflict (alias_norm) do nothing");
   });
 });

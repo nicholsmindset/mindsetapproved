@@ -16,6 +16,7 @@ function RootStack() {
       <Stack.Protected guard={onboarded}>
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         <Stack.Screen name="result/[id]" options={{ title: 'Result', headerBackTitle: 'Back' }} />
+        <Stack.Screen name="upgrade" options={{ title: 'Premium', presentation: 'modal' }} />
       </Stack.Protected>
     </Stack>
   );

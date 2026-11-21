@@ -21,11 +21,11 @@ describe('diffBundles', () => {
   });
   it('reports added, removed and moved aliases', () => {
     const next = clone();
-    next.aliases['ponceau 4r'] = 'red_40';
+    next.aliases['zzq test alias'] = 'red_40';
     delete next.aliases['colza oil'];
     next.eNumbers['e211'] = 'msg';
     const d = diffBundles(bundle, next);
-    expect(d.addedAliases).toEqual([{ key: 'ponceau 4r', ingredientId: 'red_40' }]);
+    expect(d.addedAliases).toEqual([{ key: 'zzq test alias', ingredientId: 'red_40' }]);
     expect(d.removedAliases).toEqual([{ key: 'colza oil', ingredientId: 'canola_oil' }]);
     expect(d.movedAliases).toEqual([{ key: 'e211', from: 'sodium_benzoate', to: 'msg' }]);
   });

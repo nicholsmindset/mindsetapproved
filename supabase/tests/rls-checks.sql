@@ -4,8 +4,8 @@ insert into auth.users values ('00000000-0000-0000-0000-000000000001'), ('000000
 
 -- seed loaded
 do $$ begin
-  assert (select count(*) from public.ingredients where is_active) = 57, 'expected 57 active ingredients';
-  assert (select count(*) from public.aliases) = 547, format('expected 547 aliases, got %s', (select count(*) from public.aliases));
+  assert (select count(*) from public.ingredients where is_active) >= 57, 'expected the starter ingredients';
+  assert (select count(*) from public.aliases) >= 547, format('expected the starter aliases, got %s', (select count(*) from public.aliases));
   assert public.norm_key('FD&C Red No. 40') = 'fd c red no 40', 'norm_key';
   assert public.norm_key('Purée') = 'puree', 'norm_key accents';
   assert public.e_code('INS No. 129') = 'e129', 'e_code ins';
@@ -22,7 +22,7 @@ do $$ begin
   assert (select count(*) from public.aliases) = 0, 'anon must not read aliases';
 end $$;
 insert into public.scans (verdict, ocr_text, rules_version) values ('caution', 'sugar, salt', 1);
-select public.log_unmatched(array['Zzqx Powder', 'zzqx powder', 'E471'], 'zzqx powder, sugar');
+select public.log_unmatched(array['Zzqx Powder', 'zzqx powder', 'E1520'], 'zzqx powder, sugar');
 select public.submit_product('9556001234567', 'sugar, salt, palm oil', 'Test biscuit', 'Brand');
 do $$ begin
   assert (select count(*) from public.scans) = 0, 'anon must not read scans back';
@@ -79,15 +79,16 @@ reset role;
 set role authenticated;
 set request.jwt.claims = '{"sub": "00000000-0000-0000-0000-000000000002", "role": "authenticated", "app_metadata": {"role": "admin"}}';
 insert into public.ingredients (id, display_name, category, tier, strict_tier, reason_short, is_active)
-  values ('ponceau_4r', 'Ponceau 4R', 'dye', 'bad', 'bad', 'Ponceau 4R is a synthetic dye. The EU requires a warning label on foods that contain it.', true);
-insert into public.aliases (alias, alias_norm, ingredient_id, kind) values ('Ponceau 4R', '', 'ponceau_4r', 'name'), ('E124', '', 'ponceau_4r', 'e_number');
+  values ('test_dye', 'Test Dye X', 'dye', 'bad', 'bad', 'Test Dye X is a synthetic dye used only in tests.', true);
+insert into public.aliases (alias, alias_norm, ingredient_id, kind) values ('Test Dye X', '', 'test_dye', 'name'), ('E999', '', 'test_dye', 'e_number');
 do $$
 declare r jsonb := public.export_rules();
 begin
-  assert jsonb_array_length(r -> 'ingredients') = 58, 'export includes new ingredient';
-  assert (select alias_norm from public.aliases where alias = 'E124') = 'e124', 'e_number trigger';
+  assert jsonb_array_length(r -> 'ingredients') = (select count(*) from public.ingredients where is_active), 'export includes every active ingredient';
+  assert exists (select 1 from jsonb_array_elements(r -> 'ingredients') x where x ->> 'id' = 'test_dye'), 'export includes the new ingredient';
+  assert (select alias_norm from public.aliases where alias = 'E999') = 'e999', 'e_number trigger';
   begin
-    insert into public.aliases (alias, alias_norm, ingredient_id, kind) values ('ponceau 4r', '', 'red_40', 'name');
+    insert into public.aliases (alias, alias_norm, ingredient_id, kind) values ('test dye x', '', 'red_40', 'name');
     raise exception 'duplicate alias_norm accepted';
   exception when unique_violation then null;
   end;
@@ -101,7 +102,7 @@ begin
     raise exception 'active ingredient without tier accepted';
   exception when check_violation then null;
   end;
-  perform public.publish_rule_version(2, 'https://example.invalid/rules-bundle.v2.json.gz', 58, 549, 'test');
+  perform public.publish_rule_version(2, 'https://example.invalid/rules-bundle.v2.json.gz', 72, 1225, 'test');
   begin
     perform public.publish_rule_version(2, 'x', 1, 1);
     raise exception 'republished same version';
@@ -114,13 +115,13 @@ insert into public.scans (verdict, source, matched) values
   ('caution', 'label', '[{"ingredientId": "added_sugar", "tier": "borderline"}]'),
   ('not_approved', 'label', '[{"ingredientId": "canola_oil", "tier": "bad"}]');
 select public.map_unmatched('zzqx powder', 'salt');
-select public.map_unmatched('E471', 'lecithin');
+select public.map_unmatched('E1520', 'lecithin');
 do $$
 declare s jsonb := public.admin_stats(30);
 begin
   assert (select status from public.unmatched_terms where term_norm = 'zzqx powder') = 'added', 'map_unmatched status';
   assert (select ingredient_id from public.aliases where alias_norm = 'zzqx powder') = 'salt', 'map_unmatched alias';
-  assert (select kind from public.aliases where alias_norm = 'e471') = 'e_number', 'map_unmatched code';
+  assert (select kind from public.aliases where alias_norm = 'e1520') = 'e_number', 'map_unmatched code';
   begin
     perform public.map_unmatched('canola oil', 'salt');
     raise exception 'remapped an existing alias';

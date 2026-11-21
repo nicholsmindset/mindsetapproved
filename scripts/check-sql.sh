@@ -19,7 +19,13 @@ PSQL=("${RUN_AS[@]}" "$PG_BIN/psql" -h "$WORK" -p "$PORT" -U postgres -d postgre
 "${PSQL[@]}" -f - < "$ROOT/supabase/tests/supabase-stubs.sql"
 for f in "$ROOT"/supabase/migrations/*.sql; do echo "apply $(basename "$f")"; "${PSQL[@]}" -f - < "$f"; done
 echo "apply seed.sql"; "${PSQL[@]}" -f - < "$ROOT/supabase/seed.sql"
-"${PSQL[@]}" -At -c "select alias_norm from public.aliases order by 1" | LC_ALL=C sort > "$WORK/sql-keys.txt"
+# Optional: CHECK_OFF_IMPORT=1 also applies generated supabase/off-import*.sql (pnpm off:import) after the seed.
+if [ "${CHECK_OFF_IMPORT:-}" = 1 ]; then
+  for f in "$ROOT"/supabase/off-import*.sql; do [ -f "$f" ] && { echo "apply $(basename "$f")"; "${PSQL[@]}" -f - < "$f"; }; done
+  "${PSQL[@]}" -At -c "select 'off rows: ' || count(*) || ' inactive ingredients, ' || (select count(*) from public.aliases) || ' aliases total' from public.ingredients where not is_active"
+  echo "OFF import applies cleanly (RLS checks run without CHECK_OFF_IMPORT)"; exit 0
+fi
+"${PSQL[@]}" -At -c "select a.alias_norm from public.aliases a join public.ingredients i on i.id = a.ingredient_id where i.is_active order by 1" | LC_ALL=C sort > "$WORK/sql-keys.txt"
 "${PSQL[@]}" -f - < "$ROOT/supabase/tests/rls-checks.sql"
 
 # The SQL norm_key()/e_code() must agree with the engine's normKey()/eCode() for every seeded alias.

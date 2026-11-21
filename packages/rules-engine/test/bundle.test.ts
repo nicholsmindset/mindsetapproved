@@ -70,8 +70,14 @@ describe('starter bundle', () => {
     expect(Object.keys(bundle.aliases).length).toBeGreaterThan(300);
   });
   it('has all 37 PRD rules', () => {
-    const flaggable = bundle.ingredients.filter((i) => i.category !== 'basic');
-    expect(flaggable).toHaveLength(37);
+    const PRD = ['canola_oil', 'soybean_oil', 'corn_oil', 'cottonseed_oil', 'sunflower_oil', 'high_oleic_oil', 'grapeseed_oil', 'vegetable_oil',
+      'partially_hydrogenated_oil', 'palm_oil', 'avocado_oil', 'olive_oil', 'coconut_oil', 'butter_ghee_tallow', 'red_40', 'yellow_5', 'yellow_6',
+      'blue_1_2', 'red_3', 'titanium_dioxide', 'caramel_color', 'hfcs', 'added_sugar', 'aspartame', 'sucralose', 'acesulfame_k', 'saccharin',
+      'artificial_flavors', 'natural_flavors', 'bha_bht_tbhq', 'nitrites_nitrates', 'sodium_benzoate', 'msg', 'carrageenan', 'polysorbate_80',
+      'gelatin', 'gums'];
+    expect(PRD).toHaveLength(37);
+    const ids = new Set(bundle.ingredients.map((i) => i.id));
+    expect(PRD.filter((id) => !ids.has(id))).toEqual([]);
   });
   it('every non-neutral rule has a reason', () => {
     for (const i of bundle.ingredients) if (i.tier !== 'neutral' || i.strictTier !== 'neutral') expect(i.reason, i.id).not.toBe('');

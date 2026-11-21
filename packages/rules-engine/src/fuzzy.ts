@@ -67,7 +67,12 @@ function sameShape(a: string, b: string): boolean {
   const wb = b.split(' ');
   if (wa.length !== wb.length) return false;
   if (a.replace(/\D/g, '') !== b.replace(/\D/g, '')) return false;
-  return wa.every((w, i) => w[0] === wb[i]![0]);
+  // Each word keeps its first letter, and short words may differ by at most one edit ("peanut" is not "plant").
+  return wa.every((w, i) => {
+    const v = wb[i]!;
+    if (w[0] !== v[0]) return false;
+    return w === v || editDistance(w, v) <= (Math.max(w.length, v.length) > 6 ? 2 : 1);
+  });
 }
 export const FUZZY_MIN_SIMILARITY = 0.85;
 

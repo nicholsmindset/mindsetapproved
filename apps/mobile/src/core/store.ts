@@ -42,6 +42,7 @@ const K = {
   products: 'products.v1',
   rules: 'rules.bundle',
   limits: 'limits.v1',
+  premium: 'premium.v1',
 } as const;
 
 export const HISTORY_CAP = 500;
@@ -93,6 +94,10 @@ export function createStore(kv: KV, newId: () => string) {
       const list = this.getHistory().map((e) => (e.id === id ? { ...e, ...patch } : e));
       kv.set(K.history, JSON.stringify(list));
     },
+    /** Replaces history (after merging the account's scans), keeping the same cap rules. */
+    setHistory(list: HistoryEntry[]) {
+      kv.set(K.history, JSON.stringify(list.filter((x, i) => i < HISTORY_CAP || x.favourite)));
+    },
     removeEntry(id: string) {
       kv.set(K.history, JSON.stringify(this.getHistory().filter((e) => e.id !== id)));
     },
@@ -109,6 +114,10 @@ export function createStore(kv: KV, newId: () => string) {
 
     getCachedBundle: (): RulesBundle | null => readJSON<RulesBundle | null>(kv, K.rules, null),
     setCachedBundle: (b: RulesBundle) => kv.set(K.rules, JSON.stringify(b)),
+
+    /** Set by the purchases adapter (RevenueCat) when an active entitlement exists. */
+    isPremium: () => kv.getString(K.premium) === '1',
+    setPremium: (on: boolean) => (on ? kv.set(K.premium, '1') : kv.remove(K.premium)),
 
     getLimits: () => readJSON<{ day: string; label: number; ai: number }>(kv, K.limits, { day: '', label: 0, ai: 0 }),
     setLimits: (l: { day: string; label: number; ai: number }) => kv.set(K.limits, JSON.stringify(l)),

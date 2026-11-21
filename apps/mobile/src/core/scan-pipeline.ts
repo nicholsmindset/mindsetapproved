@@ -23,7 +23,9 @@ export interface ScanEffects {
     matched: Array<{ ingredientId: string; tier: string; possible: boolean }>;
     rules_version: number;
     source: ScanSource;
-  }): Promise<unknown>;
+    product_name: string | null;
+    brand: string | null;
+  }, fullText: string): Promise<unknown>;
   logUnmatched(terms: string[], example: string): Promise<unknown>;
   submitProduct(barcode: string, text: string, name?: string, brand?: string): Promise<unknown>;
 }
@@ -72,7 +74,9 @@ export function runScan(input: ScanInput, deps: { rules: Rules; settings: UserSe
       matched: chipsForServer(result),
       rules_version: result.rulesVersion,
       source: input.source,
-    }).catch(swallow);
+      product_name: input.productName ?? null,
+      brand: input.brand ?? null,
+    }, input.text).catch(swallow);
     if (result.unmatched.length) fx.logUnmatched(result.unmatched.slice(0, 50), input.text.slice(0, 500)).catch(swallow);
     // Flow B step 5: a label photographed for a barcode the databases didn't know.
     if (input.barcode && (input.source === 'label' || input.source === 'ai') && result.verdict !== 'cant_verify') {

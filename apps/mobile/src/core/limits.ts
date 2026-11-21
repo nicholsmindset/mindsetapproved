@@ -10,6 +10,7 @@ export function dayKey(d = new Date()): string {
 }
 
 export function remaining(store: Store, kind: LimitKind, now = new Date()): number {
+  if (store.isPremium()) return Number.POSITIVE_INFINITY;
   const l = store.getLimits();
   const used = l.day === dayKey(now) ? l[kind] : 0;
   return Math.max(0, FREE_LIMITS[kind] - used);
@@ -18,6 +19,7 @@ export function remaining(store: Store, kind: LimitKind, now = new Date()): numb
 /** Records one use. Returns false (and records nothing) when today's limit is used up. */
 export function consume(store: Store, kind: LimitKind, now = new Date()): boolean {
   if (remaining(store, kind, now) <= 0) return false;
+  if (store.isPremium()) return true;
   const l = store.getLimits();
   const today = dayKey(now);
   const base = l.day === today ? l : { day: today, label: 0, ai: 0 };

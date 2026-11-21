@@ -15,7 +15,8 @@ insert into public.categories (id, label, toggleable, sort_order) values ('prese
 insert into public.categories (id, label, toggleable, sort_order) values ('emulsifier', 'Emulsifiers', true, 10) on conflict (id) do update set label = excluded.label, toggleable = excluded.toggleable, sort_order = excluded.sort_order;
 insert into public.categories (id, label, toggleable, sort_order) values ('thickener', 'Gums and thickeners', true, 11) on conflict (id) do update set label = excluded.label, toggleable = excluded.toggleable, sort_order = excluded.sort_order;
 insert into public.categories (id, label, toggleable, sort_order) values ('animal_derived', 'Animal-derived', true, 12) on conflict (id) do update set label = excluded.label, toggleable = excluded.toggleable, sort_order = excluded.sort_order;
-insert into public.categories (id, label, toggleable, sort_order) values ('basic', 'Everyday ingredients', false, 13) on conflict (id) do update set label = excluded.label, toggleable = excluded.toggleable, sort_order = excluded.sort_order;
+insert into public.categories (id, label, toggleable, sort_order) values ('additive', 'Other additives', false, 13) on conflict (id) do update set label = excluded.label, toggleable = excluded.toggleable, sort_order = excluded.sort_order;
+insert into public.categories (id, label, toggleable, sort_order) values ('basic', 'Everyday ingredients', false, 14) on conflict (id) do update set label = excluded.label, toggleable = excluded.toggleable, sort_order = excluded.sort_order;
 
 insert into public.ingredients (id, display_name, short_name, category, tier, strict_tier, reason_short, reason_long, e_number, sources, is_active) values ('canola_oil', 'Canola / rapeseed oil', 'canola oil', 'seed_oil', 'bad'::public.tier, 'bad'::public.tier, 'Canola oil is an industrial seed oil. Mindset rules avoid seed oils; this is a Mindset preference, not a safety finding.', null, null, '{"regulator":[],"preference":["Mindset seed-oil preference"]}'::jsonb, true) on conflict (id) do update set display_name = excluded.display_name, short_name = excluded.short_name, category = excluded.category, tier = excluded.tier, strict_tier = excluded.strict_tier, reason_short = excluded.reason_short, reason_long = excluded.reason_long, e_number = excluded.e_number, sources = excluded.sources, is_active = excluded.is_active;
 insert into public.ingredients (id, display_name, short_name, category, tier, strict_tier, reason_short, reason_long, e_number, sources, is_active) values ('soybean_oil', 'Soybean oil', 'soybean oil', 'seed_oil', 'bad'::public.tier, 'bad'::public.tier, 'Soybean oil is an industrial seed oil. Mindset rules avoid seed oils; this is a Mindset preference, not a safety finding.', null, null, '{"regulator":[],"preference":["Mindset seed-oil preference"]}'::jsonb, true) on conflict (id) do update set display_name = excluded.display_name, short_name = excluded.short_name, category = excluded.category, tier = excluded.tier, strict_tier = excluded.strict_tier, reason_short = excluded.reason_short, reason_long = excluded.reason_long, e_number = excluded.e_number, sources = excluded.sources, is_active = excluded.is_active;
@@ -57,11 +58,11 @@ insert into public.ingredients (id, display_name, short_name, category, tier, st
 insert into public.ingredients (id, display_name, short_name, category, tier, strict_tier, reason_short, reason_long, e_number, sources, is_active) values ('water', 'Water', 'water', 'basic', 'neutral'::public.tier, 'neutral'::public.tier, '', null, null, '{"regulator":[],"preference":[]}'::jsonb, true) on conflict (id) do update set display_name = excluded.display_name, short_name = excluded.short_name, category = excluded.category, tier = excluded.tier, strict_tier = excluded.strict_tier, reason_short = excluded.reason_short, reason_long = excluded.reason_long, e_number = excluded.e_number, sources = excluded.sources, is_active = excluded.is_active;
 insert into public.ingredients (id, display_name, short_name, category, tier, strict_tier, reason_short, reason_long, e_number, sources, is_active) values ('salt', 'Salt', 'salt', 'basic', 'neutral'::public.tier, 'neutral'::public.tier, '', null, null, '{"regulator":[],"preference":[]}'::jsonb, true) on conflict (id) do update set display_name = excluded.display_name, short_name = excluded.short_name, category = excluded.category, tier = excluded.tier, strict_tier = excluded.strict_tier, reason_short = excluded.reason_short, reason_long = excluded.reason_long, e_number = excluded.e_number, sources = excluded.sources, is_active = excluded.is_active;
 insert into public.ingredients (id, display_name, short_name, category, tier, strict_tier, reason_short, reason_long, e_number, sources, is_active) values ('flour', 'Flour', 'flour', 'basic', 'neutral'::public.tier, 'neutral'::public.tier, '', null, null, '{"regulator":[],"preference":[]}'::jsonb, true) on conflict (id) do update set display_name = excluded.display_name, short_name = excluded.short_name, category = excluded.category, tier = excluded.tier, strict_tier = excluded.strict_tier, reason_short = excluded.reason_short, reason_long = excluded.reason_long, e_number = excluded.e_number, sources = excluded.sources, is_active = excluded.is_active;
-insert into public.ingredients (id, display_name, short_name, category, tier, strict_tier, reason_short, reason_long, e_number, sources, is_active) values ('flour_enrichment', 'Added vitamins and minerals', 'vitamins', 'basic', 'neutral'::public.tier, 'neutral'::public.tier, '', null, null, '{"regulator":[],"preference":[]}'::jsonb, true) on conflict (id) do update set display_name = excluded.display_name, short_name = excluded.short_name, category = excluded.category, tier = excluded.tier, strict_tier = excluded.strict_tier, reason_short = excluded.reason_short, reason_long = excluded.reason_long, e_number = excluded.e_number, sources = excluded.sources, is_active = excluded.is_active;
+insert into public.ingredients (id, display_name, short_name, category, tier, strict_tier, reason_short, reason_long, e_number, sources, is_active) values ('flour_enrichment', 'Added vitamins and minerals', 'vitamins', 'basic', 'neutral'::public.tier, 'neutral'::public.tier, '', null, 'E101', '{"regulator":[],"preference":[]}'::jsonb, true) on conflict (id) do update set display_name = excluded.display_name, short_name = excluded.short_name, category = excluded.category, tier = excluded.tier, strict_tier = excluded.strict_tier, reason_short = excluded.reason_short, reason_long = excluded.reason_long, e_number = excluded.e_number, sources = excluded.sources, is_active = excluded.is_active;
 insert into public.ingredients (id, display_name, short_name, category, tier, strict_tier, reason_short, reason_long, e_number, sources, is_active) values ('eggs', 'Eggs', 'eggs', 'basic', 'neutral'::public.tier, 'neutral'::public.tier, '', null, null, '{"regulator":[],"preference":[]}'::jsonb, true) on conflict (id) do update set display_name = excluded.display_name, short_name = excluded.short_name, category = excluded.category, tier = excluded.tier, strict_tier = excluded.strict_tier, reason_short = excluded.reason_short, reason_long = excluded.reason_long, e_number = excluded.e_number, sources = excluded.sources, is_active = excluded.is_active;
 insert into public.ingredients (id, display_name, short_name, category, tier, strict_tier, reason_short, reason_long, e_number, sources, is_active) values ('dairy', 'Milk and dairy', 'milk', 'basic', 'neutral'::public.tier, 'neutral'::public.tier, '', null, null, '{"regulator":[],"preference":[]}'::jsonb, true) on conflict (id) do update set display_name = excluded.display_name, short_name = excluded.short_name, category = excluded.category, tier = excluded.tier, strict_tier = excluded.strict_tier, reason_short = excluded.reason_short, reason_long = excluded.reason_long, e_number = excluded.e_number, sources = excluded.sources, is_active = excluded.is_active;
 insert into public.ingredients (id, display_name, short_name, category, tier, strict_tier, reason_short, reason_long, e_number, sources, is_active) values ('grains', 'Grains', 'grains', 'basic', 'neutral'::public.tier, 'neutral'::public.tier, '', null, null, '{"regulator":[],"preference":[]}'::jsonb, true) on conflict (id) do update set display_name = excluded.display_name, short_name = excluded.short_name, category = excluded.category, tier = excluded.tier, strict_tier = excluded.strict_tier, reason_short = excluded.reason_short, reason_long = excluded.reason_long, e_number = excluded.e_number, sources = excluded.sources, is_active = excluded.is_active;
-insert into public.ingredients (id, display_name, short_name, category, tier, strict_tier, reason_short, reason_long, e_number, sources, is_active) values ('starches', 'Starches', 'starch', 'basic', 'neutral'::public.tier, 'neutral'::public.tier, '', null, null, '{"regulator":[],"preference":[]}'::jsonb, true) on conflict (id) do update set display_name = excluded.display_name, short_name = excluded.short_name, category = excluded.category, tier = excluded.tier, strict_tier = excluded.strict_tier, reason_short = excluded.reason_short, reason_long = excluded.reason_long, e_number = excluded.e_number, sources = excluded.sources, is_active = excluded.is_active;
+insert into public.ingredients (id, display_name, short_name, category, tier, strict_tier, reason_short, reason_long, e_number, sources, is_active) values ('starches', 'Starches', 'starch', 'basic', 'neutral'::public.tier, 'neutral'::public.tier, '', null, 'E1404', '{"regulator":[],"preference":[]}'::jsonb, true) on conflict (id) do update set display_name = excluded.display_name, short_name = excluded.short_name, category = excluded.category, tier = excluded.tier, strict_tier = excluded.strict_tier, reason_short = excluded.reason_short, reason_long = excluded.reason_long, e_number = excluded.e_number, sources = excluded.sources, is_active = excluded.is_active;
 insert into public.ingredients (id, display_name, short_name, category, tier, strict_tier, reason_short, reason_long, e_number, sources, is_active) values ('vegetables', 'Vegetables', 'vegetables', 'basic', 'neutral'::public.tier, 'neutral'::public.tier, '', null, null, '{"regulator":[],"preference":[]}'::jsonb, true) on conflict (id) do update set display_name = excluded.display_name, short_name = excluded.short_name, category = excluded.category, tier = excluded.tier, strict_tier = excluded.strict_tier, reason_short = excluded.reason_short, reason_long = excluded.reason_long, e_number = excluded.e_number, sources = excluded.sources, is_active = excluded.is_active;
 insert into public.ingredients (id, display_name, short_name, category, tier, strict_tier, reason_short, reason_long, e_number, sources, is_active) values ('fruit', 'Fruit', 'fruit', 'basic', 'neutral'::public.tier, 'neutral'::public.tier, '', null, null, '{"regulator":[],"preference":[]}'::jsonb, true) on conflict (id) do update set display_name = excluded.display_name, short_name = excluded.short_name, category = excluded.category, tier = excluded.tier, strict_tier = excluded.strict_tier, reason_short = excluded.reason_short, reason_long = excluded.reason_long, e_number = excluded.e_number, sources = excluded.sources, is_active = excluded.is_active;
 insert into public.ingredients (id, display_name, short_name, category, tier, strict_tier, reason_short, reason_long, e_number, sources, is_active) values ('nuts_seeds', 'Nuts and seeds', 'nuts', 'basic', 'neutral'::public.tier, 'neutral'::public.tier, '', null, null, '{"regulator":[],"preference":[]}'::jsonb, true) on conflict (id) do update set display_name = excluded.display_name, short_name = excluded.short_name, category = excluded.category, tier = excluded.tier, strict_tier = excluded.strict_tier, reason_short = excluded.reason_short, reason_long = excluded.reason_long, e_number = excluded.e_number, sources = excluded.sources, is_active = excluded.is_active;
@@ -69,18 +70,37 @@ insert into public.ingredients (id, display_name, short_name, category, tier, st
 insert into public.ingredients (id, display_name, short_name, category, tier, strict_tier, reason_short, reason_long, e_number, sources, is_active) values ('meat_fish', 'Meat and fish', 'meat', 'basic', 'neutral'::public.tier, 'neutral'::public.tier, '', null, null, '{"regulator":[],"preference":[]}'::jsonb, true) on conflict (id) do update set display_name = excluded.display_name, short_name = excluded.short_name, category = excluded.category, tier = excluded.tier, strict_tier = excluded.strict_tier, reason_short = excluded.reason_short, reason_long = excluded.reason_long, e_number = excluded.e_number, sources = excluded.sources, is_active = excluded.is_active;
 insert into public.ingredients (id, display_name, short_name, category, tier, strict_tier, reason_short, reason_long, e_number, sources, is_active) values ('soy_foods', 'Soy foods', 'soy', 'basic', 'neutral'::public.tier, 'neutral'::public.tier, '', null, null, '{"regulator":[],"preference":[]}'::jsonb, true) on conflict (id) do update set display_name = excluded.display_name, short_name = excluded.short_name, category = excluded.category, tier = excluded.tier, strict_tier = excluded.strict_tier, reason_short = excluded.reason_short, reason_long = excluded.reason_long, e_number = excluded.e_number, sources = excluded.sources, is_active = excluded.is_active;
 insert into public.ingredients (id, display_name, short_name, category, tier, strict_tier, reason_short, reason_long, e_number, sources, is_active) values ('lecithin', 'Lecithin', 'lecithin', 'basic', 'neutral'::public.tier, 'neutral'::public.tier, '', null, 'E322', '{"regulator":[],"preference":[]}'::jsonb, true) on conflict (id) do update set display_name = excluded.display_name, short_name = excluded.short_name, category = excluded.category, tier = excluded.tier, strict_tier = excluded.strict_tier, reason_short = excluded.reason_short, reason_long = excluded.reason_long, e_number = excluded.e_number, sources = excluded.sources, is_active = excluded.is_active;
-insert into public.ingredients (id, display_name, short_name, category, tier, strict_tier, reason_short, reason_long, e_number, sources, is_active) values ('spices_herbs', 'Spices and herbs', 'spices', 'basic', 'neutral'::public.tier, 'neutral'::public.tier, '', null, null, '{"regulator":[],"preference":[]}'::jsonb, true) on conflict (id) do update set display_name = excluded.display_name, short_name = excluded.short_name, category = excluded.category, tier = excluded.tier, strict_tier = excluded.strict_tier, reason_short = excluded.reason_short, reason_long = excluded.reason_long, e_number = excluded.e_number, sources = excluded.sources, is_active = excluded.is_active;
+insert into public.ingredients (id, display_name, short_name, category, tier, strict_tier, reason_short, reason_long, e_number, sources, is_active) values ('spices_herbs', 'Spices and herbs', 'spices', 'basic', 'neutral'::public.tier, 'neutral'::public.tier, '', null, 'E160c', '{"regulator":[],"preference":[]}'::jsonb, true) on conflict (id) do update set display_name = excluded.display_name, short_name = excluded.short_name, category = excluded.category, tier = excluded.tier, strict_tier = excluded.strict_tier, reason_short = excluded.reason_short, reason_long = excluded.reason_long, e_number = excluded.e_number, sources = excluded.sources, is_active = excluded.is_active;
 insert into public.ingredients (id, display_name, short_name, category, tier, strict_tier, reason_short, reason_long, e_number, sources, is_active) values ('vinegars_acids', 'Vinegar and natural acids', 'vinegar', 'basic', 'neutral'::public.tier, 'neutral'::public.tier, '', null, 'E330', '{"regulator":[],"preference":[]}'::jsonb, true) on conflict (id) do update set display_name = excluded.display_name, short_name = excluded.short_name, category = excluded.category, tier = excluded.tier, strict_tier = excluded.strict_tier, reason_short = excluded.reason_short, reason_long = excluded.reason_long, e_number = excluded.e_number, sources = excluded.sources, is_active = excluded.is_active;
-insert into public.ingredients (id, display_name, short_name, category, tier, strict_tier, reason_short, reason_long, e_number, sources, is_active) values ('leavening', 'Yeast and raising agents', 'yeast', 'basic', 'neutral'::public.tier, 'neutral'::public.tier, '', null, null, '{"regulator":[],"preference":[]}'::jsonb, true) on conflict (id) do update set display_name = excluded.display_name, short_name = excluded.short_name, category = excluded.category, tier = excluded.tier, strict_tier = excluded.strict_tier, reason_short = excluded.reason_short, reason_long = excluded.reason_long, e_number = excluded.e_number, sources = excluded.sources, is_active = excluded.is_active;
+insert into public.ingredients (id, display_name, short_name, category, tier, strict_tier, reason_short, reason_long, e_number, sources, is_active) values ('leavening', 'Yeast and raising agents', 'yeast', 'basic', 'neutral'::public.tier, 'neutral'::public.tier, '', null, 'E503', '{"regulator":[],"preference":[]}'::jsonb, true) on conflict (id) do update set display_name = excluded.display_name, short_name = excluded.short_name, category = excluded.category, tier = excluded.tier, strict_tier = excluded.strict_tier, reason_short = excluded.reason_short, reason_long = excluded.reason_long, e_number = excluded.e_number, sources = excluded.sources, is_active = excluded.is_active;
 insert into public.ingredients (id, display_name, short_name, category, tier, strict_tier, reason_short, reason_long, e_number, sources, is_active) values ('honey_maple', 'Honey and maple syrup', 'honey', 'basic', 'neutral'::public.tier, 'neutral'::public.tier, '', null, null, '{"regulator":[],"preference":[]}'::jsonb, true) on conflict (id) do update set display_name = excluded.display_name, short_name = excluded.short_name, category = excluded.category, tier = excluded.tier, strict_tier = excluded.strict_tier, reason_short = excluded.reason_short, reason_long = excluded.reason_long, e_number = excluded.e_number, sources = excluded.sources, is_active = excluded.is_active;
 insert into public.ingredients (id, display_name, short_name, category, tier, strict_tier, reason_short, reason_long, e_number, sources, is_active) values ('tea_coffee', 'Tea and coffee', 'tea', 'basic', 'neutral'::public.tier, 'neutral'::public.tier, '', null, null, '{"regulator":[],"preference":[]}'::jsonb, true) on conflict (id) do update set display_name = excluded.display_name, short_name = excluded.short_name, category = excluded.category, tier = excluded.tier, strict_tier = excluded.strict_tier, reason_short = excluded.reason_short, reason_long = excluded.reason_long, e_number = excluded.e_number, sources = excluded.sources, is_active = excluded.is_active;
+insert into public.ingredients (id, display_name, short_name, category, tier, strict_tier, reason_short, reason_long, e_number, sources, is_active) values ('fibres', 'Fibres', 'fibre', 'basic', 'neutral'::public.tier, 'neutral'::public.tier, '', null, 'E1200', '{"regulator":[],"preference":[]}'::jsonb, true) on conflict (id) do update set display_name = excluded.display_name, short_name = excluded.short_name, category = excluded.category, tier = excluded.tier, strict_tier = excluded.strict_tier, reason_short = excluded.reason_short, reason_long = excluded.reason_long, e_number = excluded.e_number, sources = excluded.sources, is_active = excluded.is_active;
+insert into public.ingredients (id, display_name, short_name, category, tier, strict_tier, reason_short, reason_long, e_number, sources, is_active) values ('alcohol', 'Alcohol', 'alcohol', 'basic', 'neutral'::public.tier, 'neutral'::public.tier, '', null, null, '{"regulator":[],"preference":[]}'::jsonb, true) on conflict (id) do update set display_name = excluded.display_name, short_name = excluded.short_name, category = excluded.category, tier = excluded.tier, strict_tier = excluded.strict_tier, reason_short = excluded.reason_short, reason_long = excluded.reason_long, e_number = excluded.e_number, sources = excluded.sources, is_active = excluded.is_active;
+insert into public.ingredients (id, display_name, short_name, category, tier, strict_tier, reason_short, reason_long, e_number, sources, is_active) values ('common_additives', 'Common additives', 'additive', 'additive', 'neutral'::public.tier, 'neutral'::public.tier, 'A common food additive. Mindset rules don’t flag it.', null, 'E551', '{"regulator":[],"preference":[]}'::jsonb, true) on conflict (id) do update set display_name = excluded.display_name, short_name = excluded.short_name, category = excluded.category, tier = excluded.tier, strict_tier = excluded.strict_tier, reason_short = excluded.reason_short, reason_long = excluded.reason_long, e_number = excluded.e_number, sources = excluded.sources, is_active = excluded.is_active;
+insert into public.ingredients (id, display_name, short_name, category, tier, strict_tier, reason_short, reason_long, e_number, sources, is_active) values ('other_emulsifiers', 'Mono- and diglycerides and other emulsifiers', 'emulsifiers', 'emulsifier', 'neutral'::public.tier, 'neutral'::public.tier, 'Processed emulsifiers made from fats. Mindset rules don’t flag them by default.', null, 'E471', '{"regulator":[],"preference":[]}'::jsonb, true) on conflict (id) do update set display_name = excluded.display_name, short_name = excluded.short_name, category = excluded.category, tier = excluded.tier, strict_tier = excluded.strict_tier, reason_short = excluded.reason_short, reason_long = excluded.reason_long, e_number = excluded.e_number, sources = excluded.sources, is_active = excluded.is_active;
+insert into public.ingredients (id, display_name, short_name, category, tier, strict_tier, reason_short, reason_long, e_number, sources, is_active) values ('other_preservatives', 'Sorbates, propionates and sulphites', 'preservatives', 'preservative', 'neutral'::public.tier, 'neutral'::public.tier, 'Common preservatives. Mindset rules don’t flag them by default.', null, 'E200', '{"regulator":[],"preference":[]}'::jsonb, true) on conflict (id) do update set display_name = excluded.display_name, short_name = excluded.short_name, category = excluded.category, tier = excluded.tier, strict_tier = excluded.strict_tier, reason_short = excluded.reason_short, reason_long = excluded.reason_long, e_number = excluded.e_number, sources = excluded.sources, is_active = excluded.is_active;
+insert into public.ingredients (id, display_name, short_name, category, tier, strict_tier, reason_short, reason_long, e_number, sources, is_active) values ('edta', 'Calcium disodium EDTA', 'EDTA', 'preservative', 'neutral'::public.tier, 'neutral'::public.tier, 'A synthetic sequestrant that keeps colour and flavour stable. Mindset rules don’t flag it by default.', null, 'E385', '{"regulator":[],"preference":[]}'::jsonb, true) on conflict (id) do update set display_name = excluded.display_name, short_name = excluded.short_name, category = excluded.category, tier = excluded.tier, strict_tier = excluded.strict_tier, reason_short = excluded.reason_short, reason_long = excluded.reason_long, e_number = excluded.e_number, sources = excluded.sources, is_active = excluded.is_active;
+insert into public.ingredients (id, display_name, short_name, category, tier, strict_tier, reason_short, reason_long, e_number, sources, is_active) values ('other_flavor_enhancers', 'Disodium inosinate / guanylate (ribonucleotides)', 'flavour enhancers', 'flavor_enhancer', 'borderline'::public.tier, 'bad'::public.tier, 'Flavour enhancers usually used alongside MSG. Mindset rules treat them like MSG: borderline.', null, 'E627', '{"regulator":[],"preference":[]}'::jsonb, true) on conflict (id) do update set display_name = excluded.display_name, short_name = excluded.short_name, category = excluded.category, tier = excluded.tier, strict_tier = excluded.strict_tier, reason_short = excluded.reason_short, reason_long = excluded.reason_long, e_number = excluded.e_number, sources = excluded.sources, is_active = excluded.is_active;
+insert into public.ingredients (id, display_name, short_name, category, tier, strict_tier, reason_short, reason_long, e_number, sources, is_active) values ('polyols_natural_sweeteners', 'Stevia and sugar alcohols', 'stevia', 'sweetener', 'neutral'::public.tier, 'neutral'::public.tier, 'Plant-derived sweeteners (stevia, monk fruit) and sugar alcohols. Mindset rules don’t flag them by default.', null, 'E960', '{"regulator":[],"preference":[]}'::jsonb, true) on conflict (id) do update set display_name = excluded.display_name, short_name = excluded.short_name, category = excluded.category, tier = excluded.tier, strict_tier = excluded.strict_tier, reason_short = excluded.reason_short, reason_long = excluded.reason_long, e_number = excluded.e_number, sources = excluded.sources, is_active = excluded.is_active;
+insert into public.ingredients (id, display_name, short_name, category, tier, strict_tier, reason_short, reason_long, e_number, sources, is_active) values ('natural_colours', 'Plant-based colours', 'natural colour', 'basic', 'neutral'::public.tier, 'neutral'::public.tier, '', null, 'E150a', '{"regulator":[],"preference":[]}'::jsonb, true) on conflict (id) do update set display_name = excluded.display_name, short_name = excluded.short_name, category = excluded.category, tier = excluded.tier, strict_tier = excluded.strict_tier, reason_short = excluded.reason_short, reason_long = excluded.reason_long, e_number = excluded.e_number, sources = excluded.sources, is_active = excluded.is_active;
+insert into public.ingredients (id, display_name, short_name, category, tier, strict_tier, reason_short, reason_long, e_number, sources, is_active) values ('tropical_fats', 'Shea and other tropical fats', 'shea fat', 'fat', 'borderline'::public.tier, 'borderline'::public.tier, 'Refined tropical fats used like palm oil. Mindset rules treat them as borderline, like palm oil.', null, null, '{"regulator":[],"preference":[]}'::jsonb, true) on conflict (id) do update set display_name = excluded.display_name, short_name = excluded.short_name, category = excluded.category, tier = excluded.tier, strict_tier = excluded.strict_tier, reason_short = excluded.reason_short, reason_long = excluded.reason_long, e_number = excluded.e_number, sources = excluded.sources, is_active = excluded.is_active;
+insert into public.ingredients (id, display_name, short_name, category, tier, strict_tier, reason_short, reason_long, e_number, sources, is_active) values ('peanut_oil', 'Peanut (groundnut) oil', 'peanut oil', 'seed_oil', 'borderline'::public.tier, 'bad'::public.tier, 'Peanut oil is a refined legume oil, high in omega-6 fats like seed oils. Mindset rules treat it as borderline; this is a Mindset preference.', null, null, '{"regulator":[],"preference":[]}'::jsonb, true) on conflict (id) do update set display_name = excluded.display_name, short_name = excluded.short_name, category = excluded.category, tier = excluded.tier, strict_tier = excluded.strict_tier, reason_short = excluded.reason_short, reason_long = excluded.reason_long, e_number = excluded.e_number, sources = excluded.sources, is_active = excluded.is_active;
+insert into public.ingredients (id, display_name, short_name, category, tier, strict_tier, reason_short, reason_long, e_number, sources, is_active) values ('yellow_quinoline', 'Quinoline yellow', 'Quinoline yellow', 'dye', 'bad'::public.tier, 'bad'::public.tier, 'Quinoline yellow is a synthetic dye. The EU requires a warning label on foods that contain it.', null, 'E104', '{"regulator":["EU Regulation (EC) No 1333/2008, Annex V (warning label)"],"preference":[]}'::jsonb, true) on conflict (id) do update set display_name = excluded.display_name, short_name = excluded.short_name, category = excluded.category, tier = excluded.tier, strict_tier = excluded.strict_tier, reason_short = excluded.reason_short, reason_long = excluded.reason_long, e_number = excluded.e_number, sources = excluded.sources, is_active = excluded.is_active;
+insert into public.ingredients (id, display_name, short_name, category, tier, strict_tier, reason_short, reason_long, e_number, sources, is_active) values ('carmoisine', 'Carmoisine (azorubine)', 'Carmoisine', 'dye', 'bad'::public.tier, 'bad'::public.tier, 'Carmoisine is a synthetic dye. The EU requires a warning label on foods that contain it.', null, 'E122', '{"regulator":["EU Regulation (EC) No 1333/2008, Annex V (warning label)"],"preference":[]}'::jsonb, true) on conflict (id) do update set display_name = excluded.display_name, short_name = excluded.short_name, category = excluded.category, tier = excluded.tier, strict_tier = excluded.strict_tier, reason_short = excluded.reason_short, reason_long = excluded.reason_long, e_number = excluded.e_number, sources = excluded.sources, is_active = excluded.is_active;
+insert into public.ingredients (id, display_name, short_name, category, tier, strict_tier, reason_short, reason_long, e_number, sources, is_active) values ('ponceau_4r', 'Ponceau 4R', 'Ponceau 4R', 'dye', 'bad'::public.tier, 'bad'::public.tier, 'Ponceau 4R is a synthetic dye. The EU requires a warning label on foods that contain it.', null, 'E124', '{"regulator":["EU Regulation (EC) No 1333/2008, Annex V (warning label)"],"preference":[]}'::jsonb, true) on conflict (id) do update set display_name = excluded.display_name, short_name = excluded.short_name, category = excluded.category, tier = excluded.tier, strict_tier = excluded.strict_tier, reason_short = excluded.reason_short, reason_long = excluded.reason_long, e_number = excluded.e_number, sources = excluded.sources, is_active = excluded.is_active;
 
 insert into public.aliases (alias, alias_norm, ingredient_id, lang, kind) select v.alias, '', v.ingredient_id, v.lang, v.kind from (values
   ('canola oil', 'canola_oil', 'en', 'name'::public.alias_kind),
   ('rapeseed oil', 'canola_oil', 'en', 'name'::public.alias_kind),
   ('colza oil', 'canola_oil', 'en', 'name'::public.alias_kind),
   ('canola', 'canola_oil', 'en', 'name'::public.alias_kind),
-  ('low erucic acid rapeseed oil', 'canola_oil', 'en', 'name'::public.alias_kind)
+  ('low erucic acid rapeseed oil', 'canola_oil', 'en', 'name'::public.alias_kind),
+  ('rapeseed', 'canola_oil', 'en', 'name'::public.alias_kind),
+  ('rapsolje', 'canola_oil', 'en', 'name'::public.alias_kind),
+  ('huile de colza', 'canola_oil', 'en', 'name'::public.alias_kind),
+  ('huile de canola', 'canola_oil', 'en', 'name'::public.alias_kind),
+  ('rapsöl', 'canola_oil', 'en', 'name'::public.alias_kind)
 ) as v(alias, ingredient_id, lang, kind)
 on conflict (alias_norm) do nothing;
 insert into public.aliases (alias, alias_norm, ingredient_id, lang, kind) select v.alias, '', v.ingredient_id, v.lang, v.kind from (values
@@ -106,7 +126,10 @@ insert into public.aliases (alias, alias_norm, ingredient_id, lang, kind) select
   ('sunflower oil', 'sunflower_oil', 'en', 'name'::public.alias_kind),
   ('safflower oil', 'sunflower_oil', 'en', 'name'::public.alias_kind),
   ('sunflower seed oil', 'sunflower_oil', 'en', 'name'::public.alias_kind),
-  ('safflower seed oil', 'sunflower_oil', 'en', 'name'::public.alias_kind)
+  ('safflower seed oil', 'sunflower_oil', 'en', 'name'::public.alias_kind),
+  ('solsikkeolje', 'sunflower_oil', 'en', 'name'::public.alias_kind),
+  ('huile de tournesol', 'sunflower_oil', 'en', 'name'::public.alias_kind),
+  ('sonnenblumenöl', 'sunflower_oil', 'en', 'name'::public.alias_kind)
 ) as v(alias, ingredient_id, lang, kind)
 on conflict (alias_norm) do nothing;
 insert into public.aliases (alias, alias_norm, ingredient_id, lang, kind) select v.alias, '', v.ingredient_id, v.lang, v.kind from (values
@@ -153,7 +176,11 @@ insert into public.aliases (alias, alias_norm, ingredient_id, lang, kind) select
   ('palm fat', 'palm_oil', 'en', 'name'::public.alias_kind),
   ('palm kernel fat', 'palm_oil', 'en', 'name'::public.alias_kind),
   ('palm stearin', 'palm_oil', 'en', 'name'::public.alias_kind),
-  ('refined palm oil', 'palm_oil', 'en', 'name'::public.alias_kind)
+  ('refined palm oil', 'palm_oil', 'en', 'name'::public.alias_kind),
+  ('sustainable palm fruit oil', 'palm_oil', 'en', 'name'::public.alias_kind),
+  ('palm fruit oil', 'palm_oil', 'en', 'name'::public.alias_kind),
+  ('palm kernel', 'palm_oil', 'en', 'name'::public.alias_kind),
+  ('palm stearin oil', 'palm_oil', 'en', 'name'::public.alias_kind)
 ) as v(alias, ingredient_id, lang, kind)
 on conflict (alias_norm) do nothing;
 insert into public.aliases (alias, alias_norm, ingredient_id, lang, kind) select v.alias, '', v.ingredient_id, v.lang, v.kind from (values
@@ -169,7 +196,9 @@ on conflict (alias_norm) do nothing;
 insert into public.aliases (alias, alias_norm, ingredient_id, lang, kind) select v.alias, '', v.ingredient_id, v.lang, v.kind from (values
   ('coconut oil', 'coconut_oil', 'en', 'name'::public.alias_kind),
   ('virgin coconut oil', 'coconut_oil', 'en', 'name'::public.alias_kind),
-  ('extra virgin coconut oil', 'coconut_oil', 'en', 'name'::public.alias_kind)
+  ('extra virgin coconut oil', 'coconut_oil', 'en', 'name'::public.alias_kind),
+  ('coconut butter', 'coconut_oil', 'en', 'name'::public.alias_kind),
+  ('coconut fat', 'coconut_oil', 'en', 'name'::public.alias_kind)
 ) as v(alias, ingredient_id, lang, kind)
 on conflict (alias_norm) do nothing;
 insert into public.aliases (alias, alias_norm, ingredient_id, lang, kind) select v.alias, '', v.ingredient_id, v.lang, v.kind from (values
@@ -267,7 +296,9 @@ insert into public.aliases (alias, alias_norm, ingredient_id, lang, kind) select
   ('sulphite ammonia caramel', 'caramel_color', 'en', 'name'::public.alias_kind),
   ('sulfite ammonia caramel', 'caramel_color', 'en', 'name'::public.alias_kind),
   ('E150c', 'caramel_color', 'en', 'e_number'::public.alias_kind),
-  ('E150d', 'caramel_color', 'en', 'e_number'::public.alias_kind)
+  ('E150d', 'caramel_color', 'en', 'e_number'::public.alias_kind),
+  ('E150', 'caramel_color', 'en', 'e_number'::public.alias_kind),
+  ('E150b', 'caramel_color', 'en', 'e_number'::public.alias_kind)
 ) as v(alias, ingredient_id, lang, kind)
 on conflict (alias_norm) do nothing;
 insert into public.aliases (alias, alias_norm, ingredient_id, lang, kind) select v.alias, '', v.ingredient_id, v.lang, v.kind from (values
@@ -319,7 +350,19 @@ insert into public.aliases (alias, alias_norm, ingredient_id, lang, kind) select
   ('agave syrup', 'added_sugar', 'en', 'name'::public.alias_kind),
   ('agave nectar', 'added_sugar', 'en', 'name'::public.alias_kind),
   ('caramel', 'added_sugar', 'en', 'name'::public.alias_kind),
-  ('sugar syrup', 'added_sugar', 'en', 'name'::public.alias_kind)
+  ('sugar syrup', 'added_sugar', 'en', 'name'::public.alias_kind),
+  ('sucre', 'added_sugar', 'en', 'name'::public.alias_kind),
+  ('sukker', 'added_sugar', 'en', 'name'::public.alias_kind),
+  ('azucar', 'added_sugar', 'en', 'name'::public.alias_kind),
+  ('azúcar', 'added_sugar', 'en', 'name'::public.alias_kind),
+  ('zucker', 'added_sugar', 'en', 'name'::public.alias_kind),
+  ('invert syrup', 'added_sugar', 'en', 'name'::public.alias_kind),
+  ('partially inverted refiners syrup', 'added_sugar', 'en', 'name'::public.alias_kind),
+  ('date syrup', 'added_sugar', 'en', 'name'::public.alias_kind),
+  ('sugars', 'added_sugar', 'en', 'name'::public.alias_kind),
+  ('caster sugar', 'added_sugar', 'en', 'name'::public.alias_kind),
+  ('jaggery', 'added_sugar', 'en', 'name'::public.alias_kind),
+  ('glucose-fructose', 'added_sugar', 'en', 'name'::public.alias_kind)
 ) as v(alias, ingredient_id, lang, kind)
 on conflict (alias_norm) do nothing;
 insert into public.aliases (alias, alias_norm, ingredient_id, lang, kind) select v.alias, '', v.ingredient_id, v.lang, v.kind from (values
@@ -368,7 +411,18 @@ insert into public.aliases (alias, alias_norm, ingredient_id, lang, kind) select
   ('flavour', 'natural_flavors', 'en', 'name'::public.alias_kind),
   ('flavoring', 'natural_flavors', 'en', 'name'::public.alias_kind),
   ('flavouring', 'natural_flavors', 'en', 'name'::public.alias_kind),
-  ('natural flavors and spices', 'natural_flavors', 'en', 'name'::public.alias_kind)
+  ('natural flavors and spices', 'natural_flavors', 'en', 'name'::public.alias_kind),
+  ('aroma', 'natural_flavors', 'en', 'name'::public.alias_kind),
+  ('aromas', 'natural_flavors', 'en', 'name'::public.alias_kind),
+  ('natural aroma', 'natural_flavors', 'en', 'name'::public.alias_kind),
+  ('natural aromas', 'natural_flavors', 'en', 'name'::public.alias_kind),
+  ('arome', 'natural_flavors', 'en', 'name'::public.alias_kind),
+  ('arome naturel', 'natural_flavors', 'en', 'name'::public.alias_kind),
+  ('arôme', 'natural_flavors', 'en', 'name'::public.alias_kind),
+  ('arôme naturel', 'natural_flavors', 'en', 'name'::public.alias_kind),
+  ('aromes', 'natural_flavors', 'en', 'name'::public.alias_kind),
+  ('arômes', 'natural_flavors', 'en', 'name'::public.alias_kind),
+  ('flavour enhancer free natural flavouring', 'natural_flavors', 'en', 'name'::public.alias_kind)
 ) as v(alias, ingredient_id, lang, kind)
 on conflict (alias_norm) do nothing;
 insert into public.aliases (alias, alias_norm, ingredient_id, lang, kind) select v.alias, '', v.ingredient_id, v.lang, v.kind from (values
@@ -456,7 +510,12 @@ insert into public.aliases (alias, alias_norm, ingredient_id, lang, kind) select
   ('filtered water', 'water', 'en', 'name'::public.alias_kind),
   ('purified water', 'water', 'en', 'name'::public.alias_kind),
   ('carbonated water', 'water', 'en', 'name'::public.alias_kind),
-  ('drinking water', 'water', 'en', 'name'::public.alias_kind)
+  ('drinking water', 'water', 'en', 'name'::public.alias_kind),
+  ('eau', 'water', 'en', 'name'::public.alias_kind),
+  ('vann', 'water', 'en', 'name'::public.alias_kind),
+  ('aqua', 'water', 'en', 'name'::public.alias_kind),
+  ('wasser', 'water', 'en', 'name'::public.alias_kind),
+  ('agua', 'water', 'en', 'name'::public.alias_kind)
 ) as v(alias, ingredient_id, lang, kind)
 on conflict (alias_norm) do nothing;
 insert into public.aliases (alias, alias_norm, ingredient_id, lang, kind) select v.alias, '', v.ingredient_id, v.lang, v.kind from (values
@@ -465,7 +524,13 @@ insert into public.aliases (alias, alias_norm, ingredient_id, lang, kind) select
   ('iodized salt', 'salt', 'en', 'name'::public.alias_kind),
   ('iodised salt', 'salt', 'en', 'name'::public.alias_kind),
   ('himalayan salt', 'salt', 'en', 'name'::public.alias_kind),
-  ('rock salt', 'salt', 'en', 'name'::public.alias_kind)
+  ('rock salt', 'salt', 'en', 'name'::public.alias_kind),
+  ('sel', 'salt', 'en', 'name'::public.alias_kind),
+  ('sal', 'salt', 'en', 'name'::public.alias_kind),
+  ('havsalt', 'salt', 'en', 'name'::public.alias_kind),
+  ('salz', 'salt', 'en', 'name'::public.alias_kind),
+  ('sodium chloride', 'salt', 'en', 'name'::public.alias_kind),
+  ('sea-salt', 'salt', 'en', 'name'::public.alias_kind)
 ) as v(alias, ingredient_id, lang, kind)
 on conflict (alias_norm) do nothing;
 insert into public.aliases (alias, alias_norm, ingredient_id, lang, kind) select v.alias, '', v.ingredient_id, v.lang, v.kind from (values
@@ -482,7 +547,40 @@ insert into public.aliases (alias, alias_norm, ingredient_id, lang, kind) select
   ('wheat', 'flour', 'en', 'name'::public.alias_kind),
   ('whole grain wheat', 'flour', 'en', 'name'::public.alias_kind),
   ('semolina', 'flour', 'en', 'name'::public.alias_kind),
-  ('durum wheat semolina', 'flour', 'en', 'name'::public.alias_kind)
+  ('durum wheat semolina', 'flour', 'en', 'name'::public.alias_kind),
+  ('maida', 'flour', 'en', 'name'::public.alias_kind),
+  ('atta', 'flour', 'en', 'name'::public.alias_kind),
+  ('whole wheat atta', 'flour', 'en', 'name'::public.alias_kind),
+  ('besan', 'flour', 'en', 'name'::public.alias_kind),
+  ('gram flour', 'flour', 'en', 'name'::public.alias_kind),
+  ('bengal gram flour', 'flour', 'en', 'name'::public.alias_kind),
+  ('chickpea flour', 'flour', 'en', 'name'::public.alias_kind),
+  ('cornflour', 'flour', 'en', 'name'::public.alias_kind),
+  ('corn flour', 'flour', 'en', 'name'::public.alias_kind),
+  ('farine de ble', 'flour', 'en', 'name'::public.alias_kind),
+  ('farine de blé', 'flour', 'en', 'name'::public.alias_kind),
+  ('hvetemel', 'flour', 'en', 'name'::public.alias_kind),
+  ('weizenmehl', 'flour', 'en', 'name'::public.alias_kind),
+  ('gluten', 'flour', 'en', 'name'::public.alias_kind),
+  ('wheat gluten', 'flour', 'en', 'name'::public.alias_kind),
+  ('vital wheat gluten', 'flour', 'en', 'name'::public.alias_kind),
+  ('gluten de ble', 'flour', 'en', 'name'::public.alias_kind),
+  ('gluten de blé', 'flour', 'en', 'name'::public.alias_kind),
+  ('spelt', 'flour', 'en', 'name'::public.alias_kind),
+  ('spelt flour', 'flour', 'en', 'name'::public.alias_kind),
+  ('rolled spelt', 'flour', 'en', 'name'::public.alias_kind),
+  ('triticale', 'flour', 'en', 'name'::public.alias_kind),
+  ('oatmeal', 'flour', 'en', 'name'::public.alias_kind),
+  ('cornmeal', 'flour', 'en', 'name'::public.alias_kind),
+  ('yellow cornmeal', 'flour', 'en', 'name'::public.alias_kind),
+  ('blue cornmeal', 'flour', 'en', 'name'::public.alias_kind),
+  ('sooji', 'flour', 'en', 'name'::public.alias_kind),
+  ('rava', 'flour', 'en', 'name'::public.alias_kind),
+  ('cereal extract', 'flour', 'en', 'name'::public.alias_kind),
+  ('malt extract', 'flour', 'en', 'name'::public.alias_kind),
+  ('barley malt extract', 'flour', 'en', 'name'::public.alias_kind),
+  ('malted barley', 'flour', 'en', 'name'::public.alias_kind),
+  ('malted barley flour', 'flour', 'en', 'name'::public.alias_kind)
 ) as v(alias, ingredient_id, lang, kind)
 on conflict (alias_norm) do nothing;
 insert into public.aliases (alias, alias_norm, ingredient_id, lang, kind) select v.alias, '', v.ingredient_id, v.lang, v.kind from (values
@@ -499,7 +597,90 @@ insert into public.aliases (alias, alias_norm, ingredient_id, lang, kind) select
   ('vitamin a', 'flour_enrichment', 'en', 'name'::public.alias_kind),
   ('vitamin b12', 'flour_enrichment', 'en', 'name'::public.alias_kind),
   ('calcium carbonate', 'flour_enrichment', 'en', 'name'::public.alias_kind),
-  ('zinc oxide', 'flour_enrichment', 'en', 'name'::public.alias_kind)
+  ('zinc oxide', 'flour_enrichment', 'en', 'name'::public.alias_kind),
+  ('thiamin', 'flour_enrichment', 'en', 'name'::public.alias_kind),
+  ('thiamine', 'flour_enrichment', 'en', 'name'::public.alias_kind),
+  ('thiamine hydrochloride', 'flour_enrichment', 'en', 'name'::public.alias_kind),
+  ('thiamin hydrochloride', 'flour_enrichment', 'en', 'name'::public.alias_kind),
+  ('b1', 'flour_enrichment', 'en', 'name'::public.alias_kind),
+  ('b2', 'flour_enrichment', 'en', 'name'::public.alias_kind),
+  ('b3', 'flour_enrichment', 'en', 'name'::public.alias_kind),
+  ('b5', 'flour_enrichment', 'en', 'name'::public.alias_kind),
+  ('b6', 'flour_enrichment', 'en', 'name'::public.alias_kind),
+  ('b9', 'flour_enrichment', 'en', 'name'::public.alias_kind),
+  ('b12', 'flour_enrichment', 'en', 'name'::public.alias_kind),
+  ('d2', 'flour_enrichment', 'en', 'name'::public.alias_kind),
+  ('d3', 'flour_enrichment', 'en', 'name'::public.alias_kind),
+  ('vitamin b1', 'flour_enrichment', 'en', 'name'::public.alias_kind),
+  ('vitamin b2', 'flour_enrichment', 'en', 'name'::public.alias_kind),
+  ('vitamin b3', 'flour_enrichment', 'en', 'name'::public.alias_kind),
+  ('vitamin b5', 'flour_enrichment', 'en', 'name'::public.alias_kind),
+  ('vitamin b6', 'flour_enrichment', 'en', 'name'::public.alias_kind),
+  ('vitamin b9', 'flour_enrichment', 'en', 'name'::public.alias_kind),
+  ('vitamin d2', 'flour_enrichment', 'en', 'name'::public.alias_kind),
+  ('vitamin k', 'flour_enrichment', 'en', 'name'::public.alias_kind),
+  ('vitamin k1', 'flour_enrichment', 'en', 'name'::public.alias_kind),
+  ('vitamin k2', 'flour_enrichment', 'en', 'name'::public.alias_kind),
+  ('vitamins', 'flour_enrichment', 'en', 'name'::public.alias_kind),
+  ('vitamins b2', 'flour_enrichment', 'en', 'name'::public.alias_kind),
+  ('minerals', 'flour_enrichment', 'en', 'name'::public.alias_kind),
+  ('vitamins mineral', 'flour_enrichment', 'en', 'name'::public.alias_kind),
+  ('vitamins and minerals', 'flour_enrichment', 'en', 'name'::public.alias_kind),
+  ('folate', 'flour_enrichment', 'en', 'name'::public.alias_kind),
+  ('pantothenic acid', 'flour_enrichment', 'en', 'name'::public.alias_kind),
+  ('calcium pantothenate', 'flour_enrichment', 'en', 'name'::public.alias_kind),
+  ('d calcium pantothenate', 'flour_enrichment', 'en', 'name'::public.alias_kind),
+  ('cyanocobalamin', 'flour_enrichment', 'en', 'name'::public.alias_kind),
+  ('pyridoxine', 'flour_enrichment', 'en', 'name'::public.alias_kind),
+  ('pyridoxine hydrochloride', 'flour_enrichment', 'en', 'name'::public.alias_kind),
+  ('niacinamide', 'flour_enrichment', 'en', 'name'::public.alias_kind),
+  ('nicotinamide', 'flour_enrichment', 'en', 'name'::public.alias_kind),
+  ('ergocalciferol', 'flour_enrichment', 'en', 'name'::public.alias_kind),
+  ('cholecalciferol', 'flour_enrichment', 'en', 'name'::public.alias_kind),
+  ('inositol', 'flour_enrichment', 'en', 'name'::public.alias_kind),
+  ('taurine', 'flour_enrichment', 'en', 'name'::public.alias_kind),
+  ('biotin', 'flour_enrichment', 'en', 'name'::public.alias_kind),
+  ('beta carotene', 'flour_enrichment', 'en', 'name'::public.alias_kind),
+  ('retinyl acetate', 'flour_enrichment', 'en', 'name'::public.alias_kind),
+  ('retinyl palmitate', 'flour_enrichment', 'en', 'name'::public.alias_kind),
+  ('vitamin a palmitate', 'flour_enrichment', 'en', 'name'::public.alias_kind),
+  ('vitamin a acetate', 'flour_enrichment', 'en', 'name'::public.alias_kind),
+  ('calcium', 'flour_enrichment', 'en', 'name'::public.alias_kind),
+  ('magnesium', 'flour_enrichment', 'en', 'name'::public.alias_kind),
+  ('potassium', 'flour_enrichment', 'en', 'name'::public.alias_kind),
+  ('zinc', 'flour_enrichment', 'en', 'name'::public.alias_kind),
+  ('zinc gluconate', 'flour_enrichment', 'en', 'name'::public.alias_kind),
+  ('zinc sulphate', 'flour_enrichment', 'en', 'name'::public.alias_kind),
+  ('zinc sulfate', 'flour_enrichment', 'en', 'name'::public.alias_kind),
+  ('potassium iodide', 'flour_enrichment', 'en', 'name'::public.alias_kind),
+  ('potassium iodate', 'flour_enrichment', 'en', 'name'::public.alias_kind),
+  ('iodine', 'flour_enrichment', 'en', 'name'::public.alias_kind),
+  ('ferrous sulphate', 'flour_enrichment', 'en', 'name'::public.alias_kind),
+  ('ferrous sulfate', 'flour_enrichment', 'en', 'name'::public.alias_kind),
+  ('ferrous fumarate', 'flour_enrichment', 'en', 'name'::public.alias_kind),
+  ('ferric pyrophosphate', 'flour_enrichment', 'en', 'name'::public.alias_kind),
+  ('electrolytic iron', 'flour_enrichment', 'en', 'name'::public.alias_kind),
+  ('phosphorus', 'flour_enrichment', 'en', 'name'::public.alias_kind),
+  ('tricalcium phosphate', 'flour_enrichment', 'en', 'name'::public.alias_kind),
+  ('tri calcium phosphate', 'flour_enrichment', 'en', 'name'::public.alias_kind),
+  ('calcium phosphate', 'flour_enrichment', 'en', 'name'::public.alias_kind),
+  ('dicalcium phosphate', 'flour_enrichment', 'en', 'name'::public.alias_kind),
+  ('magnesium oxide', 'flour_enrichment', 'en', 'name'::public.alias_kind),
+  ('magnesium carbonate', 'flour_enrichment', 'en', 'name'::public.alias_kind),
+  ('calcium sulphate', 'flour_enrichment', 'en', 'name'::public.alias_kind),
+  ('calcium sulfate', 'flour_enrichment', 'en', 'name'::public.alias_kind),
+  ('calcium chloride', 'flour_enrichment', 'en', 'name'::public.alias_kind),
+  ('potassium chloride', 'flour_enrichment', 'en', 'name'::public.alias_kind),
+  ('sodium selenite', 'flour_enrichment', 'en', 'name'::public.alias_kind),
+  ('copper sulphate', 'flour_enrichment', 'en', 'name'::public.alias_kind),
+  ('manganese sulphate', 'flour_enrichment', 'en', 'name'::public.alias_kind),
+  ('E101', 'flour_enrichment', 'en', 'e_number'::public.alias_kind),
+  ('E341', 'flour_enrichment', 'en', 'e_number'::public.alias_kind),
+  ('E516', 'flour_enrichment', 'en', 'e_number'::public.alias_kind),
+  ('E509', 'flour_enrichment', 'en', 'e_number'::public.alias_kind),
+  ('E508', 'flour_enrichment', 'en', 'e_number'::public.alias_kind),
+  ('E504', 'flour_enrichment', 'en', 'e_number'::public.alias_kind),
+  ('E170', 'flour_enrichment', 'en', 'e_number'::public.alias_kind)
 ) as v(alias, ingredient_id, lang, kind)
 on conflict (alias_norm) do nothing;
 insert into public.aliases (alias, alias_norm, ingredient_id, lang, kind) select v.alias, '', v.ingredient_id, v.lang, v.kind from (values
@@ -536,7 +717,36 @@ insert into public.aliases (alias, alias_norm, ingredient_id, lang, kind) select
   ('cultures', 'dairy', 'en', 'name'::public.alias_kind),
   ('enzymes', 'dairy', 'en', 'name'::public.alias_kind),
   ('bacterial cultures', 'dairy', 'en', 'name'::public.alias_kind),
-  ('rennet', 'dairy', 'en', 'name'::public.alias_kind)
+  ('rennet', 'dairy', 'en', 'name'::public.alias_kind),
+  ('lait', 'dairy', 'en', 'name'::public.alias_kind),
+  ('melk', 'dairy', 'en', 'name'::public.alias_kind),
+  ('milkfat', 'dairy', 'en', 'name'::public.alias_kind),
+  ('milk fat', 'dairy', 'en', 'name'::public.alias_kind),
+  ('lactase', 'dairy', 'en', 'name'::public.alias_kind),
+  ('lactase enzyme', 'dairy', 'en', 'name'::public.alias_kind),
+  ('l bulgaricus', 'dairy', 'en', 'name'::public.alias_kind),
+  ('s thermophilus', 'dairy', 'en', 'name'::public.alias_kind),
+  ('bulgaricus', 'dairy', 'en', 'name'::public.alias_kind),
+  ('thermophilus', 'dairy', 'en', 'name'::public.alias_kind),
+  ('streptococcus thermophilus', 'dairy', 'en', 'name'::public.alias_kind),
+  ('lactobacillus bulgaricus', 'dairy', 'en', 'name'::public.alias_kind),
+  ('lactobacillus delbrueckii subsp bulgaricus', 'dairy', 'en', 'name'::public.alias_kind),
+  ('l acidophilus', 'dairy', 'en', 'name'::public.alias_kind),
+  ('lactobacillus acidophilus', 'dairy', 'en', 'name'::public.alias_kind),
+  ('acidophilus', 'dairy', 'en', 'name'::public.alias_kind),
+  ('l casei', 'dairy', 'en', 'name'::public.alias_kind),
+  ('lactobacillus casei', 'dairy', 'en', 'name'::public.alias_kind),
+  ('casei', 'dairy', 'en', 'name'::public.alias_kind),
+  ('bifidus', 'dairy', 'en', 'name'::public.alias_kind),
+  ('bifidobacterium', 'dairy', 'en', 'name'::public.alias_kind),
+  ('bifidobacterium lactis', 'dairy', 'en', 'name'::public.alias_kind),
+  ('b lactis', 'dairy', 'en', 'name'::public.alias_kind),
+  ('lactobacillus rhamnosus', 'dairy', 'en', 'name'::public.alias_kind),
+  ('lactic ferments', 'dairy', 'en', 'name'::public.alias_kind),
+  ('live cultures', 'dairy', 'en', 'name'::public.alias_kind),
+  ('probiotic cultures', 'dairy', 'en', 'name'::public.alias_kind),
+  ('yogurt cultures', 'dairy', 'en', 'name'::public.alias_kind),
+  ('milk cultures', 'dairy', 'en', 'name'::public.alias_kind)
 ) as v(alias, ingredient_id, lang, kind)
 on conflict (alias_norm) do nothing;
 insert into public.aliases (alias, alias_norm, ingredient_id, lang, kind) select v.alias, '', v.ingredient_id, v.lang, v.kind from (values
@@ -555,7 +765,20 @@ insert into public.aliases (alias, alias_norm, ingredient_id, lang, kind) select
   ('barley', 'grains', 'en', 'name'::public.alias_kind),
   ('quinoa', 'grains', 'en', 'name'::public.alias_kind),
   ('buckwheat', 'grains', 'en', 'name'::public.alias_kind),
-  ('rye', 'grains', 'en', 'name'::public.alias_kind)
+  ('rye', 'grains', 'en', 'name'::public.alias_kind),
+  ('maize', 'grains', 'en', 'name'::public.alias_kind),
+  ('millet', 'grains', 'en', 'name'::public.alias_kind),
+  ('millet seeds', 'grains', 'en', 'name'::public.alias_kind),
+  ('sorghum', 'grains', 'en', 'name'::public.alias_kind),
+  ('amaranth', 'grains', 'en', 'name'::public.alias_kind),
+  ('teff', 'grains', 'en', 'name'::public.alias_kind),
+  ('moong dal', 'grains', 'en', 'name'::public.alias_kind),
+  ('moth dal', 'grains', 'en', 'name'::public.alias_kind),
+  ('urad dal', 'grains', 'en', 'name'::public.alias_kind),
+  ('chana dal', 'grains', 'en', 'name'::public.alias_kind),
+  ('toor dal', 'grains', 'en', 'name'::public.alias_kind),
+  ('masoor dal', 'grains', 'en', 'name'::public.alias_kind),
+  ('red lentil', 'grains', 'en', 'name'::public.alias_kind)
 ) as v(alias, ingredient_id, lang, kind)
 on conflict (alias_norm) do nothing;
 insert into public.aliases (alias, alias_norm, ingredient_id, lang, kind) select v.alias, '', v.ingredient_id, v.lang, v.kind from (values
@@ -567,7 +790,26 @@ insert into public.aliases (alias, alias_norm, ingredient_id, lang, kind) select
   ('wheat starch', 'starches', 'en', 'name'::public.alias_kind),
   ('starch', 'starches', 'en', 'name'::public.alias_kind),
   ('tapioca', 'starches', 'en', 'name'::public.alias_kind),
-  ('arrowroot', 'starches', 'en', 'name'::public.alias_kind)
+  ('arrowroot', 'starches', 'en', 'name'::public.alias_kind),
+  ('modified cornflour', 'starches', 'en', 'name'::public.alias_kind),
+  ('modified corn starch', 'starches', 'en', 'name'::public.alias_kind),
+  ('modified maize starch', 'starches', 'en', 'name'::public.alias_kind),
+  ('modified tapioca starch', 'starches', 'en', 'name'::public.alias_kind),
+  ('modified potato starch', 'starches', 'en', 'name'::public.alias_kind),
+  ('modified food starch', 'starches', 'en', 'name'::public.alias_kind),
+  ('dextrin', 'starches', 'en', 'name'::public.alias_kind),
+  ('maltodextrin-free', 'starches', 'en', 'name'::public.alias_kind),
+  ('E1404', 'starches', 'en', 'e_number'::public.alias_kind),
+  ('E1410', 'starches', 'en', 'e_number'::public.alias_kind),
+  ('E1412', 'starches', 'en', 'e_number'::public.alias_kind),
+  ('E1413', 'starches', 'en', 'e_number'::public.alias_kind),
+  ('E1414', 'starches', 'en', 'e_number'::public.alias_kind),
+  ('E1420', 'starches', 'en', 'e_number'::public.alias_kind),
+  ('E1422', 'starches', 'en', 'e_number'::public.alias_kind),
+  ('E1440', 'starches', 'en', 'e_number'::public.alias_kind),
+  ('E1442', 'starches', 'en', 'e_number'::public.alias_kind),
+  ('E1450', 'starches', 'en', 'e_number'::public.alias_kind),
+  ('E1451', 'starches', 'en', 'e_number'::public.alias_kind)
 ) as v(alias, ingredient_id, lang, kind)
 on conflict (alias_norm) do nothing;
 insert into public.aliases (alias, alias_norm, ingredient_id, lang, kind) select v.alias, '', v.ingredient_id, v.lang, v.kind from (values
@@ -604,7 +846,37 @@ insert into public.aliases (alias, alias_norm, ingredient_id, lang, kind) select
   ('shallots', 'vegetables', 'en', 'name'::public.alias_kind),
   ('lemongrass', 'vegetables', 'en', 'name'::public.alias_kind),
   ('seaweed', 'vegetables', 'en', 'name'::public.alias_kind),
-  ('nori', 'vegetables', 'en', 'name'::public.alias_kind)
+  ('nori', 'vegetables', 'en', 'name'::public.alias_kind),
+  ('carrot', 'vegetables', 'en', 'name'::public.alias_kind),
+  ('dried carrot', 'vegetables', 'en', 'name'::public.alias_kind),
+  ('pumpkin', 'vegetables', 'en', 'name'::public.alias_kind),
+  ('leek', 'vegetables', 'en', 'name'::public.alias_kind),
+  ('leeks', 'vegetables', 'en', 'name'::public.alias_kind),
+  ('sweetcorn', 'vegetables', 'en', 'name'::public.alias_kind),
+  ('sweet corn', 'vegetables', 'en', 'name'::public.alias_kind),
+  ('shallot powder', 'vegetables', 'en', 'name'::public.alias_kind),
+  ('shallot', 'vegetables', 'en', 'name'::public.alias_kind),
+  ('tamarind', 'vegetables', 'en', 'name'::public.alias_kind),
+  ('pea protein', 'vegetables', 'en', 'name'::public.alias_kind),
+  ('peas protein', 'vegetables', 'en', 'name'::public.alias_kind),
+  ('beet red', 'vegetables', 'en', 'name'::public.alias_kind),
+  ('spinach powder', 'vegetables', 'en', 'name'::public.alias_kind),
+  ('cauliflower', 'vegetables', 'en', 'name'::public.alias_kind),
+  ('broccoli', 'vegetables', 'en', 'name'::public.alias_kind),
+  ('zucchini', 'vegetables', 'en', 'name'::public.alias_kind),
+  ('courgette', 'vegetables', 'en', 'name'::public.alias_kind),
+  ('cucumber', 'vegetables', 'en', 'name'::public.alias_kind),
+  ('kale', 'vegetables', 'en', 'name'::public.alias_kind),
+  ('pepper flakes', 'vegetables', 'en', 'name'::public.alias_kind),
+  ('jalapeno', 'vegetables', 'en', 'name'::public.alias_kind),
+  ('green chilli', 'vegetables', 'en', 'name'::public.alias_kind),
+  ('coriander leaves', 'vegetables', 'en', 'name'::public.alias_kind),
+  ('curry leaves', 'vegetables', 'en', 'name'::public.alias_kind),
+  ('kaffir lime leaves', 'vegetables', 'en', 'name'::public.alias_kind),
+  ('lime leaves', 'vegetables', 'en', 'name'::public.alias_kind),
+  ('hvitløk', 'vegetables', 'en', 'name'::public.alias_kind),
+  ('knoblauch', 'vegetables', 'en', 'name'::public.alias_kind),
+  ('ajo', 'vegetables', 'en', 'name'::public.alias_kind)
 ) as v(alias, ingredient_id, lang, kind)
 on conflict (alias_norm) do nothing;
 insert into public.aliases (alias, alias_norm, ingredient_id, lang, kind) select v.alias, '', v.ingredient_id, v.lang, v.kind from (values
@@ -626,7 +898,43 @@ insert into public.aliases (alias, alias_norm, ingredient_id, lang, kind) select
   ('coconut milk', 'fruit', 'en', 'name'::public.alias_kind),
   ('coconut cream', 'fruit', 'en', 'name'::public.alias_kind),
   ('dried cranberries', 'fruit', 'en', 'name'::public.alias_kind),
-  ('fruit puree', 'fruit', 'en', 'name'::public.alias_kind)
+  ('fruit puree', 'fruit', 'en', 'name'::public.alias_kind),
+  ('lemon', 'fruit', 'en', 'name'::public.alias_kind),
+  ('lime', 'fruit', 'en', 'name'::public.alias_kind),
+  ('orange', 'fruit', 'en', 'name'::public.alias_kind),
+  ('raspberry', 'fruit', 'en', 'name'::public.alias_kind),
+  ('raspberries', 'fruit', 'en', 'name'::public.alias_kind),
+  ('strawberry', 'fruit', 'en', 'name'::public.alias_kind),
+  ('blueberry', 'fruit', 'en', 'name'::public.alias_kind),
+  ('blackcurrant', 'fruit', 'en', 'name'::public.alias_kind),
+  ('blackcurrants', 'fruit', 'en', 'name'::public.alias_kind),
+  ('currants', 'fruit', 'en', 'name'::public.alias_kind),
+  ('cranberries', 'fruit', 'en', 'name'::public.alias_kind),
+  ('pineapple', 'fruit', 'en', 'name'::public.alias_kind),
+  ('pineapple juice', 'fruit', 'en', 'name'::public.alias_kind),
+  ('grape juice', 'fruit', 'en', 'name'::public.alias_kind),
+  ('grapes', 'fruit', 'en', 'name'::public.alias_kind),
+  ('papaya pulp', 'fruit', 'en', 'name'::public.alias_kind),
+  ('pear pulp', 'fruit', 'en', 'name'::public.alias_kind),
+  ('pear', 'fruit', 'en', 'name'::public.alias_kind),
+  ('mixed fruit', 'fruit', 'en', 'name'::public.alias_kind),
+  ('acerola cherry powder', 'fruit', 'en', 'name'::public.alias_kind),
+  ('acerola', 'fruit', 'en', 'name'::public.alias_kind),
+  ('apple puree', 'fruit', 'en', 'name'::public.alias_kind),
+  ('mango pulp', 'fruit', 'en', 'name'::public.alias_kind),
+  ('banana puree', 'fruit', 'en', 'name'::public.alias_kind),
+  ('fruit juice concentrate', 'fruit', 'en', 'name'::public.alias_kind),
+  ('sultanas', 'fruit', 'en', 'name'::public.alias_kind),
+  ('figs', 'fruit', 'en', 'name'::public.alias_kind),
+  ('apricots', 'fruit', 'en', 'name'::public.alias_kind),
+  ('cherries', 'fruit', 'en', 'name'::public.alias_kind),
+  ('peach', 'fruit', 'en', 'name'::public.alias_kind),
+  ('plum', 'fruit', 'en', 'name'::public.alias_kind),
+  ('lemon juice concentrate', 'fruit', 'en', 'name'::public.alias_kind),
+  ('lime juice concentrate', 'fruit', 'en', 'name'::public.alias_kind),
+  ('orange peel', 'fruit', 'en', 'name'::public.alias_kind),
+  ('lemon peel', 'fruit', 'en', 'name'::public.alias_kind),
+  ('candied peel', 'fruit', 'en', 'name'::public.alias_kind)
 ) as v(alias, ingredient_id, lang, kind)
 on conflict (alias_norm) do nothing;
 insert into public.aliases (alias, alias_norm, ingredient_id, lang, kind) select v.alias, '', v.ingredient_id, v.lang, v.kind from (values
@@ -648,7 +956,28 @@ insert into public.aliases (alias, alias_norm, ingredient_id, lang, kind) select
   ('peanut butter', 'nuts_seeds', 'en', 'name'::public.alias_kind),
   ('almond butter', 'nuts_seeds', 'en', 'name'::public.alias_kind),
   ('nut butter', 'nuts_seeds', 'en', 'name'::public.alias_kind),
-  ('tahini', 'nuts_seeds', 'en', 'name'::public.alias_kind)
+  ('tahini', 'nuts_seeds', 'en', 'name'::public.alias_kind),
+  ('cashew nuts', 'nuts_seeds', 'en', 'name'::public.alias_kind),
+  ('brazil nuts', 'nuts_seeds', 'en', 'name'::public.alias_kind),
+  ('pistachio nuts', 'nuts_seeds', 'en', 'name'::public.alias_kind),
+  ('hazelnut paste', 'nuts_seeds', 'en', 'name'::public.alias_kind),
+  ('almond paste', 'nuts_seeds', 'en', 'name'::public.alias_kind),
+  ('poppy seeds', 'nuts_seeds', 'en', 'name'::public.alias_kind),
+  ('linseed', 'nuts_seeds', 'en', 'name'::public.alias_kind),
+  ('linseeds', 'nuts_seeds', 'en', 'name'::public.alias_kind),
+  ('brown linseed', 'nuts_seeds', 'en', 'name'::public.alias_kind),
+  ('golden linseed', 'nuts_seeds', 'en', 'name'::public.alias_kind),
+  ('golden linseeds', 'nuts_seeds', 'en', 'name'::public.alias_kind),
+  ('salvia hispanica', 'nuts_seeds', 'en', 'name'::public.alias_kind),
+  ('pepitas', 'nuts_seeds', 'en', 'name'::public.alias_kind),
+  ('groundnut', 'nuts_seeds', 'en', 'name'::public.alias_kind),
+  ('groundnuts', 'nuts_seeds', 'en', 'name'::public.alias_kind),
+  ('peanut paste', 'nuts_seeds', 'en', 'name'::public.alias_kind),
+  ('sesame paste', 'nuts_seeds', 'en', 'name'::public.alias_kind),
+  ('melon seeds', 'nuts_seeds', 'en', 'name'::public.alias_kind),
+  ('watermelon seeds', 'nuts_seeds', 'en', 'name'::public.alias_kind),
+  ('pine nuts', 'nuts_seeds', 'en', 'name'::public.alias_kind),
+  ('coconut flakes', 'nuts_seeds', 'en', 'name'::public.alias_kind)
 ) as v(alias, ingredient_id, lang, kind)
 on conflict (alias_norm) do nothing;
 insert into public.aliases (alias, alias_norm, ingredient_id, lang, kind) select v.alias, '', v.ingredient_id, v.lang, v.kind from (values
@@ -662,7 +991,12 @@ insert into public.aliases (alias, alias_norm, ingredient_id, lang, kind) select
   ('cacao', 'cocoa', 'en', 'name'::public.alias_kind),
   ('cacao butter', 'cocoa', 'en', 'name'::public.alias_kind),
   ('unsweetened chocolate', 'cocoa', 'en', 'name'::public.alias_kind),
-  ('cocoa processed with alkali', 'cocoa', 'en', 'name'::public.alias_kind)
+  ('cocoa processed with alkali', 'cocoa', 'en', 'name'::public.alias_kind),
+  ('chocolate', 'cocoa', 'en', 'name'::public.alias_kind),
+  ('dark chocolate', 'cocoa', 'en', 'name'::public.alias_kind),
+  ('milk chocolate', 'cocoa', 'en', 'name'::public.alias_kind),
+  ('cocoa nibs', 'cocoa', 'en', 'name'::public.alias_kind),
+  ('white chocolate', 'cocoa', 'en', 'name'::public.alias_kind)
 ) as v(alias, ingredient_id, lang, kind)
 on conflict (alias_norm) do nothing;
 insert into public.aliases (alias, alias_norm, ingredient_id, lang, kind) select v.alias, '', v.ingredient_id, v.lang, v.kind from (values
@@ -692,7 +1026,14 @@ insert into public.aliases (alias, alias_norm, ingredient_id, lang, kind) select
   ('soy protein isolate', 'soy_foods', 'en', 'name'::public.alias_kind),
   ('soy protein', 'soy_foods', 'en', 'name'::public.alias_kind),
   ('soy flour', 'soy_foods', 'en', 'name'::public.alias_kind),
-  ('fermented soybean', 'soy_foods', 'en', 'name'::public.alias_kind)
+  ('fermented soybean', 'soy_foods', 'en', 'name'::public.alias_kind),
+  ('soy', 'soy_foods', 'en', 'name'::public.alias_kind),
+  ('soya', 'soy_foods', 'en', 'name'::public.alias_kind),
+  ('soybean', 'soy_foods', 'en', 'name'::public.alias_kind),
+  ('soya bean', 'soy_foods', 'en', 'name'::public.alias_kind),
+  ('soy beans', 'soy_foods', 'en', 'name'::public.alias_kind),
+  ('edamame', 'soy_foods', 'en', 'name'::public.alias_kind),
+  ('tempeh', 'soy_foods', 'en', 'name'::public.alias_kind)
 ) as v(alias, ingredient_id, lang, kind)
 on conflict (alias_norm) do nothing;
 insert into public.aliases (alias, alias_norm, ingredient_id, lang, kind) select v.alias, '', v.ingredient_id, v.lang, v.kind from (values
@@ -701,6 +1042,10 @@ insert into public.aliases (alias, alias_norm, ingredient_id, lang, kind) select
   ('soya lecithin', 'lecithin', 'en', 'name'::public.alias_kind),
   ('sunflower lecithin', 'lecithin', 'en', 'name'::public.alias_kind),
   ('lecithins', 'lecithin', 'en', 'name'::public.alias_kind),
+  ('lecithine de soja', 'lecithin', 'en', 'name'::public.alias_kind),
+  ('lécithine de soja', 'lecithin', 'en', 'name'::public.alias_kind),
+  ('soy lecithine', 'lecithin', 'en', 'name'::public.alias_kind),
+  ('rapeseed lecithin', 'lecithin', 'en', 'name'::public.alias_kind),
   ('E322', 'lecithin', 'en', 'e_number'::public.alias_kind)
 ) as v(alias, ingredient_id, lang, kind)
 on conflict (alias_norm) do nothing;
@@ -739,7 +1084,47 @@ insert into public.aliases (alias, alias_norm, ingredient_id, lang, kind) select
   ('rosemary extract', 'spices_herbs', 'en', 'name'::public.alias_kind),
   ('turmeric extract', 'spices_herbs', 'en', 'name'::public.alias_kind),
   ('annatto', 'spices_herbs', 'en', 'name'::public.alias_kind),
-  ('annatto extract', 'spices_herbs', 'en', 'name'::public.alias_kind)
+  ('annatto extract', 'spices_herbs', 'en', 'name'::public.alias_kind),
+  ('clove', 'spices_herbs', 'en', 'name'::public.alias_kind),
+  ('clove powder', 'spices_herbs', 'en', 'name'::public.alias_kind),
+  ('aniseed', 'spices_herbs', 'en', 'name'::public.alias_kind),
+  ('aniseed powder', 'spices_herbs', 'en', 'name'::public.alias_kind),
+  ('asafoetida', 'spices_herbs', 'en', 'name'::public.alias_kind),
+  ('hing', 'spices_herbs', 'en', 'name'::public.alias_kind),
+  ('bay leaves', 'spices_herbs', 'en', 'name'::public.alias_kind),
+  ('bay leaf', 'spices_herbs', 'en', 'name'::public.alias_kind),
+  ('fenugreek', 'spices_herbs', 'en', 'name'::public.alias_kind),
+  ('fenugreek powder', 'spices_herbs', 'en', 'name'::public.alias_kind),
+  ('kasuri methi', 'spices_herbs', 'en', 'name'::public.alias_kind),
+  ('cardamom', 'spices_herbs', 'en', 'name'::public.alias_kind),
+  ('carom seed', 'spices_herbs', 'en', 'name'::public.alias_kind),
+  ('ajwain', 'spices_herbs', 'en', 'name'::public.alias_kind),
+  ('fennel', 'spices_herbs', 'en', 'name'::public.alias_kind),
+  ('fennel seeds', 'spices_herbs', 'en', 'name'::public.alias_kind),
+  ('mace', 'spices_herbs', 'en', 'name'::public.alias_kind),
+  ('licorice', 'spices_herbs', 'en', 'name'::public.alias_kind),
+  ('liquorice', 'spices_herbs', 'en', 'name'::public.alias_kind),
+  ('elderflowers', 'spices_herbs', 'en', 'name'::public.alias_kind),
+  ('elderflower', 'spices_herbs', 'en', 'name'::public.alias_kind),
+  ('hops', 'spices_herbs', 'en', 'name'::public.alias_kind),
+  ('saffron', 'spices_herbs', 'en', 'name'::public.alias_kind),
+  ('mint', 'spices_herbs', 'en', 'name'::public.alias_kind),
+  ('ginger powder', 'spices_herbs', 'en', 'name'::public.alias_kind),
+  ('garam masala', 'spices_herbs', 'en', 'name'::public.alias_kind),
+  ('chaat masala', 'spices_herbs', 'en', 'name'::public.alias_kind),
+  ('cumin seeds', 'spices_herbs', 'en', 'name'::public.alias_kind),
+  ('mustard seeds', 'spices_herbs', 'en', 'name'::public.alias_kind),
+  ('dried herbs', 'spices_herbs', 'en', 'name'::public.alias_kind),
+  ('smoked paprika', 'spices_herbs', 'en', 'name'::public.alias_kind),
+  ('chilli powder', 'spices_herbs', 'en', 'name'::public.alias_kind),
+  ('chili powder', 'spices_herbs', 'en', 'name'::public.alias_kind),
+  ('red chilli powder', 'spices_herbs', 'en', 'name'::public.alias_kind),
+  ('kashmiri chilli', 'spices_herbs', 'en', 'name'::public.alias_kind),
+  ('turmeric powder', 'spices_herbs', 'en', 'name'::public.alias_kind),
+  ('coriander powder', 'spices_herbs', 'en', 'name'::public.alias_kind),
+  ('black salt', 'spices_herbs', 'en', 'name'::public.alias_kind),
+  ('E160c', 'spices_herbs', 'en', 'e_number'::public.alias_kind),
+  ('E100', 'spices_herbs', 'en', 'e_number'::public.alias_kind)
 ) as v(alias, ingredient_id, lang, kind)
 on conflict (alias_norm) do nothing;
 insert into public.aliases (alias, alias_norm, ingredient_id, lang, kind) select v.alias, '', v.ingredient_id, v.lang, v.kind from (values
@@ -757,13 +1142,45 @@ insert into public.aliases (alias, alias_norm, ingredient_id, lang, kind) select
   ('vitamin e', 'vinegars_acids', 'en', 'name'::public.alias_kind),
   ('pectin', 'vinegars_acids', 'en', 'name'::public.alias_kind),
   ('fruit pectin', 'vinegars_acids', 'en', 'name'::public.alias_kind),
+  ('vinaigre', 'vinegars_acids', 'en', 'name'::public.alias_kind),
+  ('eddik', 'vinegars_acids', 'en', 'name'::public.alias_kind),
+  ('essig', 'vinegars_acids', 'en', 'name'::public.alias_kind),
+  ('acetic acid', 'vinegars_acids', 'en', 'name'::public.alias_kind),
+  ('tartaric acid', 'vinegars_acids', 'en', 'name'::public.alias_kind),
+  ('phosphoric acid', 'vinegars_acids', 'en', 'name'::public.alias_kind),
+  ('sodium citrates', 'vinegars_acids', 'en', 'name'::public.alias_kind),
+  ('sodium citrate', 'vinegars_acids', 'en', 'name'::public.alias_kind),
+  ('trisodium citrate', 'vinegars_acids', 'en', 'name'::public.alias_kind),
+  ('potassium citrate', 'vinegars_acids', 'en', 'name'::public.alias_kind),
+  ('calcium citrate', 'vinegars_acids', 'en', 'name'::public.alias_kind),
+  ('tri calciumcitrate', 'vinegars_acids', 'en', 'name'::public.alias_kind),
+  ('tricalcium citrate', 'vinegars_acids', 'en', 'name'::public.alias_kind),
+  ('carbonic acid', 'vinegars_acids', 'en', 'name'::public.alias_kind),
+  ('tocopherol rich extract', 'vinegars_acids', 'en', 'name'::public.alias_kind),
+  ('tocopherol-rich extract', 'vinegars_acids', 'en', 'name'::public.alias_kind),
+  ('ascorbyl palmitate', 'vinegars_acids', 'en', 'name'::public.alias_kind),
+  ('alpha tocopherol', 'vinegars_acids', 'en', 'name'::public.alias_kind),
+  ('sodium ascorbate', 'vinegars_acids', 'en', 'name'::public.alias_kind),
+  ('calcium ascorbate', 'vinegars_acids', 'en', 'name'::public.alias_kind),
   ('E330', 'vinegars_acids', 'en', 'e_number'::public.alias_kind),
   ('E300', 'vinegars_acids', 'en', 'e_number'::public.alias_kind),
   ('E270', 'vinegars_acids', 'en', 'e_number'::public.alias_kind),
   ('E306', 'vinegars_acids', 'en', 'e_number'::public.alias_kind),
   ('E440', 'vinegars_acids', 'en', 'e_number'::public.alias_kind),
   ('E500', 'vinegars_acids', 'en', 'e_number'::public.alias_kind),
-  ('E296', 'vinegars_acids', 'en', 'e_number'::public.alias_kind)
+  ('E296', 'vinegars_acids', 'en', 'e_number'::public.alias_kind),
+  ('E260', 'vinegars_acids', 'en', 'e_number'::public.alias_kind),
+  ('E334', 'vinegars_acids', 'en', 'e_number'::public.alias_kind),
+  ('E338', 'vinegars_acids', 'en', 'e_number'::public.alias_kind),
+  ('E331', 'vinegars_acids', 'en', 'e_number'::public.alias_kind),
+  ('E332', 'vinegars_acids', 'en', 'e_number'::public.alias_kind),
+  ('E333', 'vinegars_acids', 'en', 'e_number'::public.alias_kind),
+  ('E290', 'vinegars_acids', 'en', 'e_number'::public.alias_kind),
+  ('E307', 'vinegars_acids', 'en', 'e_number'::public.alias_kind),
+  ('E307b', 'vinegars_acids', 'en', 'e_number'::public.alias_kind),
+  ('E304', 'vinegars_acids', 'en', 'e_number'::public.alias_kind),
+  ('E301', 'vinegars_acids', 'en', 'e_number'::public.alias_kind),
+  ('E302', 'vinegars_acids', 'en', 'e_number'::public.alias_kind)
 ) as v(alias, ingredient_id, lang, kind)
 on conflict (alias_norm) do nothing;
 insert into public.aliases (alias, alias_norm, ingredient_id, lang, kind) select v.alias, '', v.ingredient_id, v.lang, v.kind from (values
@@ -774,7 +1191,30 @@ insert into public.aliases (alias, alias_norm, ingredient_id, lang, kind) select
   ('baking powder', 'leavening', 'en', 'name'::public.alias_kind),
   ('cream of tartar', 'leavening', 'en', 'name'::public.alias_kind),
   ('sourdough culture', 'leavening', 'en', 'name'::public.alias_kind),
-  ('leavening', 'leavening', 'en', 'name'::public.alias_kind)
+  ('leavening', 'leavening', 'en', 'name'::public.alias_kind),
+  ('levure', 'leavening', 'en', 'name'::public.alias_kind),
+  ('sodium carbonates', 'leavening', 'en', 'name'::public.alias_kind),
+  ('sodium acid carbonate', 'leavening', 'en', 'name'::public.alias_kind),
+  ('sodium hydrogen carbonate', 'leavening', 'en', 'name'::public.alias_kind),
+  ('sodium carbonate', 'leavening', 'en', 'name'::public.alias_kind),
+  ('bicarbonate of soda', 'leavening', 'en', 'name'::public.alias_kind),
+  ('bicarbonates', 'leavening', 'en', 'name'::public.alias_kind),
+  ('ammonium carbonates', 'leavening', 'en', 'name'::public.alias_kind),
+  ('ammonium bicarbonate', 'leavening', 'en', 'name'::public.alias_kind),
+  ('ammonium hydrogen carbonate', 'leavening', 'en', 'name'::public.alias_kind),
+  ('ammonium acid carbonate', 'leavening', 'en', 'name'::public.alias_kind),
+  ('potassium carbonates', 'leavening', 'en', 'name'::public.alias_kind),
+  ('potassium carbonate', 'leavening', 'en', 'name'::public.alias_kind),
+  ('potassium bicarbonate', 'leavening', 'en', 'name'::public.alias_kind),
+  ('disodium diphosphate', 'leavening', 'en', 'name'::public.alias_kind),
+  ('sodium acid pyrophosphate', 'leavening', 'en', 'name'::public.alias_kind),
+  ('diphosphates', 'leavening', 'en', 'name'::public.alias_kind),
+  ('raising agent', 'leavening', 'en', 'name'::public.alias_kind),
+  ('glucono delta lactone', 'leavening', 'en', 'name'::public.alias_kind),
+  ('E503', 'leavening', 'en', 'e_number'::public.alias_kind),
+  ('E501', 'leavening', 'en', 'e_number'::public.alias_kind),
+  ('E450', 'leavening', 'en', 'e_number'::public.alias_kind),
+  ('E575', 'leavening', 'en', 'e_number'::public.alias_kind)
 ) as v(alias, ingredient_id, lang, kind)
 on conflict (alias_norm) do nothing;
 insert into public.aliases (alias, alias_norm, ingredient_id, lang, kind) select v.alias, '', v.ingredient_id, v.lang, v.kind from (values
@@ -792,7 +1232,312 @@ insert into public.aliases (alias, alias_norm, ingredient_id, lang, kind) select
   ('instant coffee', 'tea_coffee', 'en', 'name'::public.alias_kind),
   ('tea extract', 'tea_coffee', 'en', 'name'::public.alias_kind),
   ('green tea extract', 'tea_coffee', 'en', 'name'::public.alias_kind),
-  ('matcha', 'tea_coffee', 'en', 'name'::public.alias_kind)
+  ('matcha', 'tea_coffee', 'en', 'name'::public.alias_kind),
+  ('caffeine', 'tea_coffee', 'en', 'name'::public.alias_kind),
+  ('coffee extract', 'tea_coffee', 'en', 'name'::public.alias_kind),
+  ('chicory', 'tea_coffee', 'en', 'name'::public.alias_kind)
+) as v(alias, ingredient_id, lang, kind)
+on conflict (alias_norm) do nothing;
+insert into public.aliases (alias, alias_norm, ingredient_id, lang, kind) select v.alias, '', v.ingredient_id, v.lang, v.kind from (values
+  ('psyllium', 'fibres', 'en', 'name'::public.alias_kind),
+  ('psyllium husk', 'fibres', 'en', 'name'::public.alias_kind),
+  ('chicory root fiber', 'fibres', 'en', 'name'::public.alias_kind),
+  ('chicory root fibre', 'fibres', 'en', 'name'::public.alias_kind),
+  ('chicory fibre', 'fibres', 'en', 'name'::public.alias_kind),
+  ('inulin', 'fibres', 'en', 'name'::public.alias_kind),
+  ('oligofructose', 'fibres', 'en', 'name'::public.alias_kind),
+  ('polydextrose', 'fibres', 'en', 'name'::public.alias_kind),
+  ('resistant dextrin', 'fibres', 'en', 'name'::public.alias_kind),
+  ('soluble corn fibre', 'fibres', 'en', 'name'::public.alias_kind),
+  ('soluble corn fiber', 'fibres', 'en', 'name'::public.alias_kind),
+  ('oat fibre', 'fibres', 'en', 'name'::public.alias_kind),
+  ('oat fiber', 'fibres', 'en', 'name'::public.alias_kind),
+  ('wheat fibre', 'fibres', 'en', 'name'::public.alias_kind),
+  ('citrus fibre', 'fibres', 'en', 'name'::public.alias_kind),
+  ('pea fibre', 'fibres', 'en', 'name'::public.alias_kind),
+  ('apple fibre', 'fibres', 'en', 'name'::public.alias_kind),
+  ('bamboo fibre', 'fibres', 'en', 'name'::public.alias_kind),
+  ('E1200', 'fibres', 'en', 'e_number'::public.alias_kind)
+) as v(alias, ingredient_id, lang, kind)
+on conflict (alias_norm) do nothing;
+insert into public.aliases (alias, alias_norm, ingredient_id, lang, kind) select v.alias, '', v.ingredient_id, v.lang, v.kind from (values
+  ('alcohol', 'alcohol', 'en', 'name'::public.alias_kind),
+  ('ethyl alcohol', 'alcohol', 'en', 'name'::public.alias_kind),
+  ('ethanol', 'alcohol', 'en', 'name'::public.alias_kind),
+  ('irish whiskey', 'alcohol', 'en', 'name'::public.alias_kind),
+  ('whiskey', 'alcohol', 'en', 'name'::public.alias_kind),
+  ('whisky', 'alcohol', 'en', 'name'::public.alias_kind),
+  ('rum', 'alcohol', 'en', 'name'::public.alias_kind),
+  ('brandy', 'alcohol', 'en', 'name'::public.alias_kind),
+  ('wine', 'alcohol', 'en', 'name'::public.alias_kind),
+  ('red wine', 'alcohol', 'en', 'name'::public.alias_kind),
+  ('white wine', 'alcohol', 'en', 'name'::public.alias_kind),
+  ('beer', 'alcohol', 'en', 'name'::public.alias_kind),
+  ('cider', 'alcohol', 'en', 'name'::public.alias_kind),
+  ('sake', 'alcohol', 'en', 'name'::public.alias_kind),
+  ('mirin', 'alcohol', 'en', 'name'::public.alias_kind)
+) as v(alias, ingredient_id, lang, kind)
+on conflict (alias_norm) do nothing;
+insert into public.aliases (alias, alias_norm, ingredient_id, lang, kind) select v.alias, '', v.ingredient_id, v.lang, v.kind from (values
+  ('silicon dioxide', 'common_additives', 'en', 'name'::public.alias_kind),
+  ('silica', 'common_additives', 'en', 'name'::public.alias_kind),
+  ('carbon dioxide', 'common_additives', 'en', 'name'::public.alias_kind),
+  ('glycerol', 'common_additives', 'en', 'name'::public.alias_kind),
+  ('glycerin', 'common_additives', 'en', 'name'::public.alias_kind),
+  ('glycerine', 'common_additives', 'en', 'name'::public.alias_kind),
+  ('vegetable glycerine', 'common_additives', 'en', 'name'::public.alias_kind),
+  ('cellulose', 'common_additives', 'en', 'name'::public.alias_kind),
+  ('microcrystalline cellulose', 'common_additives', 'en', 'name'::public.alias_kind),
+  ('hydroxypropyl methylcellulose', 'common_additives', 'en', 'name'::public.alias_kind),
+  ('methylcellulose', 'common_additives', 'en', 'name'::public.alias_kind),
+  ('sodium carboxymethyl cellulose', 'common_additives', 'en', 'name'::public.alias_kind),
+  ('carboxymethylcellulose', 'common_additives', 'en', 'name'::public.alias_kind),
+  ('cellulose gum', 'common_additives', 'en', 'name'::public.alias_kind),
+  ('sodium hydroxide', 'common_additives', 'en', 'name'::public.alias_kind),
+  ('calcium hydroxide', 'common_additives', 'en', 'name'::public.alias_kind),
+  ('magnesium chloride', 'common_additives', 'en', 'name'::public.alias_kind),
+  ('nigari', 'common_additives', 'en', 'name'::public.alias_kind),
+  ('sodium phosphates', 'common_additives', 'en', 'name'::public.alias_kind),
+  ('sodium phosphate', 'common_additives', 'en', 'name'::public.alias_kind),
+  ('disodium phosphate', 'common_additives', 'en', 'name'::public.alias_kind),
+  ('dipotassium phosphate', 'common_additives', 'en', 'name'::public.alias_kind),
+  ('potassium phosphates', 'common_additives', 'en', 'name'::public.alias_kind),
+  ('trisodium phosphate', 'common_additives', 'en', 'name'::public.alias_kind),
+  ('sodium triphosphate', 'common_additives', 'en', 'name'::public.alias_kind),
+  ('pentasodium triphosphate', 'common_additives', 'en', 'name'::public.alias_kind),
+  ('sodium polyphosphate', 'common_additives', 'en', 'name'::public.alias_kind),
+  ('polyphosphates', 'common_additives', 'en', 'name'::public.alias_kind),
+  ('triphosphates', 'common_additives', 'en', 'name'::public.alias_kind),
+  ('sodium tripolyphosphate', 'common_additives', 'en', 'name'::public.alias_kind),
+  ('quinine', 'common_additives', 'en', 'name'::public.alias_kind),
+  ('anticaking agent', 'common_additives', 'en', 'name'::public.alias_kind),
+  ('firming agent', 'common_additives', 'en', 'name'::public.alias_kind),
+  ('amylase', 'common_additives', 'en', 'name'::public.alias_kind),
+  ('protease', 'common_additives', 'en', 'name'::public.alias_kind),
+  ('enzyme', 'common_additives', 'en', 'name'::public.alias_kind),
+  ('enzymes rennet', 'common_additives', 'en', 'name'::public.alias_kind),
+  ('ammonium sulphate', 'common_additives', 'en', 'name'::public.alias_kind),
+  ('ammonium sulfate', 'common_additives', 'en', 'name'::public.alias_kind),
+  ('sulfates', 'common_additives', 'en', 'name'::public.alias_kind),
+  ('chlorides', 'common_additives', 'en', 'name'::public.alias_kind),
+  ('E551', 'common_additives', 'en', 'e_number'::public.alias_kind),
+  ('E422', 'common_additives', 'en', 'e_number'::public.alias_kind),
+  ('E460', 'common_additives', 'en', 'e_number'::public.alias_kind),
+  ('E464', 'common_additives', 'en', 'e_number'::public.alias_kind),
+  ('E466', 'common_additives', 'en', 'e_number'::public.alias_kind),
+  ('E524', 'common_additives', 'en', 'e_number'::public.alias_kind),
+  ('E526', 'common_additives', 'en', 'e_number'::public.alias_kind),
+  ('E511', 'common_additives', 'en', 'e_number'::public.alias_kind),
+  ('E339', 'common_additives', 'en', 'e_number'::public.alias_kind),
+  ('E340', 'common_additives', 'en', 'e_number'::public.alias_kind),
+  ('E451', 'common_additives', 'en', 'e_number'::public.alias_kind),
+  ('E452', 'common_additives', 'en', 'e_number'::public.alias_kind),
+  ('E1100', 'common_additives', 'en', 'e_number'::public.alias_kind),
+  ('E1101', 'common_additives', 'en', 'e_number'::public.alias_kind),
+  ('E517', 'common_additives', 'en', 'e_number'::public.alias_kind)
+) as v(alias, ingredient_id, lang, kind)
+on conflict (alias_norm) do nothing;
+insert into public.aliases (alias, alias_norm, ingredient_id, lang, kind) select v.alias, '', v.ingredient_id, v.lang, v.kind from (values
+  ('mono and diglycerides', 'other_emulsifiers', 'en', 'name'::public.alias_kind),
+  ('mono- and diglycerides', 'other_emulsifiers', 'en', 'name'::public.alias_kind),
+  ('mono and di glycerides', 'other_emulsifiers', 'en', 'name'::public.alias_kind),
+  ('mono and diglycerides of fatty acids', 'other_emulsifiers', 'en', 'name'::public.alias_kind),
+  ('mono- and diglycerides of fatty acids', 'other_emulsifiers', 'en', 'name'::public.alias_kind),
+  ('monoglycerides', 'other_emulsifiers', 'en', 'name'::public.alias_kind),
+  ('diglycerides', 'other_emulsifiers', 'en', 'name'::public.alias_kind),
+  ('datem', 'other_emulsifiers', 'en', 'name'::public.alias_kind),
+  ('diacetyl tartaric acid esters of mono and diglycerides', 'other_emulsifiers', 'en', 'name'::public.alias_kind),
+  ('diacetyl tartaric acid esters of mono and diglycerides of fatty acids', 'other_emulsifiers', 'en', 'name'::public.alias_kind),
+  ('polyglycerol polyricinoleate', 'other_emulsifiers', 'en', 'name'::public.alias_kind),
+  ('pgpr', 'other_emulsifiers', 'en', 'name'::public.alias_kind),
+  ('sodium stearoyl lactylate', 'other_emulsifiers', 'en', 'name'::public.alias_kind),
+  ('sodium stearoyl 2 lactylate', 'other_emulsifiers', 'en', 'name'::public.alias_kind),
+  ('calcium stearoyl lactylate', 'other_emulsifiers', 'en', 'name'::public.alias_kind),
+  ('sucrose esters of fatty acids', 'other_emulsifiers', 'en', 'name'::public.alias_kind),
+  ('sorbitan monostearate', 'other_emulsifiers', 'en', 'name'::public.alias_kind),
+  ('polysorbate 60', 'other_emulsifiers', 'en', 'name'::public.alias_kind),
+  ('polyglycerol esters of fatty acids', 'other_emulsifiers', 'en', 'name'::public.alias_kind),
+  ('lactic acid esters of mono and diglycerides', 'other_emulsifiers', 'en', 'name'::public.alias_kind),
+  ('citric acid esters of mono and diglycerides', 'other_emulsifiers', 'en', 'name'::public.alias_kind),
+  ('E471', 'other_emulsifiers', 'en', 'e_number'::public.alias_kind),
+  ('E472a', 'other_emulsifiers', 'en', 'e_number'::public.alias_kind),
+  ('E472b', 'other_emulsifiers', 'en', 'e_number'::public.alias_kind),
+  ('E472c', 'other_emulsifiers', 'en', 'e_number'::public.alias_kind),
+  ('E472e', 'other_emulsifiers', 'en', 'e_number'::public.alias_kind),
+  ('E476', 'other_emulsifiers', 'en', 'e_number'::public.alias_kind),
+  ('E481', 'other_emulsifiers', 'en', 'e_number'::public.alias_kind),
+  ('E482', 'other_emulsifiers', 'en', 'e_number'::public.alias_kind),
+  ('E473', 'other_emulsifiers', 'en', 'e_number'::public.alias_kind),
+  ('E475', 'other_emulsifiers', 'en', 'e_number'::public.alias_kind),
+  ('E491', 'other_emulsifiers', 'en', 'e_number'::public.alias_kind),
+  ('E435', 'other_emulsifiers', 'en', 'e_number'::public.alias_kind)
+) as v(alias, ingredient_id, lang, kind)
+on conflict (alias_norm) do nothing;
+insert into public.aliases (alias, alias_norm, ingredient_id, lang, kind) select v.alias, '', v.ingredient_id, v.lang, v.kind from (values
+  ('potassium sorbate', 'other_preservatives', 'en', 'name'::public.alias_kind),
+  ('sorbic acid', 'other_preservatives', 'en', 'name'::public.alias_kind),
+  ('calcium sorbate', 'other_preservatives', 'en', 'name'::public.alias_kind),
+  ('calcium propionate', 'other_preservatives', 'en', 'name'::public.alias_kind),
+  ('sodium propionate', 'other_preservatives', 'en', 'name'::public.alias_kind),
+  ('propionic acid', 'other_preservatives', 'en', 'name'::public.alias_kind),
+  ('sodium metabisulphite', 'other_preservatives', 'en', 'name'::public.alias_kind),
+  ('sodium metabisulfite', 'other_preservatives', 'en', 'name'::public.alias_kind),
+  ('potassium metabisulphite', 'other_preservatives', 'en', 'name'::public.alias_kind),
+  ('potassium metabisulfite', 'other_preservatives', 'en', 'name'::public.alias_kind),
+  ('sulphur dioxide', 'other_preservatives', 'en', 'name'::public.alias_kind),
+  ('sulfur dioxide', 'other_preservatives', 'en', 'name'::public.alias_kind),
+  ('sodium sulphite', 'other_preservatives', 'en', 'name'::public.alias_kind),
+  ('sulphites', 'other_preservatives', 'en', 'name'::public.alias_kind),
+  ('sulfites', 'other_preservatives', 'en', 'name'::public.alias_kind),
+  ('natamycin', 'other_preservatives', 'en', 'name'::public.alias_kind),
+  ('nisin', 'other_preservatives', 'en', 'name'::public.alias_kind),
+  ('E200', 'other_preservatives', 'en', 'e_number'::public.alias_kind),
+  ('E202', 'other_preservatives', 'en', 'e_number'::public.alias_kind),
+  ('E203', 'other_preservatives', 'en', 'e_number'::public.alias_kind),
+  ('E280', 'other_preservatives', 'en', 'e_number'::public.alias_kind),
+  ('E281', 'other_preservatives', 'en', 'e_number'::public.alias_kind),
+  ('E282', 'other_preservatives', 'en', 'e_number'::public.alias_kind),
+  ('E220', 'other_preservatives', 'en', 'e_number'::public.alias_kind),
+  ('E221', 'other_preservatives', 'en', 'e_number'::public.alias_kind),
+  ('E223', 'other_preservatives', 'en', 'e_number'::public.alias_kind),
+  ('E224', 'other_preservatives', 'en', 'e_number'::public.alias_kind),
+  ('E228', 'other_preservatives', 'en', 'e_number'::public.alias_kind),
+  ('E235', 'other_preservatives', 'en', 'e_number'::public.alias_kind),
+  ('E234', 'other_preservatives', 'en', 'e_number'::public.alias_kind)
+) as v(alias, ingredient_id, lang, kind)
+on conflict (alias_norm) do nothing;
+insert into public.aliases (alias, alias_norm, ingredient_id, lang, kind) select v.alias, '', v.ingredient_id, v.lang, v.kind from (values
+  ('calcium disodium edta', 'edta', 'en', 'name'::public.alias_kind),
+  ('disodium edta', 'edta', 'en', 'name'::public.alias_kind),
+  ('edta', 'edta', 'en', 'name'::public.alias_kind),
+  ('calcium disodium ethylenediaminetetraacetate', 'edta', 'en', 'name'::public.alias_kind),
+  ('E385', 'edta', 'en', 'e_number'::public.alias_kind)
+) as v(alias, ingredient_id, lang, kind)
+on conflict (alias_norm) do nothing;
+insert into public.aliases (alias, alias_norm, ingredient_id, lang, kind) select v.alias, '', v.ingredient_id, v.lang, v.kind from (values
+  ('disodium inosinate', 'other_flavor_enhancers', 'en', 'name'::public.alias_kind),
+  ('disodium guanylate', 'other_flavor_enhancers', 'en', 'name'::public.alias_kind),
+  ('disodium ribonucleotides', 'other_flavor_enhancers', 'en', 'name'::public.alias_kind),
+  ('disodium 5 ribonucleotides', 'other_flavor_enhancers', 'en', 'name'::public.alias_kind),
+  ('disodium 5 inosinate', 'other_flavor_enhancers', 'en', 'name'::public.alias_kind),
+  ('disodium 5 guanylate', 'other_flavor_enhancers', 'en', 'name'::public.alias_kind),
+  ('ribonucleotides', 'other_flavor_enhancers', 'en', 'name'::public.alias_kind),
+  ('yeast extract flavour enhancer', 'other_flavor_enhancers', 'en', 'name'::public.alias_kind),
+  ('hydrolysed vegetable protein', 'other_flavor_enhancers', 'en', 'name'::public.alias_kind),
+  ('hydrolyzed vegetable protein', 'other_flavor_enhancers', 'en', 'name'::public.alias_kind),
+  ('hydrolysed soy protein', 'other_flavor_enhancers', 'en', 'name'::public.alias_kind),
+  ('hydrolysed groundnut protein', 'other_flavor_enhancers', 'en', 'name'::public.alias_kind),
+  ('hydrolysed corn protein', 'other_flavor_enhancers', 'en', 'name'::public.alias_kind),
+  ('hvp', 'other_flavor_enhancers', 'en', 'name'::public.alias_kind),
+  ('E627', 'other_flavor_enhancers', 'en', 'e_number'::public.alias_kind),
+  ('E631', 'other_flavor_enhancers', 'en', 'e_number'::public.alias_kind),
+  ('E635', 'other_flavor_enhancers', 'en', 'e_number'::public.alias_kind)
+) as v(alias, ingredient_id, lang, kind)
+on conflict (alias_norm) do nothing;
+insert into public.aliases (alias, alias_norm, ingredient_id, lang, kind) select v.alias, '', v.ingredient_id, v.lang, v.kind from (values
+  ('steviol glycosides', 'polyols_natural_sweeteners', 'en', 'name'::public.alias_kind),
+  ('stevia', 'polyols_natural_sweeteners', 'en', 'name'::public.alias_kind),
+  ('stevia extract', 'polyols_natural_sweeteners', 'en', 'name'::public.alias_kind),
+  ('stevia leaf extract', 'polyols_natural_sweeteners', 'en', 'name'::public.alias_kind),
+  ('rebaudioside a', 'polyols_natural_sweeteners', 'en', 'name'::public.alias_kind),
+  ('reb a', 'polyols_natural_sweeteners', 'en', 'name'::public.alias_kind),
+  ('monk fruit', 'polyols_natural_sweeteners', 'en', 'name'::public.alias_kind),
+  ('monk fruit extract', 'polyols_natural_sweeteners', 'en', 'name'::public.alias_kind),
+  ('luo han guo', 'polyols_natural_sweeteners', 'en', 'name'::public.alias_kind),
+  ('erythritol', 'polyols_natural_sweeteners', 'en', 'name'::public.alias_kind),
+  ('sorbitol', 'polyols_natural_sweeteners', 'en', 'name'::public.alias_kind),
+  ('xylitol', 'polyols_natural_sweeteners', 'en', 'name'::public.alias_kind),
+  ('maltitol', 'polyols_natural_sweeteners', 'en', 'name'::public.alias_kind),
+  ('isomalt', 'polyols_natural_sweeteners', 'en', 'name'::public.alias_kind),
+  ('mannitol', 'polyols_natural_sweeteners', 'en', 'name'::public.alias_kind),
+  ('sorbitol syrup', 'polyols_natural_sweeteners', 'en', 'name'::public.alias_kind),
+  ('maltitol syrup', 'polyols_natural_sweeteners', 'en', 'name'::public.alias_kind),
+  ('allulose', 'polyols_natural_sweeteners', 'en', 'name'::public.alias_kind),
+  ('E960', 'polyols_natural_sweeteners', 'en', 'e_number'::public.alias_kind),
+  ('E960a', 'polyols_natural_sweeteners', 'en', 'e_number'::public.alias_kind),
+  ('E968', 'polyols_natural_sweeteners', 'en', 'e_number'::public.alias_kind),
+  ('E420', 'polyols_natural_sweeteners', 'en', 'e_number'::public.alias_kind),
+  ('E967', 'polyols_natural_sweeteners', 'en', 'e_number'::public.alias_kind),
+  ('E965', 'polyols_natural_sweeteners', 'en', 'e_number'::public.alias_kind),
+  ('E953', 'polyols_natural_sweeteners', 'en', 'e_number'::public.alias_kind),
+  ('E421', 'polyols_natural_sweeteners', 'en', 'e_number'::public.alias_kind)
+) as v(alias, ingredient_id, lang, kind)
+on conflict (alias_norm) do nothing;
+insert into public.aliases (alias, alias_norm, ingredient_id, lang, kind) select v.alias, '', v.ingredient_id, v.lang, v.kind from (values
+  ('curcumin', 'natural_colours', 'en', 'name'::public.alias_kind),
+  ('beetroot red', 'natural_colours', 'en', 'name'::public.alias_kind),
+  ('beet juice concentrate', 'natural_colours', 'en', 'name'::public.alias_kind),
+  ('carrot extract', 'natural_colours', 'en', 'name'::public.alias_kind),
+  ('anthocyanins', 'natural_colours', 'en', 'name'::public.alias_kind),
+  ('black carrot extract', 'natural_colours', 'en', 'name'::public.alias_kind),
+  ('purple carrot juice', 'natural_colours', 'en', 'name'::public.alias_kind),
+  ('spirulina', 'natural_colours', 'en', 'name'::public.alias_kind),
+  ('spirulina extract', 'natural_colours', 'en', 'name'::public.alias_kind),
+  ('spirulina concentrate', 'natural_colours', 'en', 'name'::public.alias_kind),
+  ('plain caramel', 'natural_colours', 'en', 'name'::public.alias_kind),
+  ('caramel e150a', 'natural_colours', 'en', 'name'::public.alias_kind),
+  ('chlorophyll', 'natural_colours', 'en', 'name'::public.alias_kind),
+  ('copper complexes of chlorophyll', 'natural_colours', 'en', 'name'::public.alias_kind),
+  ('carotenes', 'natural_colours', 'en', 'name'::public.alias_kind),
+  ('mixed carotenes', 'natural_colours', 'en', 'name'::public.alias_kind),
+  ('lycopene', 'natural_colours', 'en', 'name'::public.alias_kind),
+  ('paprika oleoresin', 'natural_colours', 'en', 'name'::public.alias_kind),
+  ('vegetable carbon', 'natural_colours', 'en', 'name'::public.alias_kind),
+  ('safflower extract', 'natural_colours', 'en', 'name'::public.alias_kind),
+  ('radish concentrate', 'natural_colours', 'en', 'name'::public.alias_kind),
+  ('E150a', 'natural_colours', 'en', 'e_number'::public.alias_kind),
+  ('E160a', 'natural_colours', 'en', 'e_number'::public.alias_kind),
+  ('E160b', 'natural_colours', 'en', 'e_number'::public.alias_kind),
+  ('E160d', 'natural_colours', 'en', 'e_number'::public.alias_kind),
+  ('E162', 'natural_colours', 'en', 'e_number'::public.alias_kind),
+  ('E163', 'natural_colours', 'en', 'e_number'::public.alias_kind),
+  ('E140', 'natural_colours', 'en', 'e_number'::public.alias_kind),
+  ('E141', 'natural_colours', 'en', 'e_number'::public.alias_kind),
+  ('E153', 'natural_colours', 'en', 'e_number'::public.alias_kind)
+) as v(alias, ingredient_id, lang, kind)
+on conflict (alias_norm) do nothing;
+insert into public.aliases (alias, alias_norm, ingredient_id, lang, kind) select v.alias, '', v.ingredient_id, v.lang, v.kind from (values
+  ('shea', 'tropical_fats', 'en', 'name'::public.alias_kind),
+  ('shea butter', 'tropical_fats', 'en', 'name'::public.alias_kind),
+  ('shea fat', 'tropical_fats', 'en', 'name'::public.alias_kind),
+  ('shea oil', 'tropical_fats', 'en', 'name'::public.alias_kind),
+  ('shea stearin', 'tropical_fats', 'en', 'name'::public.alias_kind),
+  ('sal fat', 'tropical_fats', 'en', 'name'::public.alias_kind),
+  ('illipe', 'tropical_fats', 'en', 'name'::public.alias_kind),
+  ('illipe butter', 'tropical_fats', 'en', 'name'::public.alias_kind),
+  ('mango kernel fat', 'tropical_fats', 'en', 'name'::public.alias_kind),
+  ('kokum butter', 'tropical_fats', 'en', 'name'::public.alias_kind)
+) as v(alias, ingredient_id, lang, kind)
+on conflict (alias_norm) do nothing;
+insert into public.aliases (alias, alias_norm, ingredient_id, lang, kind) select v.alias, '', v.ingredient_id, v.lang, v.kind from (values
+  ('peanut oil', 'peanut_oil', 'en', 'name'::public.alias_kind),
+  ('groundnut oil', 'peanut_oil', 'en', 'name'::public.alias_kind),
+  ('arachis oil', 'peanut_oil', 'en', 'name'::public.alias_kind),
+  ('refined groundnut oil', 'peanut_oil', 'en', 'name'::public.alias_kind),
+  ('filtered groundnut oil', 'peanut_oil', 'en', 'name'::public.alias_kind)
+) as v(alias, ingredient_id, lang, kind)
+on conflict (alias_norm) do nothing;
+insert into public.aliases (alias, alias_norm, ingredient_id, lang, kind) select v.alias, '', v.ingredient_id, v.lang, v.kind from (values
+  ('quinoline yellow', 'yellow_quinoline', 'en', 'name'::public.alias_kind),
+  ('quinoline yellow ws', 'yellow_quinoline', 'en', 'name'::public.alias_kind),
+  ('ci 47005', 'yellow_quinoline', 'en', 'name'::public.alias_kind),
+  ('E104', 'yellow_quinoline', 'en', 'e_number'::public.alias_kind)
+) as v(alias, ingredient_id, lang, kind)
+on conflict (alias_norm) do nothing;
+insert into public.aliases (alias, alias_norm, ingredient_id, lang, kind) select v.alias, '', v.ingredient_id, v.lang, v.kind from (values
+  ('carmoisine', 'carmoisine', 'en', 'name'::public.alias_kind),
+  ('azorubine', 'carmoisine', 'en', 'name'::public.alias_kind),
+  ('ci 14720', 'carmoisine', 'en', 'name'::public.alias_kind),
+  ('E122', 'carmoisine', 'en', 'e_number'::public.alias_kind)
+) as v(alias, ingredient_id, lang, kind)
+on conflict (alias_norm) do nothing;
+insert into public.aliases (alias, alias_norm, ingredient_id, lang, kind) select v.alias, '', v.ingredient_id, v.lang, v.kind from (values
+  ('ponceau 4r', 'ponceau_4r', 'en', 'name'::public.alias_kind),
+  ('ponceau', 'ponceau_4r', 'en', 'name'::public.alias_kind),
+  ('cochineal red a', 'ponceau_4r', 'en', 'name'::public.alias_kind),
+  ('new coccine', 'ponceau_4r', 'en', 'name'::public.alias_kind),
+  ('ci 16255', 'ponceau_4r', 'en', 'name'::public.alias_kind),
+  ('E124', 'ponceau_4r', 'en', 'e_number'::public.alias_kind)
 ) as v(alias, ingredient_id, lang, kind)
 on conflict (alias_norm) do nothing;
 

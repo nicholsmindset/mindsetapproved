@@ -1,112 +1,986 @@
 [
-  { "name": "us tortilla chips canola", "text": "INGREDIENTS: Whole grain corn, canola oil, salt.", "verdict": "not_approved", "flagged": ["canola_oil"] },
-  { "name": "us tortilla chips avocado oil", "text": "Ingredients: Organic stone ground corn, avocado oil, sea salt, lime.", "verdict": "approved", "flagged": [], "good": ["avocado_oil"] },
-  { "name": "us potato chips sunflower", "text": "Ingredients: Potatoes, sunflower oil, salt.", "verdict": "not_approved", "flagged": ["sunflower_oil"] },
-  { "name": "us potato chips high oleic", "text": "Ingredients: Potatoes, high oleic sunflower oil, sea salt.", "verdict": "caution", "flagged": ["high_oleic_oil"] },
-  { "name": "us potato chips coconut", "text": "INGREDIENTS: POTATOES, COCONUT OIL, SEA SALT", "verdict": "approved", "flagged": [], "good": ["coconut_oil"] },
-  { "name": "us kettle chips oil blend", "text": "Ingredients: Potatoes, vegetable oil (sunflower, safflower and/or canola oil), salt.", "verdict": "not_approved", "flagged": ["sunflower_oil", "canola_oil", "vegetable_oil"] },
-  { "name": "us cheese crackers", "text": "INGREDIENTS: ENRICHED FLOUR (WHEAT FLOUR, NIACIN, REDUCED IRON, THIAMIN MONONITRATE, RIBOFLAVIN, FOLIC ACID), VEGETABLE OIL (SOYBEAN, PALM, AND PALM KERNEL OIL WITH TBHQ FOR FRESHNESS), CHEESE MADE WITH SKIM MILK (SKIM MILK, WHEY PROTEIN, SALT, CHEESE CULTURES, ENZYMES, ANNATTO EXTRACT FOR COLOR), CONTAINS 2% OR LESS OF SALT, PAPRIKA, YEAST, PAPRIKA EXTRACT FOR COLOR, SOY LECITHIN. CONTAINS: WHEAT, MILK, SOY.", "verdict": "not_approved", "flagged": ["soybean_oil", "bha_bht_tbhq", "vegetable_oil", "palm_oil"] },
-  { "name": "us sandwich cookie", "text": "Ingredients: Unbleached enriched flour (wheat flour, niacin, reduced iron, thiamine mononitrate, riboflavin, folic acid), sugar, palm and/or canola oil, cocoa (processed with alkali), high fructose corn syrup, leavening (baking soda and/or calcium phosphate), salt, soy lecithin, chocolate, artificial flavor.", "verdict": "not_approved", "flagged": ["canola_oil", "hfcs", "artificial_flavors", "added_sugar", "palm_oil"] },
-  { "name": "us fruit snacks dyes", "text": "INGREDIENTS: CORN SYRUP, SUGAR, MODIFIED CORN STARCH, FRUIT JUICE FROM CONCENTRATE (PEAR), CONTAINS LESS THAN 2% OF CITRIC ACID, SODIUM CITRATE, ASCORBIC ACID (VITAMIN C), NATURAL FLAVOR, CARNAUBA WAX, RED 40, YELLOW 5, BLUE 1.", "verdict": "not_approved", "flagged": ["red_40", "yellow_5", "blue_1_2", "added_sugar", "natural_flavors"] },
-  { "name": "us cereal bht", "text": "Ingredients: Whole grain oats, sugar, corn starch, salt, tripotassium phosphate, vitamin E (mixed tocopherols) to preserve freshness. BHT added to packaging for freshness.", "verdict": "not_approved", "flagged": ["bha_bht_tbhq", "added_sugar"] },
-  { "name": "us cereal bht in list", "text": "Ingredients: Milled corn, sugar, salt, malt flavor, BHT for freshness.", "verdict": "not_approved", "flagged": ["bha_bht_tbhq", "added_sugar", "natural_flavors"] },
-  { "name": "us soda", "text": "Ingredients: Carbonated water, high fructose corn syrup, caramel color, phosphoric acid, natural flavors, caffeine.", "verdict": "not_approved", "flagged": ["hfcs", "caramel_color", "natural_flavors"] },
-  { "name": "us diet soda", "text": "INGREDIENTS: CARBONATED WATER, CARAMEL COLOR, ASPARTAME, PHOSPHORIC ACID, POTASSIUM BENZOATE (TO PROTECT TASTE), NATURAL FLAVORS, CITRIC ACID, CAFFEINE.", "verdict": "not_approved", "flagged": ["aspartame", "caramel_color", "sodium_benzoate", "natural_flavors"] },
-  { "name": "us zero sugar sweeteners", "text": "Ingredients: Carbonated water, citric acid, natural flavor, sodium citrate, acesulfame potassium, sucralose.", "verdict": "not_approved", "flagged": ["acesulfame_k", "sucralose", "natural_flavors"] },
-  { "name": "us sports drink", "text": "Ingredients: Water, sugar, dextrose, citric acid, salt, sodium citrate, monopotassium phosphate, gum arabic, glycerol ester of rosin, natural flavor, yellow 6.", "verdict": "not_approved", "flagged": ["yellow_6", "added_sugar", "natural_flavors"] },
-  { "name": "us hot dogs nitrite", "text": "INGREDIENTS: MECHANICALLY SEPARATED CHICKEN, PORK, WATER, CORN SYRUP, CONTAINS 2% OR LESS OF: SALT, POTASSIUM LACTATE, SODIUM PHOSPHATES, FLAVORINGS, SODIUM DIACETATE, SODIUM ASCORBATE, SODIUM NITRITE, EXTRACTIVES OF PAPRIKA.", "verdict": "not_approved", "flagged": ["nitrites_nitrates", "added_sugar", "natural_flavors"] },
-  { "name": "us bacon uncured", "text": "Ingredients: Pork, water, salt, cane sugar, celery powder, sea salt.", "verdict": "caution", "flagged": ["added_sugar"] },
-  { "name": "us mayo soybean", "text": "Ingredients: Soybean oil, water, whole eggs, vinegar, egg yolks, salt, sugar, lemon juice, natural flavors, calcium disodium EDTA (used to protect quality).", "verdict": "not_approved", "flagged": ["soybean_oil", "added_sugar", "natural_flavors"] },
-  { "name": "us mayo avocado", "text": "Ingredients: Avocado oil, organic eggs, organic egg yolks, water, organic vinegar, salt, organic lemon juice concentrate, rosemary extract.", "verdict": "approved", "flagged": [], "good": ["avocado_oil"] },
-  { "name": "us peanut butter hydrogenated", "text": "Ingredients: Roasted peanuts, sugar, contains 2% or less of: molasses, fully hydrogenated vegetable oils (rapeseed and soybean), mono and diglycerides, salt.", "verdict": "not_approved", "flagged": ["partially_hydrogenated_oil", "canola_oil", "soybean_oil", "added_sugar"] },
-  { "name": "us peanut butter clean", "text": "Ingredients: Peanuts, salt.", "verdict": "cant_verify", "flagged": [] },
-  { "name": "us almond butter clean 3", "text": "Ingredients: Dry roasted almonds, sea salt, cinnamon.", "verdict": "approved", "flagged": [] },
-  { "name": "us microwave popcorn pho", "text": "Ingredients: Whole grain popping corn, partially hydrogenated soybean oil, salt, natural and artificial flavor, color added, TBHQ and citric acid (to protect flavor).", "verdict": "not_approved", "flagged": ["partially_hydrogenated_oil", "soybean_oil", "artificial_flavors", "natural_flavors", "bha_bht_tbhq"] },
-  { "name": "us bread", "text": "Ingredients: Whole wheat flour, water, sugar, wheat gluten, yeast, soybean oil, salt, preservatives (calcium propionate, sorbic acid), monoglycerides, soy lecithin.", "verdict": "not_approved", "flagged": ["soybean_oil", "added_sugar"] },
-  { "name": "us sourdough clean", "text": "Ingredients: Unbleached wheat flour, water, sea salt, sourdough culture.", "verdict": "approved", "flagged": [] },
-  { "name": "us ice cream carrageenan", "text": "Ingredients: Milk, cream, sugar, corn syrup, whey, mono and diglycerides, guar gum, carrageenan, natural flavor, annatto (color).", "verdict": "caution", "flagged": ["added_sugar", "carrageenan", "natural_flavors"] },
-  { "name": "us ice cream simple", "text": "Ingredients: Cream, skim milk, cane sugar, egg yolks, vanilla extract.", "verdict": "caution", "flagged": ["added_sugar"] },
-  { "name": "us yogurt gelatin", "text": "Ingredients: Cultured grade A nonfat milk, sugar, modified corn starch, kosher gelatin, natural flavor, potassium sorbate.", "verdict": "caution", "flagged": ["added_sugar", "gelatin", "natural_flavors"] },
-  { "name": "us greek yogurt plain", "text": "Ingredients: Cultured pasteurized nonfat milk, cream, live active cultures.", "verdict": "approved", "flagged": [] },
-  { "name": "us gummy bears", "text": "Ingredients: Glucose syrup, sugar, gelatin, dextrose, citric acid, corn starch, artificial and natural flavors, palm oil, palm kernel oil, carnauba wax, white beeswax, yellow beeswax, coloring (includes Yellow 5, Red 40, Blue 1).", "verdict": "not_approved", "flagged": ["yellow_5", "red_40", "blue_1_2", "artificial_flavors", "added_sugar", "gelatin", "natural_flavors", "palm_oil"] },
-  { "name": "us candy titanium dioxide", "text": "INGREDIENTS: SUGAR, CORN SYRUP, HYDROGENATED PALM KERNEL OIL, CITRIC ACID, TAPIOCA DEXTRIN, MODIFIED CORN STARCH, NATURAL AND ARTIFICIAL FLAVORS, COLORING (TITANIUM DIOXIDE, RED 40 LAKE, YELLOW 6 LAKE, YELLOW 5 LAKE, BLUE 2 LAKE, BLUE 1 LAKE, BLUE 1).", "verdict": "not_approved", "flagged": ["partially_hydrogenated_oil", "titanium_dioxide", "red_40", "yellow_6", "yellow_5", "blue_1_2", "artificial_flavors", "added_sugar", "palm_oil", "natural_flavors"] },
-  { "name": "us frosting red 3", "text": "Ingredients: Sugar, palm oil, water, corn syrup, corn starch, contains 2% or less of: salt, mono- and diglycerides, polysorbate 60, artificial flavor, potassium sorbate, Red 3.", "verdict": "not_approved", "flagged": ["red_3", "artificial_flavors", "added_sugar", "palm_oil"] },
-  { "name": "us salad dressing", "text": "Ingredients: Soybean oil, water, vinegar, sugar, salt, garlic, contains less than 2% of xanthan gum, polysorbate 80, calcium disodium EDTA, natural flavor.", "verdict": "not_approved", "flagged": ["soybean_oil", "added_sugar", "polysorbate_80", "natural_flavors"] },
-  { "name": "us olive oil dressing", "text": "Ingredients: Extra virgin olive oil, red wine vinegar, water, dijon mustard (water, mustard seed, vinegar, salt), garlic, oregano, black pepper.", "verdict": "approved", "flagged": [], "good": ["olive_oil"] },
-  { "name": "us ketchup hfcs", "text": "Ingredients: Tomato concentrate from red ripe tomatoes, distilled vinegar, high fructose corn syrup, corn syrup, salt, spice, onion powder, natural flavoring.", "verdict": "not_approved", "flagged": ["hfcs", "added_sugar", "natural_flavors"] },
-  { "name": "us protein bar", "text": "Ingredients: Protein blend (whey protein isolate, milk protein isolate), soluble corn fiber, almonds, water, natural flavors, sea salt, sucralose, sunflower lecithin, cocoa butter.", "verdict": "not_approved", "flagged": ["sucralose", "natural_flavors"] },
-  { "name": "us granola butter coconut", "text": "Ingredients: Rolled oats, honey, coconut oil, almonds, sea salt, cinnamon.", "verdict": "approved", "flagged": [], "good": ["coconut_oil"] },
-  { "name": "us beef jerky msg", "text": "Ingredients: Beef, water, sugar, salt, soy sauce (water, wheat, soybeans, salt), monosodium glutamate, natural flavors, sodium nitrite.", "verdict": "not_approved", "flagged": ["nitrites_nitrates", "added_sugar", "msg", "natural_flavors"] },
-  { "name": "us ghee", "text": "Ingredients: Organic clarified butter.", "verdict": "cant_verify", "flagged": [], "good": ["butter_ghee_tallow"] },
-  { "name": "us tallow fries", "text": "Ingredients: Potatoes, beef tallow, sea salt.", "verdict": "approved", "flagged": [], "good": ["butter_ghee_tallow"] },
-  { "name": "us expeller pressed canola", "text": "Ingredients: Potatoes, expeller-pressed canola oil, sea salt.", "verdict": "not_approved", "flagged": ["canola_oil"] },
-  { "name": "us cottonseed crackers", "text": "Ingredients: Enriched flour, cottonseed oil, salt, baking soda.", "verdict": "not_approved", "flagged": ["cottonseed_oil"] },
-  { "name": "us grapeseed", "text": "Ingredients: Water, grapeseed oil, apple cider vinegar, salt, garlic.", "verdict": "not_approved", "flagged": ["grapeseed_oil"] },
-  { "name": "us corn oil", "text": "Ingredients: Corn, corn oil, salt.", "verdict": "not_approved", "flagged": ["corn_oil"] },
-  { "name": "us saccharin packets", "text": "Ingredients: Dextrose, saccharin, cream of tartar, calcium silicate.", "verdict": "not_approved", "flagged": ["saccharin", "added_sugar"] },
-  { "name": "us bha cereal", "text": "Ingredients: Corn meal, sugar, salt, BHA added to preserve freshness.", "verdict": "not_approved", "flagged": ["bha_bht_tbhq", "added_sugar"] },
-  { "name": "us maltodextrin seasoning", "text": "Ingredients: Maltodextrin, salt, garlic powder, onion powder, spices.", "verdict": "caution", "flagged": ["added_sugar"] },
-  { "name": "us fd&c full names", "text": "Ingredients: Sugar, corn syrup, FD&C Red No. 40, FD&C Yellow No. 5, FD&C Blue No. 1.", "verdict": "not_approved", "flagged": ["red_40", "yellow_5", "blue_1_2", "added_sugar"] },
-  { "name": "us butter flavor not butter", "text": "Ingredients: Popcorn, palm oil, salt, artificial butter flavor.", "verdict": "not_approved", "flagged": ["artificial_flavors", "palm_oil"], "good": [] },
-  { "name": "us natural butter flavor", "text": "Ingredients: Popcorn, coconut oil, salt, natural butter flavor.", "verdict": "caution", "flagged": ["natural_flavors"], "good": ["coconut_oil"] },
-
-  { "name": "uk crisps rapeseed", "text": "Ingredients: Potatoes, Rapeseed Oil, Salt.", "verdict": "not_approved", "flagged": ["canola_oil"] },
-  { "name": "uk biscuits palm", "text": "Ingredients: Wheat Flour (with added Calcium, Iron, Niacin, Thiamin), Sugar, Vegetable Oils (Palm, Rapeseed), Wholemeal Wheat Flour, Glucose-Fructose Syrup, Raising Agents (Sodium Bicarbonate, Malic Acid, Ammonium Bicarbonate), Salt.", "verdict": "not_approved", "flagged": ["canola_oil", "hfcs", "added_sugar", "vegetable_oil", "palm_oil"] },
-  { "name": "eu e-number dyes", "text": "Ingredients: Sugar, glucose syrup, acid: citric acid, colours: E129, E102, E133, flavourings.", "verdict": "not_approved", "flagged": ["red_40", "yellow_5", "blue_1_2", "added_sugar", "natural_flavors"] },
-  { "name": "eu e-number spaced", "text": "Ingredients: Water, sugar, acidity regulator (E 330), preservative (E 211), colour (E 150d), sweetener (E 950, E 955).", "verdict": "not_approved", "flagged": ["acesulfame_k", "sucralose", "added_sugar", "sodium_benzoate", "caramel_color"] },
-  { "name": "eu e-number roman suffix", "text": "Ingredients: Wheat flour, sugar, emulsifier (E322(i)), raising agent (E500(ii)), salt.", "verdict": "caution", "flagged": ["added_sugar"] },
-  { "name": "eu titanium dioxide e171", "text": "Ingredients: Sugar, cocoa butter, whole milk powder, colour: E171, glazing agent: shellac.", "verdict": "not_approved", "flagged": ["titanium_dioxide", "added_sugar"] },
-  { "name": "eu flavouring generic", "text": "Ingredients: Oat flakes (60%), raisins (20%), hazelnuts (10%), flavouring.", "verdict": "caution", "flagged": ["natural_flavors"] },
-  { "name": "eu nature identical", "text": "Ingredients: Sugar, cocoa butter, milk powder, nature-identical flavouring (vanillin).", "verdict": "not_approved", "flagged": ["artificial_flavors", "added_sugar"] },
-  { "name": "eu chocolate compound", "text": "Ingredients: Milk chocolate (sugar, cocoa butter, cocoa mass, skimmed milk powder, emulsifier: soya lecithin, natural vanilla flavouring), wheat flour, palm fat, salt.", "verdict": "caution", "flagged": ["added_sugar", "natural_flavors", "palm_oil"] },
-  { "name": "eu dark chocolate 85", "text": "Ingredients: Cocoa mass, cocoa butter, cocoa powder, demerara sugar, vanilla.", "verdict": "caution", "flagged": ["added_sugar"] },
-  { "name": "eu dark chocolate 100", "text": "Ingredients: Cocoa mass, cocoa butter, vanilla beans.", "verdict": "approved", "flagged": [] },
-  { "name": "eu percentages", "text": "Ingredients: Tomatoes (65%), Extra Virgin Olive Oil (8%), Onion (5%), Salt (1.5%), Basil 0.5%.", "verdict": "approved", "flagged": [], "good": ["olive_oil"] },
-  { "name": "eu nitrites ham", "text": "Ingredients: Pork (90%), Water, Salt, Dextrose, Stabiliser: Sodium Triphosphate, Antioxidant: Sodium Ascorbate, Preservative: Sodium Nitrite.", "verdict": "not_approved", "flagged": ["nitrites_nitrates", "added_sugar"] },
-  { "name": "eu e250 code only", "text": "Ingredients: Pork, salt, preservatives (E250, E252).", "verdict": "not_approved", "flagged": ["nitrites_nitrates"] },
-  { "name": "eu sweetener codes", "text": "Ingredients: Water, citric acid, sweeteners (E951, E954), flavourings.", "verdict": "not_approved", "flagged": ["aspartame", "saccharin", "natural_flavors"] },
-  { "name": "eu carrageenan code", "text": "Ingredients: Coconut milk (90%), water, thickener (E407), stabiliser (E412).", "verdict": "caution", "flagged": ["carrageenan"] },
-  { "name": "eu gelatine", "text": "Ingredients: Glucose syrup, sugar, gelatine, dextrose, citric acid, flavouring, colours (paprika extract, spirulina concentrate).", "verdict": "caution", "flagged": ["added_sugar", "gelatin", "natural_flavors"] },
-
-  { "name": "sg instant noodles", "text": "INGREDIENTS: NOODLES: WHEAT FLOUR, PALM OIL, TAPIOCA STARCH, SALT, ACIDITY REGULATORS (501(i), 500(i), 451(i)), THICKENER (412), COLOUR (101(i)). SEASONING: SALT, SUGAR, FLAVOUR ENHANCERS (621, 627, 631), GARLIC POWDER, YEAST EXTRACT. CONTAINS WHEAT AND SOY.", "verdict": "caution", "flagged": ["palm_oil", "added_sugar", "msg"] },
-  { "name": "sg edible vegetable oil", "text": "Ingredients: Wheat Flour, Sugar, Edible Vegetable Oil (Palm Olein), Glucose, Milk Powder, Salt, Leavening Agents (500ii, 503ii), Emulsifier (322 from soy).", "verdict": "caution", "flagged": ["vegetable_oil", "palm_oil", "added_sugar"] },
-  { "name": "sg kaya", "text": "Ingredients: Sugar, coconut milk, eggs, pandan leaves, sodium benzoate (E211).", "verdict": "caution", "flagged": ["added_sugar", "sodium_benzoate"] },
-  { "name": "sg chilli sauce dyes", "text": "Ingredients: Chilli, sugar, water, salt, garlic, vinegar, modified starch (1442), preservative (211), colour (129, 102).", "verdict": "not_approved", "flagged": ["red_40", "yellow_5", "added_sugar", "sodium_benzoate"] },
-  { "name": "sg soy milk", "text": "Ingredients: Water, soybeans (8%), cane sugar, stabiliser (418).", "verdict": "caution", "flagged": ["added_sugar"] },
-  { "name": "sg gula melaka", "text": "Ingredients: Glutinous rice flour, gula melaka, coconut, salt, pandan.", "verdict": "caution", "flagged": ["added_sugar"] },
-  { "name": "sg teh drink", "text": "Ingredients: Water, sugar, black tea, milk powder, creamer (glucose syrup, hydrogenated vegetable oil, sodium caseinate), stabiliser (E340, E471).", "verdict": "not_approved", "flagged": ["partially_hydrogenated_oil", "added_sugar"] },
-  { "name": "sg ins codes", "text": "Ingredients: Water, sugar, acidity regulator (INS 330), preservative (INS 211), colour (INS 102).", "verdict": "not_approved", "flagged": ["yellow_5", "added_sugar", "sodium_benzoate"] },
-  { "name": "sg korean ramen", "text": "Ingredients: Wheat flour, potato starch, palm oil, salt, modified starch, soup base: salt, sugar, MSG, red pepper powder, garlic, onion, soy sauce, caramel colour.", "verdict": "caution", "flagged": ["palm_oil", "added_sugar", "msg", "caramel_color"] },
-  { "name": "sg biscuits brand x", "text": "Ingredients: Wheat Flour, Sugar, Vegetable Fat (Palm), Invert Sugar Syrup, Salt, Raising Agents (Sodium Bicarbonate, Ammonium Bicarbonate), Emulsifier (Soy Lecithin), Flavour (Butter, Vanilla).", "verdict": "caution", "flagged": ["vegetable_oil", "palm_oil", "added_sugar", "natural_flavors"] },
-  { "name": "sg kopi 3 in 1", "text": "Ingredients: Sugar, non-dairy creamer (glucose syrup, hydrogenated palm kernel oil, sodium caseinate, stabilisers (E340, E452), emulsifier (E471)), instant coffee (12%).", "verdict": "not_approved", "flagged": ["partially_hydrogenated_oil", "added_sugar", "palm_oil"] },
-  { "name": "sg coconut cookies clean", "text": "Ingredients: Wheat flour, butter, coconut, eggs, honey, baking powder.", "verdict": "approved", "flagged": [], "good": ["butter_ghee_tallow"] },
-  { "name": "sg malay label", "text": "Bahan-bahan: Tepung gandum, gula, minyak sawit, garam.", "verdict": "cant_verify", "flagged": [] },
-  { "name": "sg chinese header only english", "text": "配料 Ingredients: Water, soybeans, salt, wheat flour, sugar.", "verdict": "caution", "flagged": ["added_sugar"] },
-
-  { "name": "ocr broken lines", "text": "INGREDIENTS: SUGAR, ENRICHED\nFLOUR (WHEAT FLOUR, NIACIN), SUN-\nFLOWER OIL, SALT\nNutrition Facts Serving size 30g", "verdict": "not_approved", "flagged": ["sunflower_oil", "added_sugar"] },
-  { "name": "ocr digit confusion", "text": "Ingredients: P0tatoes, cano1a oil, sa1t", "verdict": "not_approved", "flagged": ["canola_oil"] },
-  { "name": "ocr rn to m", "text": "Ingredients: Corn, com oil, salt", "verdict": "not_approved", "flagged": ["corn_oil"] },
-  { "name": "ocr fuzzy tartrazine", "text": "Ingredients: Sugar, citric acid, tartrazlne, sunset yel1ow fcf", "verdict": "not_approved", "flagged": ["yellow_5", "yellow_6", "added_sugar"] },
-  { "name": "ocr fuzzy never approves", "text": "Ingredients: avacado oil, extra virgn olive oil, sea sallt", "verdict": "cant_verify", "flagged": [] },
-  { "name": "ocr unmatched majority", "text": "Ingredients: water, salt, garlic, xqzt, blorf, mmmnn, glorp", "verdict": "cant_verify", "flagged": [] },
-  { "name": "ocr no header", "text": "Potatoes, avocado oil, sea salt", "verdict": "approved", "flagged": [], "good": ["avocado_oil"] },
-  { "name": "ocr marketing then header", "text": "Made with simple ingredients you can trust! INGREDIENTS: Oats, almonds, honey, sea salt. Best before: see top.", "verdict": "approved", "flagged": [] },
-  { "name": "ocr low confidence", "text": "Ingredients: Water, salt, garlic, onion", "ocrConfidence": 0.5, "verdict": "cant_verify", "flagged": [] },
-  { "name": "ocr low confidence still flags bad", "text": "Ingredients: Water, canola oil, salt", "ocrConfidence": 0.4, "verdict": "not_approved", "flagged": ["canola_oil"] },
-  { "name": "ocr unbalanced bracket", "text": "Ingredients: Chocolate (sugar, cocoa butter, soy lecithin, salt, corn oil", "verdict": "not_approved", "flagged": ["corn_oil", "added_sugar"] },
-  { "name": "ocr square brackets", "text": "Ingredients: Seasoning [salt, sugar, yeast extract, red 40], potatoes, avocado oil.", "verdict": "not_approved", "flagged": ["red_40", "added_sugar"], "good": ["avocado_oil"] },
-  { "name": "ocr semicolons", "text": "Ingredients: water; salt; sugar; spices", "verdict": "caution", "flagged": ["added_sugar"] },
-  { "name": "notes do not flag", "text": "Ingredients: Almonds, cashews, sea salt. May contain traces of peanuts and soybean oil. Made in a facility that also processes wheat.", "verdict": "approved", "flagged": [], "notes": 2 },
-  { "name": "allergen tail ignored", "text": "Ingredients: Rice, water, salt. Allergens: none. Contains: canola oil residue warning.", "verdict": "approved", "flagged": [] },
-  { "name": "storage tail ignored", "text": "Ingredients: Oats, raisins, cinnamon. Storage: keep in a cool dry place away from canola oil.", "verdict": "approved", "flagged": [] },
-  { "name": "manufactured by tail", "text": "Ingredients: Water, tomatoes, salt. Manufactured by: Sugar Foods Pte Ltd, Singapore.", "verdict": "approved", "flagged": [] },
-
-  { "name": "settings strict natural flavors", "text": "Ingredients: Water, apple juice, natural flavor, lemon juice.", "settings": { "strictMode": true }, "verdict": "not_approved", "flagged": ["natural_flavors"] },
-  { "name": "settings strict gums borderline", "text": "Ingredients: Coconut milk, water, guar gum.", "settings": { "strictMode": true }, "verdict": "caution", "flagged": ["gums"] },
-  { "name": "settings standard gums neutral", "text": "Ingredients: Coconut milk, water, guar gum.", "verdict": "approved", "flagged": [] },
-  { "name": "settings ignore sugar", "text": "Ingredients: Oats, sugar, salt, cinnamon.", "settings": { "disabledCategories": ["sugar"] }, "verdict": "approved", "flagged": [] },
-  { "name": "settings allow high oleic", "text": "Ingredients: Potatoes, high oleic sunflower oil, sea salt.", "settings": { "disabledIngredients": ["high_oleic_oil"] }, "verdict": "approved", "flagged": [] },
-  { "name": "settings no gelatin", "text": "Ingredients: Water, sugar, gelatin, citric acid.", "settings": { "noGelatin": true }, "verdict": "not_approved", "flagged": ["gelatin", "added_sugar"] },
-  { "name": "settings ignore seed oils", "text": "Ingredients: Potatoes, canola oil, salt.", "settings": { "disabledCategories": ["seed_oil"] }, "verdict": "approved", "flagged": [] },
-  { "name": "settings good_fat not toggleable", "text": "Ingredients: Potatoes, avocado oil, salt.", "settings": { "disabledCategories": ["good_fat"] }, "verdict": "approved", "flagged": [], "good": ["avocado_oil"] }
+  {
+    "name": "us tortilla chips canola",
+    "text": "INGREDIENTS: Whole grain corn, canola oil, salt.",
+    "verdict": "not_approved",
+    "flagged": [
+      "canola_oil"
+    ]
+  },
+  {
+    "name": "us tortilla chips avocado oil",
+    "text": "Ingredients: Organic stone ground corn, avocado oil, sea salt, lime.",
+    "verdict": "approved",
+    "flagged": [],
+    "good": [
+      "avocado_oil"
+    ]
+  },
+  {
+    "name": "us potato chips sunflower",
+    "text": "Ingredients: Potatoes, sunflower oil, salt.",
+    "verdict": "not_approved",
+    "flagged": [
+      "sunflower_oil"
+    ]
+  },
+  {
+    "name": "us potato chips high oleic",
+    "text": "Ingredients: Potatoes, high oleic sunflower oil, sea salt.",
+    "verdict": "caution",
+    "flagged": [
+      "high_oleic_oil"
+    ]
+  },
+  {
+    "name": "us potato chips coconut",
+    "text": "INGREDIENTS: POTATOES, COCONUT OIL, SEA SALT",
+    "verdict": "approved",
+    "flagged": [],
+    "good": [
+      "coconut_oil"
+    ]
+  },
+  {
+    "name": "us kettle chips oil blend",
+    "text": "Ingredients: Potatoes, vegetable oil (sunflower, safflower and/or canola oil), salt.",
+    "verdict": "not_approved",
+    "flagged": [
+      "sunflower_oil",
+      "canola_oil",
+      "vegetable_oil"
+    ]
+  },
+  {
+    "name": "us cheese crackers",
+    "text": "INGREDIENTS: ENRICHED FLOUR (WHEAT FLOUR, NIACIN, REDUCED IRON, THIAMIN MONONITRATE, RIBOFLAVIN, FOLIC ACID), VEGETABLE OIL (SOYBEAN, PALM, AND PALM KERNEL OIL WITH TBHQ FOR FRESHNESS), CHEESE MADE WITH SKIM MILK (SKIM MILK, WHEY PROTEIN, SALT, CHEESE CULTURES, ENZYMES, ANNATTO EXTRACT FOR COLOR), CONTAINS 2% OR LESS OF SALT, PAPRIKA, YEAST, PAPRIKA EXTRACT FOR COLOR, SOY LECITHIN. CONTAINS: WHEAT, MILK, SOY.",
+    "verdict": "not_approved",
+    "flagged": [
+      "soybean_oil",
+      "bha_bht_tbhq",
+      "vegetable_oil",
+      "palm_oil"
+    ]
+  },
+  {
+    "name": "us sandwich cookie",
+    "text": "Ingredients: Unbleached enriched flour (wheat flour, niacin, reduced iron, thiamine mononitrate, riboflavin, folic acid), sugar, palm and/or canola oil, cocoa (processed with alkali), high fructose corn syrup, leavening (baking soda and/or calcium phosphate), salt, soy lecithin, chocolate, artificial flavor.",
+    "verdict": "not_approved",
+    "flagged": [
+      "canola_oil",
+      "hfcs",
+      "artificial_flavors",
+      "added_sugar",
+      "palm_oil"
+    ]
+  },
+  {
+    "name": "us fruit snacks dyes",
+    "text": "INGREDIENTS: CORN SYRUP, SUGAR, MODIFIED CORN STARCH, FRUIT JUICE FROM CONCENTRATE (PEAR), CONTAINS LESS THAN 2% OF CITRIC ACID, SODIUM CITRATE, ASCORBIC ACID (VITAMIN C), NATURAL FLAVOR, CARNAUBA WAX, RED 40, YELLOW 5, BLUE 1.",
+    "verdict": "not_approved",
+    "flagged": [
+      "red_40",
+      "yellow_5",
+      "blue_1_2",
+      "added_sugar",
+      "natural_flavors"
+    ]
+  },
+  {
+    "name": "us cereal bht",
+    "text": "Ingredients: Whole grain oats, sugar, corn starch, salt, tripotassium phosphate, vitamin E (mixed tocopherols) to preserve freshness. BHT added to packaging for freshness.",
+    "verdict": "not_approved",
+    "flagged": [
+      "bha_bht_tbhq",
+      "added_sugar"
+    ]
+  },
+  {
+    "name": "us cereal bht in list",
+    "text": "Ingredients: Milled corn, sugar, salt, malt flavor, BHT for freshness.",
+    "verdict": "not_approved",
+    "flagged": [
+      "bha_bht_tbhq",
+      "added_sugar",
+      "natural_flavors"
+    ]
+  },
+  {
+    "name": "us soda",
+    "text": "Ingredients: Carbonated water, high fructose corn syrup, caramel color, phosphoric acid, natural flavors, caffeine.",
+    "verdict": "not_approved",
+    "flagged": [
+      "hfcs",
+      "caramel_color",
+      "natural_flavors"
+    ]
+  },
+  {
+    "name": "us diet soda",
+    "text": "INGREDIENTS: CARBONATED WATER, CARAMEL COLOR, ASPARTAME, PHOSPHORIC ACID, POTASSIUM BENZOATE (TO PROTECT TASTE), NATURAL FLAVORS, CITRIC ACID, CAFFEINE.",
+    "verdict": "not_approved",
+    "flagged": [
+      "aspartame",
+      "caramel_color",
+      "sodium_benzoate",
+      "natural_flavors"
+    ]
+  },
+  {
+    "name": "us zero sugar sweeteners",
+    "text": "Ingredients: Carbonated water, citric acid, natural flavor, sodium citrate, acesulfame potassium, sucralose.",
+    "verdict": "not_approved",
+    "flagged": [
+      "acesulfame_k",
+      "sucralose",
+      "natural_flavors"
+    ]
+  },
+  {
+    "name": "us sports drink",
+    "text": "Ingredients: Water, sugar, dextrose, citric acid, salt, sodium citrate, monopotassium phosphate, gum arabic, glycerol ester of rosin, natural flavor, yellow 6.",
+    "verdict": "not_approved",
+    "flagged": [
+      "yellow_6",
+      "added_sugar",
+      "natural_flavors"
+    ]
+  },
+  {
+    "name": "us hot dogs nitrite",
+    "text": "INGREDIENTS: MECHANICALLY SEPARATED CHICKEN, PORK, WATER, CORN SYRUP, CONTAINS 2% OR LESS OF: SALT, POTASSIUM LACTATE, SODIUM PHOSPHATES, FLAVORINGS, SODIUM DIACETATE, SODIUM ASCORBATE, SODIUM NITRITE, EXTRACTIVES OF PAPRIKA.",
+    "verdict": "not_approved",
+    "flagged": [
+      "nitrites_nitrates",
+      "added_sugar",
+      "natural_flavors"
+    ]
+  },
+  {
+    "name": "us bacon uncured",
+    "text": "Ingredients: Pork, water, salt, cane sugar, celery powder, sea salt.",
+    "verdict": "caution",
+    "flagged": [
+      "added_sugar"
+    ]
+  },
+  {
+    "name": "us mayo soybean",
+    "text": "Ingredients: Soybean oil, water, whole eggs, vinegar, egg yolks, salt, sugar, lemon juice, natural flavors, calcium disodium EDTA (used to protect quality).",
+    "verdict": "not_approved",
+    "flagged": [
+      "soybean_oil",
+      "added_sugar",
+      "natural_flavors"
+    ]
+  },
+  {
+    "name": "us mayo avocado",
+    "text": "Ingredients: Avocado oil, organic eggs, organic egg yolks, water, organic vinegar, salt, organic lemon juice concentrate, rosemary extract.",
+    "verdict": "approved",
+    "flagged": [],
+    "good": [
+      "avocado_oil"
+    ]
+  },
+  {
+    "name": "us peanut butter hydrogenated",
+    "text": "Ingredients: Roasted peanuts, sugar, contains 2% or less of: molasses, fully hydrogenated vegetable oils (rapeseed and soybean), mono and diglycerides, salt.",
+    "verdict": "not_approved",
+    "flagged": [
+      "vegetable_oil",
+      "canola_oil",
+      "soybean_oil",
+      "added_sugar"
+    ]
+  },
+  {
+    "name": "us peanut butter clean",
+    "text": "Ingredients: Peanuts, salt.",
+    "verdict": "cant_verify",
+    "flagged": []
+  },
+  {
+    "name": "us almond butter clean 3",
+    "text": "Ingredients: Dry roasted almonds, sea salt, cinnamon.",
+    "verdict": "approved",
+    "flagged": []
+  },
+  {
+    "name": "us microwave popcorn pho",
+    "text": "Ingredients: Whole grain popping corn, partially hydrogenated soybean oil, salt, natural and artificial flavor, color added, TBHQ and citric acid (to protect flavor).",
+    "verdict": "not_approved",
+    "flagged": [
+      "partially_hydrogenated_oil",
+      "soybean_oil",
+      "artificial_flavors",
+      "natural_flavors",
+      "bha_bht_tbhq"
+    ]
+  },
+  {
+    "name": "us bread",
+    "text": "Ingredients: Whole wheat flour, water, sugar, wheat gluten, yeast, soybean oil, salt, preservatives (calcium propionate, sorbic acid), monoglycerides, soy lecithin.",
+    "verdict": "not_approved",
+    "flagged": [
+      "soybean_oil",
+      "added_sugar"
+    ]
+  },
+  {
+    "name": "us sourdough clean",
+    "text": "Ingredients: Unbleached wheat flour, water, sea salt, sourdough culture.",
+    "verdict": "approved",
+    "flagged": []
+  },
+  {
+    "name": "us ice cream carrageenan",
+    "text": "Ingredients: Milk, cream, sugar, corn syrup, whey, mono and diglycerides, guar gum, carrageenan, natural flavor, annatto (color).",
+    "verdict": "caution",
+    "flagged": [
+      "added_sugar",
+      "carrageenan",
+      "natural_flavors"
+    ]
+  },
+  {
+    "name": "us ice cream simple",
+    "text": "Ingredients: Cream, skim milk, cane sugar, egg yolks, vanilla extract.",
+    "verdict": "caution",
+    "flagged": [
+      "added_sugar"
+    ]
+  },
+  {
+    "name": "us yogurt gelatin",
+    "text": "Ingredients: Cultured grade A nonfat milk, sugar, modified corn starch, kosher gelatin, natural flavor, potassium sorbate.",
+    "verdict": "caution",
+    "flagged": [
+      "added_sugar",
+      "gelatin",
+      "natural_flavors"
+    ]
+  },
+  {
+    "name": "us greek yogurt plain",
+    "text": "Ingredients: Cultured pasteurized nonfat milk, cream, live active cultures.",
+    "verdict": "approved",
+    "flagged": []
+  },
+  {
+    "name": "us gummy bears",
+    "text": "Ingredients: Glucose syrup, sugar, gelatin, dextrose, citric acid, corn starch, artificial and natural flavors, palm oil, palm kernel oil, carnauba wax, white beeswax, yellow beeswax, coloring (includes Yellow 5, Red 40, Blue 1).",
+    "verdict": "not_approved",
+    "flagged": [
+      "yellow_5",
+      "red_40",
+      "blue_1_2",
+      "artificial_flavors",
+      "added_sugar",
+      "gelatin",
+      "natural_flavors",
+      "palm_oil"
+    ]
+  },
+  {
+    "name": "us candy titanium dioxide",
+    "text": "INGREDIENTS: SUGAR, CORN SYRUP, HYDROGENATED PALM KERNEL OIL, CITRIC ACID, TAPIOCA DEXTRIN, MODIFIED CORN STARCH, NATURAL AND ARTIFICIAL FLAVORS, COLORING (TITANIUM DIOXIDE, RED 40 LAKE, YELLOW 6 LAKE, YELLOW 5 LAKE, BLUE 2 LAKE, BLUE 1 LAKE, BLUE 1).",
+    "verdict": "not_approved",
+    "flagged": [
+      "partially_hydrogenated_oil",
+      "titanium_dioxide",
+      "red_40",
+      "yellow_6",
+      "yellow_5",
+      "blue_1_2",
+      "artificial_flavors",
+      "added_sugar",
+      "palm_oil",
+      "natural_flavors"
+    ]
+  },
+  {
+    "name": "us frosting red 3",
+    "text": "Ingredients: Sugar, palm oil, water, corn syrup, corn starch, contains 2% or less of: salt, mono- and diglycerides, polysorbate 60, artificial flavor, potassium sorbate, Red 3.",
+    "verdict": "not_approved",
+    "flagged": [
+      "red_3",
+      "artificial_flavors",
+      "added_sugar",
+      "palm_oil"
+    ]
+  },
+  {
+    "name": "us salad dressing",
+    "text": "Ingredients: Soybean oil, water, vinegar, sugar, salt, garlic, contains less than 2% of xanthan gum, polysorbate 80, calcium disodium EDTA, natural flavor.",
+    "verdict": "not_approved",
+    "flagged": [
+      "soybean_oil",
+      "added_sugar",
+      "polysorbate_80",
+      "natural_flavors"
+    ]
+  },
+  {
+    "name": "us olive oil dressing",
+    "text": "Ingredients: Extra virgin olive oil, red wine vinegar, water, dijon mustard (water, mustard seed, vinegar, salt), garlic, oregano, black pepper.",
+    "verdict": "approved",
+    "flagged": [],
+    "good": [
+      "olive_oil"
+    ]
+  },
+  {
+    "name": "us ketchup hfcs",
+    "text": "Ingredients: Tomato concentrate from red ripe tomatoes, distilled vinegar, high fructose corn syrup, corn syrup, salt, spice, onion powder, natural flavoring.",
+    "verdict": "not_approved",
+    "flagged": [
+      "hfcs",
+      "added_sugar",
+      "natural_flavors"
+    ]
+  },
+  {
+    "name": "us protein bar",
+    "text": "Ingredients: Protein blend (whey protein isolate, milk protein isolate), soluble corn fiber, almonds, water, natural flavors, sea salt, sucralose, sunflower lecithin, cocoa butter.",
+    "verdict": "not_approved",
+    "flagged": [
+      "sucralose",
+      "natural_flavors"
+    ]
+  },
+  {
+    "name": "us granola butter coconut",
+    "text": "Ingredients: Rolled oats, honey, coconut oil, almonds, sea salt, cinnamon.",
+    "verdict": "approved",
+    "flagged": [],
+    "good": [
+      "coconut_oil"
+    ]
+  },
+  {
+    "name": "us beef jerky msg",
+    "text": "Ingredients: Beef, water, sugar, salt, soy sauce (water, wheat, soybeans, salt), monosodium glutamate, natural flavors, sodium nitrite.",
+    "verdict": "not_approved",
+    "flagged": [
+      "nitrites_nitrates",
+      "added_sugar",
+      "msg",
+      "natural_flavors"
+    ]
+  },
+  {
+    "name": "us ghee",
+    "text": "Ingredients: Organic clarified butter.",
+    "verdict": "cant_verify",
+    "flagged": [],
+    "good": [
+      "butter_ghee_tallow"
+    ]
+  },
+  {
+    "name": "us tallow fries",
+    "text": "Ingredients: Potatoes, beef tallow, sea salt.",
+    "verdict": "approved",
+    "flagged": [],
+    "good": [
+      "butter_ghee_tallow"
+    ]
+  },
+  {
+    "name": "us expeller pressed canola",
+    "text": "Ingredients: Potatoes, expeller-pressed canola oil, sea salt.",
+    "verdict": "not_approved",
+    "flagged": [
+      "canola_oil"
+    ]
+  },
+  {
+    "name": "us cottonseed crackers",
+    "text": "Ingredients: Enriched flour, cottonseed oil, salt, baking soda.",
+    "verdict": "not_approved",
+    "flagged": [
+      "cottonseed_oil"
+    ]
+  },
+  {
+    "name": "us grapeseed",
+    "text": "Ingredients: Water, grapeseed oil, apple cider vinegar, salt, garlic.",
+    "verdict": "not_approved",
+    "flagged": [
+      "grapeseed_oil"
+    ]
+  },
+  {
+    "name": "us corn oil",
+    "text": "Ingredients: Corn, corn oil, salt.",
+    "verdict": "not_approved",
+    "flagged": [
+      "corn_oil"
+    ]
+  },
+  {
+    "name": "us saccharin packets",
+    "text": "Ingredients: Dextrose, saccharin, cream of tartar, calcium silicate.",
+    "verdict": "not_approved",
+    "flagged": [
+      "saccharin",
+      "added_sugar"
+    ]
+  },
+  {
+    "name": "us bha cereal",
+    "text": "Ingredients: Corn meal, sugar, salt, BHA added to preserve freshness.",
+    "verdict": "not_approved",
+    "flagged": [
+      "bha_bht_tbhq",
+      "added_sugar"
+    ]
+  },
+  {
+    "name": "us maltodextrin seasoning",
+    "text": "Ingredients: Maltodextrin, salt, garlic powder, onion powder, spices.",
+    "verdict": "caution",
+    "flagged": [
+      "added_sugar"
+    ]
+  },
+  {
+    "name": "us fd&c full names",
+    "text": "Ingredients: Sugar, corn syrup, FD&C Red No. 40, FD&C Yellow No. 5, FD&C Blue No. 1.",
+    "verdict": "not_approved",
+    "flagged": [
+      "red_40",
+      "yellow_5",
+      "blue_1_2",
+      "added_sugar"
+    ]
+  },
+  {
+    "name": "us butter flavor not butter",
+    "text": "Ingredients: Popcorn, palm oil, salt, artificial butter flavor.",
+    "verdict": "not_approved",
+    "flagged": [
+      "artificial_flavors",
+      "palm_oil"
+    ],
+    "good": []
+  },
+  {
+    "name": "us natural butter flavor",
+    "text": "Ingredients: Popcorn, coconut oil, salt, natural butter flavor.",
+    "verdict": "caution",
+    "flagged": [
+      "natural_flavors"
+    ],
+    "good": [
+      "coconut_oil"
+    ]
+  },
+  {
+    "name": "uk crisps rapeseed",
+    "text": "Ingredients: Potatoes, Rapeseed Oil, Salt.",
+    "verdict": "not_approved",
+    "flagged": [
+      "canola_oil"
+    ]
+  },
+  {
+    "name": "uk biscuits palm",
+    "text": "Ingredients: Wheat Flour (with added Calcium, Iron, Niacin, Thiamin), Sugar, Vegetable Oils (Palm, Rapeseed), Wholemeal Wheat Flour, Glucose-Fructose Syrup, Raising Agents (Sodium Bicarbonate, Malic Acid, Ammonium Bicarbonate), Salt.",
+    "verdict": "not_approved",
+    "flagged": [
+      "canola_oil",
+      "hfcs",
+      "added_sugar",
+      "vegetable_oil",
+      "palm_oil"
+    ]
+  },
+  {
+    "name": "eu e-number dyes",
+    "text": "Ingredients: Sugar, glucose syrup, acid: citric acid, colours: E129, E102, E133, flavourings.",
+    "verdict": "not_approved",
+    "flagged": [
+      "red_40",
+      "yellow_5",
+      "blue_1_2",
+      "added_sugar",
+      "natural_flavors"
+    ]
+  },
+  {
+    "name": "eu e-number spaced",
+    "text": "Ingredients: Water, sugar, acidity regulator (E 330), preservative (E 211), colour (E 150d), sweetener (E 950, E 955).",
+    "verdict": "not_approved",
+    "flagged": [
+      "acesulfame_k",
+      "sucralose",
+      "added_sugar",
+      "sodium_benzoate",
+      "caramel_color"
+    ]
+  },
+  {
+    "name": "eu e-number roman suffix",
+    "text": "Ingredients: Wheat flour, sugar, emulsifier (E322(i)), raising agent (E500(ii)), salt.",
+    "verdict": "caution",
+    "flagged": [
+      "added_sugar"
+    ]
+  },
+  {
+    "name": "eu titanium dioxide e171",
+    "text": "Ingredients: Sugar, cocoa butter, whole milk powder, colour: E171, glazing agent: shellac.",
+    "verdict": "not_approved",
+    "flagged": [
+      "titanium_dioxide",
+      "added_sugar"
+    ]
+  },
+  {
+    "name": "eu flavouring generic",
+    "text": "Ingredients: Oat flakes (60%), raisins (20%), hazelnuts (10%), flavouring.",
+    "verdict": "caution",
+    "flagged": [
+      "natural_flavors"
+    ]
+  },
+  {
+    "name": "eu nature identical",
+    "text": "Ingredients: Sugar, cocoa butter, milk powder, nature-identical flavouring (vanillin).",
+    "verdict": "not_approved",
+    "flagged": [
+      "artificial_flavors",
+      "added_sugar"
+    ]
+  },
+  {
+    "name": "eu chocolate compound",
+    "text": "Ingredients: Milk chocolate (sugar, cocoa butter, cocoa mass, skimmed milk powder, emulsifier: soya lecithin, natural vanilla flavouring), wheat flour, palm fat, salt.",
+    "verdict": "caution",
+    "flagged": [
+      "added_sugar",
+      "natural_flavors",
+      "palm_oil"
+    ]
+  },
+  {
+    "name": "eu dark chocolate 85",
+    "text": "Ingredients: Cocoa mass, cocoa butter, cocoa powder, demerara sugar, vanilla.",
+    "verdict": "caution",
+    "flagged": [
+      "added_sugar"
+    ]
+  },
+  {
+    "name": "eu dark chocolate 100",
+    "text": "Ingredients: Cocoa mass, cocoa butter, vanilla beans.",
+    "verdict": "approved",
+    "flagged": []
+  },
+  {
+    "name": "eu percentages",
+    "text": "Ingredients: Tomatoes (65%), Extra Virgin Olive Oil (8%), Onion (5%), Salt (1.5%), Basil 0.5%.",
+    "verdict": "approved",
+    "flagged": [],
+    "good": [
+      "olive_oil"
+    ]
+  },
+  {
+    "name": "eu nitrites ham",
+    "text": "Ingredients: Pork (90%), Water, Salt, Dextrose, Stabiliser: Sodium Triphosphate, Antioxidant: Sodium Ascorbate, Preservative: Sodium Nitrite.",
+    "verdict": "not_approved",
+    "flagged": [
+      "nitrites_nitrates",
+      "added_sugar"
+    ]
+  },
+  {
+    "name": "eu e250 code only",
+    "text": "Ingredients: Pork, salt, preservatives (E250, E252).",
+    "verdict": "not_approved",
+    "flagged": [
+      "nitrites_nitrates"
+    ]
+  },
+  {
+    "name": "eu sweetener codes",
+    "text": "Ingredients: Water, citric acid, sweeteners (E951, E954), flavourings.",
+    "verdict": "not_approved",
+    "flagged": [
+      "aspartame",
+      "saccharin",
+      "natural_flavors"
+    ]
+  },
+  {
+    "name": "eu carrageenan code",
+    "text": "Ingredients: Coconut milk (90%), water, thickener (E407), stabiliser (E412).",
+    "verdict": "caution",
+    "flagged": [
+      "carrageenan"
+    ]
+  },
+  {
+    "name": "eu gelatine",
+    "text": "Ingredients: Glucose syrup, sugar, gelatine, dextrose, citric acid, flavouring, colours (paprika extract, spirulina concentrate).",
+    "verdict": "caution",
+    "flagged": [
+      "added_sugar",
+      "gelatin",
+      "natural_flavors"
+    ]
+  },
+  {
+    "name": "sg instant noodles",
+    "text": "INGREDIENTS: NOODLES: WHEAT FLOUR, PALM OIL, TAPIOCA STARCH, SALT, ACIDITY REGULATORS (501(i), 500(i), 451(i)), THICKENER (412), COLOUR (101(i)). SEASONING: SALT, SUGAR, FLAVOUR ENHANCERS (621, 627, 631), GARLIC POWDER, YEAST EXTRACT. CONTAINS WHEAT AND SOY.",
+    "verdict": "caution",
+    "flagged": [
+      "added_sugar",
+      "msg",
+      "other_flavor_enhancers",
+      "palm_oil"
+    ]
+  },
+  {
+    "name": "sg edible vegetable oil",
+    "text": "Ingredients: Wheat Flour, Sugar, Edible Vegetable Oil (Palm Olein), Glucose, Milk Powder, Salt, Leavening Agents (500ii, 503ii), Emulsifier (322 from soy).",
+    "verdict": "caution",
+    "flagged": [
+      "vegetable_oil",
+      "palm_oil",
+      "added_sugar"
+    ]
+  },
+  {
+    "name": "sg kaya",
+    "text": "Ingredients: Sugar, coconut milk, eggs, pandan leaves, sodium benzoate (E211).",
+    "verdict": "caution",
+    "flagged": [
+      "added_sugar",
+      "sodium_benzoate"
+    ]
+  },
+  {
+    "name": "sg chilli sauce dyes",
+    "text": "Ingredients: Chilli, sugar, water, salt, garlic, vinegar, modified starch (1442), preservative (211), colour (129, 102).",
+    "verdict": "not_approved",
+    "flagged": [
+      "red_40",
+      "yellow_5",
+      "added_sugar",
+      "sodium_benzoate"
+    ]
+  },
+  {
+    "name": "sg soy milk",
+    "text": "Ingredients: Water, soybeans (8%), cane sugar, stabiliser (418).",
+    "verdict": "caution",
+    "flagged": [
+      "added_sugar"
+    ]
+  },
+  {
+    "name": "sg gula melaka",
+    "text": "Ingredients: Glutinous rice flour, gula melaka, coconut, salt, pandan.",
+    "verdict": "caution",
+    "flagged": [
+      "added_sugar"
+    ]
+  },
+  {
+    "name": "sg teh drink",
+    "text": "Ingredients: Water, sugar, black tea, milk powder, creamer (glucose syrup, hydrogenated vegetable oil, sodium caseinate), stabiliser (E340, E471).",
+    "verdict": "not_approved",
+    "flagged": [
+      "partially_hydrogenated_oil",
+      "added_sugar"
+    ]
+  },
+  {
+    "name": "sg ins codes",
+    "text": "Ingredients: Water, sugar, acidity regulator (INS 330), preservative (INS 211), colour (INS 102).",
+    "verdict": "not_approved",
+    "flagged": [
+      "yellow_5",
+      "added_sugar",
+      "sodium_benzoate"
+    ]
+  },
+  {
+    "name": "sg korean ramen",
+    "text": "Ingredients: Wheat flour, potato starch, palm oil, salt, modified starch, soup base: salt, sugar, MSG, red pepper powder, garlic, onion, soy sauce, caramel colour.",
+    "verdict": "caution",
+    "flagged": [
+      "palm_oil",
+      "added_sugar",
+      "msg",
+      "caramel_color"
+    ]
+  },
+  {
+    "name": "sg biscuits brand x",
+    "text": "Ingredients: Wheat Flour, Sugar, Vegetable Fat (Palm), Invert Sugar Syrup, Salt, Raising Agents (Sodium Bicarbonate, Ammonium Bicarbonate), Emulsifier (Soy Lecithin), Flavour (Butter, Vanilla).",
+    "verdict": "caution",
+    "flagged": [
+      "vegetable_oil",
+      "palm_oil",
+      "added_sugar",
+      "natural_flavors"
+    ]
+  },
+  {
+    "name": "sg kopi 3 in 1",
+    "text": "Ingredients: Sugar, non-dairy creamer (glucose syrup, hydrogenated palm kernel oil, sodium caseinate, stabilisers (E340, E452), emulsifier (E471)), instant coffee (12%).",
+    "verdict": "not_approved",
+    "flagged": [
+      "partially_hydrogenated_oil",
+      "added_sugar",
+      "palm_oil"
+    ]
+  },
+  {
+    "name": "sg coconut cookies clean",
+    "text": "Ingredients: Wheat flour, butter, coconut, eggs, honey, baking powder.",
+    "verdict": "approved",
+    "flagged": [],
+    "good": [
+      "butter_ghee_tallow"
+    ]
+  },
+  {
+    "name": "sg malay label",
+    "text": "Bahan-bahan: Tepung gandum, gula, minyak sawit, garam.",
+    "verdict": "cant_verify",
+    "flagged": []
+  },
+  {
+    "name": "sg chinese header only english",
+    "text": "配料 Ingredients: Water, soybeans, salt, wheat flour, sugar.",
+    "verdict": "caution",
+    "flagged": [
+      "added_sugar"
+    ]
+  },
+  {
+    "name": "ocr broken lines",
+    "text": "INGREDIENTS: SUGAR, ENRICHED\nFLOUR (WHEAT FLOUR, NIACIN), SUN-\nFLOWER OIL, SALT\nNutrition Facts Serving size 30g",
+    "verdict": "not_approved",
+    "flagged": [
+      "sunflower_oil",
+      "added_sugar"
+    ]
+  },
+  {
+    "name": "ocr digit confusion",
+    "text": "Ingredients: P0tatoes, cano1a oil, sa1t",
+    "verdict": "not_approved",
+    "flagged": [
+      "canola_oil"
+    ]
+  },
+  {
+    "name": "ocr rn to m",
+    "text": "Ingredients: Corn, com oil, salt",
+    "verdict": "not_approved",
+    "flagged": [
+      "corn_oil"
+    ]
+  },
+  {
+    "name": "ocr fuzzy tartrazine",
+    "text": "Ingredients: Sugar, citric acid, tartrazlne, sunset yel1ow fcf",
+    "verdict": "not_approved",
+    "flagged": [
+      "yellow_5",
+      "yellow_6",
+      "added_sugar"
+    ]
+  },
+  {
+    "name": "ocr fuzzy never approves",
+    "text": "Ingredients: avacado oil, extra virgn olive oil, sea sallt",
+    "verdict": "cant_verify",
+    "flagged": []
+  },
+  {
+    "name": "ocr unmatched majority",
+    "text": "Ingredients: water, salt, garlic, xqzt, blorf, mmmnn, glorp",
+    "verdict": "cant_verify",
+    "flagged": []
+  },
+  {
+    "name": "ocr no header",
+    "text": "Potatoes, avocado oil, sea salt",
+    "verdict": "approved",
+    "flagged": [],
+    "good": [
+      "avocado_oil"
+    ]
+  },
+  {
+    "name": "ocr marketing then header",
+    "text": "Made with simple ingredients you can trust! INGREDIENTS: Oats, almonds, honey, sea salt. Best before: see top.",
+    "verdict": "approved",
+    "flagged": []
+  },
+  {
+    "name": "ocr low confidence",
+    "text": "Ingredients: Water, salt, garlic, onion",
+    "ocrConfidence": 0.5,
+    "verdict": "cant_verify",
+    "flagged": []
+  },
+  {
+    "name": "ocr low confidence still flags bad",
+    "text": "Ingredients: Water, canola oil, salt",
+    "ocrConfidence": 0.4,
+    "verdict": "not_approved",
+    "flagged": [
+      "canola_oil"
+    ]
+  },
+  {
+    "name": "ocr unbalanced bracket",
+    "text": "Ingredients: Chocolate (sugar, cocoa butter, soy lecithin, salt, corn oil",
+    "verdict": "not_approved",
+    "flagged": [
+      "corn_oil",
+      "added_sugar"
+    ]
+  },
+  {
+    "name": "ocr square brackets",
+    "text": "Ingredients: Seasoning [salt, sugar, yeast extract, red 40], potatoes, avocado oil.",
+    "verdict": "not_approved",
+    "flagged": [
+      "red_40",
+      "added_sugar"
+    ],
+    "good": [
+      "avocado_oil"
+    ]
+  },
+  {
+    "name": "ocr semicolons",
+    "text": "Ingredients: water; salt; sugar; spices",
+    "verdict": "caution",
+    "flagged": [
+      "added_sugar"
+    ]
+  },
+  {
+    "name": "notes do not flag",
+    "text": "Ingredients: Almonds, cashews, sea salt. May contain traces of peanuts and soybean oil. Made in a facility that also processes wheat.",
+    "verdict": "approved",
+    "flagged": [],
+    "notes": 2
+  },
+  {
+    "name": "allergen tail ignored",
+    "text": "Ingredients: Rice, water, salt. Allergens: none. Contains: canola oil residue warning.",
+    "verdict": "approved",
+    "flagged": []
+  },
+  {
+    "name": "storage tail ignored",
+    "text": "Ingredients: Oats, raisins, cinnamon. Storage: keep in a cool dry place away from canola oil.",
+    "verdict": "approved",
+    "flagged": []
+  },
+  {
+    "name": "manufactured by tail",
+    "text": "Ingredients: Water, tomatoes, salt. Manufactured by: Sugar Foods Pte Ltd, Singapore.",
+    "verdict": "approved",
+    "flagged": []
+  },
+  {
+    "name": "settings strict natural flavors",
+    "text": "Ingredients: Water, apple juice, natural flavor, lemon juice.",
+    "settings": {
+      "strictMode": true
+    },
+    "verdict": "not_approved",
+    "flagged": [
+      "natural_flavors"
+    ]
+  },
+  {
+    "name": "settings strict gums borderline",
+    "text": "Ingredients: Coconut milk, water, guar gum.",
+    "settings": {
+      "strictMode": true
+    },
+    "verdict": "caution",
+    "flagged": [
+      "gums"
+    ]
+  },
+  {
+    "name": "settings standard gums neutral",
+    "text": "Ingredients: Coconut milk, water, guar gum.",
+    "verdict": "approved",
+    "flagged": []
+  },
+  {
+    "name": "settings ignore sugar",
+    "text": "Ingredients: Oats, sugar, salt, cinnamon.",
+    "settings": {
+      "disabledCategories": [
+        "sugar"
+      ]
+    },
+    "verdict": "approved",
+    "flagged": []
+  },
+  {
+    "name": "settings allow high oleic",
+    "text": "Ingredients: Potatoes, high oleic sunflower oil, sea salt.",
+    "settings": {
+      "disabledIngredients": [
+        "high_oleic_oil"
+      ]
+    },
+    "verdict": "approved",
+    "flagged": []
+  },
+  {
+    "name": "settings no gelatin",
+    "text": "Ingredients: Water, sugar, gelatin, citric acid.",
+    "settings": {
+      "noGelatin": true
+    },
+    "verdict": "not_approved",
+    "flagged": [
+      "gelatin",
+      "added_sugar"
+    ]
+  },
+  {
+    "name": "settings ignore seed oils",
+    "text": "Ingredients: Potatoes, canola oil, salt.",
+    "settings": {
+      "disabledCategories": [
+        "seed_oil"
+      ]
+    },
+    "verdict": "approved",
+    "flagged": []
+  },
+  {
+    "name": "settings good_fat not toggleable",
+    "text": "Ingredients: Potatoes, avocado oil, salt.",
+    "settings": {
+      "disabledCategories": [
+        "good_fat"
+      ]
+    },
+    "verdict": "approved",
+    "flagged": [],
+    "good": [
+      "avocado_oil"
+    ]
+  }
 ]

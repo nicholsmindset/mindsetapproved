@@ -4,8 +4,6 @@ export const DISCLAIMER =
 
 export const OFF_ATTRIBUTION = 'Contains data from Open Food Facts, available under the Open Database License.';
 
-/** Manufacturer and user correction channel (PRD). Set EXPO_PUBLIC_CORRECTIONS_EMAIL; the link is hidden until then. */
-export const CORRECTIONS_EMAIL = process.env.EXPO_PUBLIC_CORRECTIONS_EMAIL ?? '';
 
 export const REPORT_REASONS = [
   'An ingredient was misread',

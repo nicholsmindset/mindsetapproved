@@ -1,6 +1,6 @@
 import { eCode, type Rules } from './bundle';
 import { fuzzyLookup } from './fuzzy';
-import { normKey, pluralVariants, stripFiller, stripPercent } from './normalize';
+import { isNoiseKey, normKey, pluralVariants, stripFiller, stripPercent } from './normalize';
 import type { RawItem } from './split';
 import type { IngredientMatch, ParsedItem } from './types';
 
@@ -69,7 +69,7 @@ function scan(key: string, rules: Rules, kind: IngredientMatch['kind'] = 'alias'
     const t = tokens[i]!;
     let codeLen = 0;
     let code: string | null = null;
-    if (/^e\d{3,4}[a-z]*$/.test(t)) {
+    if (/^(?:e|ins)\d{3,4}[a-z]*$/.test(t)) {
       code = eCode(t);
       codeLen = 1;
     } else if (allowBare && /^\d{3,4}[a-z]*$/.test(t)) {
@@ -149,19 +149,20 @@ function matchKey(key: string, ctx: Ctx, rules: Rules): ScanResult {
     const lastWord = parts[parts.length - 1]!.split(' ').pop()!;
     const heads = HEADS.has(lastWord) ? [lastWord] : ctx.parentHead ? [ctx.parentHead] : [];
     for (const part of parts) {
-      const r = scan(part, rules);
-      if (r.matches.length === 0) {
-        for (const h of heads) {
-          const hit = lookupPhrase(`${part} ${h}`, rules);
-          if (hit) {
-            res.matches.push({ ingredientId: hit.id, matched: hit.alias, kind: 'alias', possible: false });
-            break;
-          }
-        }
-      } else {
-        res.matches.push(...r.matches);
+      // "rapeseed and soybean" under an oils parent: the head noun wins over the bare word ("soybean" the food)
+      let hit: { id: string; alias: string } | null = null;
+      for (const h of heads) {
+        if (part.endsWith(` ${h}`)) break;
+        hit = lookupPhrase(`${part} ${h}`, rules);
+        if (hit) break;
       }
+      if (hit) res.matches.push({ ingredientId: hit.id, matched: hit.alias, kind: 'alias', possible: false });
+      else res.matches.push(...scan(part, rules).matches);
     }
+    // the whole-item scan may have matched a part as a bare word; drop what the head-noun reading replaced
+    res.matches = res.matches.filter(
+      (m, i, all) => !(rules.byId.get(m.ingredientId)?.category === 'basic' && all.some((o) => o !== m && o.matched.startsWith(`${m.matched} `))),
+    );
   }
 
   // 4. "butter flavor" is a flavouring, not butter; "artificial strawberry flavour" is artificial
@@ -210,6 +211,11 @@ export function matchItems(raw: RawItem[], rules: Rules): MatchOutput {
 
       // "Colour (102, 110)" -> E102, E110
       if ((parentCtx.isClass || classPrefix) && /^\d{3,4}[a-z]*$/.test(key)) key = eCode(`e${key}`) ?? key;
+      // A bare number elsewhere is only taken as an INS code when that code is a known rule ("471", "1422").
+      else if (/^\d{3,4}\s?[a-f]?(?:\s?(?:i{1,3}|iv|vi?))?$/.test(key)) {
+        const code = eCode(`e${key.replace(/\s/g, '')}`);
+        if (code && (rules.eNumbers.has(code) || rules.eNumbers.has(code.replace(/[a-z]$/, '')))) key = code;
+      }
 
       const heads: string[] = [];
       const wordCount = key.split(' ').length;
@@ -226,7 +232,8 @@ export function matchItems(raw: RawItem[], rules: Rules): MatchOutput {
         }
       }
 
-      if (!key && it.children.length === 0) return; // e.g. "(60%)"
+      // e.g. "(60%)", or OCR/markup leftovers such as a lone "l" or "2"
+      if (it.children.length === 0 && isNoiseKey(key)) return;
 
       const item: ParsedItem = {
         text: it.name,

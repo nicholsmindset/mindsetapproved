@@ -2,7 +2,10 @@
  * One-off importer for OFF taxonomy synonyms.
  *   pnpm off:import --file additives.txt [--langs en,fr] [--out supabase/off-additives.sql]
  *   pnpm off:import --url <raw taxonomy URL> ...
- * Taxonomy files live in the openfoodfacts/openfoodfacts-server repository (taxonomies/).
+ * Taxonomy files live in the openfoodfacts/openfoodfacts-server repository:
+ *   https://raw.githubusercontent.com/openfoodfacts/openfoodfacts-server/main/taxonomies/additives.txt
+ *   https://raw.githubusercontent.com/openfoodfacts/openfoodfacts-server/main/taxonomies/food/ingredients.txt
+ * (fetch through the HTTPS proxy with NODE_USE_ENV_PROXY=1 where one is required).
  * Entries whose names already match a starter rule are skipped.
  */
 import { readFileSync, writeFileSync } from 'node:fs';
@@ -16,7 +19,13 @@ async function main() {
   const file = arg('file');
   const url = arg('url');
   if (!file && !url) throw new Error('Pass --file <path> or --url <url>');
-  const text = file ? readFileSync(file, 'utf8') : await (await fetch(url!)).text();
+  let text: string;
+  if (file) text = readFileSync(file, 'utf8');
+  else {
+    const res = await fetch(url!);
+    if (!res.ok) throw new Error(`Download failed (${res.status}) for ${url}`);
+    text = await res.text();
+  }
   const langs = (arg('langs') ?? 'en').split(',');
   const known = loadRules(compileBundle(rowsFromSource(readStarter())));
   const plan = planImport(parseTaxonomy(text), { langs, known });

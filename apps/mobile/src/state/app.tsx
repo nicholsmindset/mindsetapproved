@@ -3,6 +3,7 @@ import { randomUUID } from 'expo-crypto';
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { AppState } from 'react-native';
 import { lookupProduct, type ProductHit } from '@/core/product-lookup';
+import { mergeRemote, REMOTE_SCAN_COLUMNS, type RemoteScan } from '@/core/history-sync';
 import { resolveOnSignIn, toRow, type SettingsRow } from '@/core/settings-sync';
 import { checkForUpdate, initialRules, type LatestVersion } from '@/core/rules-sync';
 import { recheckEdited, runScan, type ScanEffects, type ScanInput, type ScanOutcome } from '@/core/scan-pipeline';
@@ -34,6 +35,9 @@ interface AppCtx {
   sendCode(email: string): Promise<{ ok: boolean; error?: string }>;
   verifyCode(email: string, code: string): Promise<{ ok: boolean; error?: string }>;
   signOut(): Promise<void>;
+  setFavourite(entryId: string, favourite: boolean): void;
+  /** Pulls the account's scans from other devices into local history. */
+  pullHistory(): Promise<number>;
   /** Server share code for a scan (creates it once). */
   shareCode(entryId: string): Promise<{ code?: string; error?: string }>;
 }
@@ -44,9 +48,11 @@ const store = createStore(deviceKV, randomUUID);
 
 const effects: ScanEffects | null = supabase
   ? {
-      insertScan: async (row) => {
+      insertScan: async (row, fullText) => {
         const { data } = await supabase!.auth.getSession();
-        const { error } = await supabase!.from('scans').insert({ ...row, user_id: data.session?.user.id ?? null });
+        const uid = data.session?.user.id ?? null;
+        // Signed in: keep the ingredient text with the scan so history can follow the account to other devices.
+        const { error } = await supabase!.from('scans').insert({ ...row, user_id: uid, ocr_text: row.ocr_text ?? (uid ? fullText.slice(0, 8000) : null) });
         if (error) throw error;
       },
       logUnmatched: async (terms, example) => {
@@ -69,11 +75,22 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [account, setAccount] = useState<string | null>(null);
   const userId = useRef<string | null>(null);
 
+  const pullHistory = useCallback(async () => {
+    if (!supabase || !userId.current) return 0;
+    const { data, error } = await supabase.from('scans').select(REMOTE_SCAN_COLUMNS).eq('user_id', userId.current).order('created_at', { ascending: false }).limit(500);
+    if (error || !data) return 0;
+    const { merged, added } = mergeRemote(store.getHistory(), data as RemoteScan[]);
+    store.setHistory(merged);
+    setHistoryVersion((v) => v + 1);
+    return added;
+  }, []);
+
   useEffect(() => {
     if (!supabase) return;
     void supabase.auth.getSession().then(({ data }) => {
       userId.current = data.session?.user.id ?? null;
       setAccount(data.session?.user.email ?? null);
+      if (userId.current) void pullHistory();
     });
     const { data: sub } = supabase.auth.onAuthStateChange((_e, session) => {
       userId.current = session?.user.id ?? null;
@@ -149,6 +166,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         store.setSettings(resolved.settings);
         setSettingsState(resolved.settings);
         if (resolved.upload) await supabase.from('user_settings').upsert(toRow(data.user.id, resolved.settings));
+        await pullHistory();
         return { ok: true };
       },
       async signOut() {
@@ -173,8 +191,25 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       recheck(entryId, text) {
         const out = recheckEdited(entryId, text, { rules, settings, store, effects });
         setHistoryVersion((v) => v + 1);
+        const remoteId = out?.entry.remoteScanId;
+        if (out && remoteId && supabase && userId.current) {
+          supabase
+            .rpc('update_my_scan', { p_scan_id: remoteId, p_ocr_text: text, p_verdict: out.result.verdict })
+            .then(({ error }) => error && console.warn('history sync failed', error.message));
+        }
         return out;
       },
+      setFavourite(entryId, favourite) {
+        store.updateEntry(entryId, { favourite });
+        setHistoryVersion((v) => v + 1);
+        const remoteId = store.getEntry(entryId)?.remoteScanId;
+        if (remoteId && supabase && userId.current) {
+          supabase
+            .rpc('update_my_scan', { p_scan_id: remoteId, p_favourite: favourite })
+            .then(({ error }) => error && console.warn('favourite sync failed', error.message));
+        }
+      },
+      pullHistory,
       lookup: (barcode) =>
         lookupProduct(barcode, {
           store,
@@ -214,7 +249,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         return { ok: true };
       },
     }),
-    [rules, settings, online, onboarded, historyVersion, account, syncRules],
+    [rules, settings, online, onboarded, historyVersion, account, syncRules, pullHistory],
   );
 
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;
