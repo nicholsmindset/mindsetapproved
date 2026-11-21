@@ -15,6 +15,7 @@ export default function TabsLayout() {
         tabBarActiveTintColor: c.accent,
         tabBarInactiveTintColor: c.muted,
         tabBarStyle: { backgroundColor: c.surface, borderTopColor: c.border },
+        tabBarLabelStyle: { fontSize: 12, lineHeight: 16 },
         sceneStyle: { backgroundColor: c.bg },
       }}
     >

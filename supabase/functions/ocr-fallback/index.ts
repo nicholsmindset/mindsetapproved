@@ -3,7 +3,8 @@
 // The photo is processed in memory and never stored.
 //
 // POST { "image": "<base64 jpeg>", "mimeType"?: "image/jpeg", "installId": "<uuid>" }
-// Secrets: GEMINI_API_KEY. Optional: GEMINI_MODEL (default gemini-2.5-flash-lite), AI_DAILY_LIMIT (default 3).
+// Secrets: GEMINI_API_KEY. Optional: GEMINI_MODEL (default gemini-2.5-flash-lite), AI_DAILY_LIMIT (default 3),
+// GEMINI_BASE_URL (tests only).
 import { createClient } from 'npm:@supabase/supabase-js@2.119.2';
 import { geminiRequest, parseGemini } from './gemini.ts';
 
@@ -40,7 +41,8 @@ Deno.serve(async (req) => {
   if (left === -1) return json({ error: `You've used today's ${limit} AI re-checks.`, remaining: 0 }, 429);
 
   const model = Deno.env.get('GEMINI_MODEL') ?? 'gemini-2.5-flash-lite';
-  const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`, {
+  const base = Deno.env.get('GEMINI_BASE_URL') ?? 'https://generativelanguage.googleapis.com';
+  const res = await fetch(`${base}/v1beta/models/${model}:generateContent`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', 'x-goog-api-key': Deno.env.get('GEMINI_API_KEY') ?? '' },
     body: JSON.stringify(geminiRequest(body.image, mimeType)),

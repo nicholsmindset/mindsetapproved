@@ -13,6 +13,11 @@ import { REPORT_REASONS } from '@/ui/copy';
 import { Button, Card, H2, P, Screen } from '@/ui/kit';
 import { radius, space, tierStyle, useColors, verdictStyle } from '@/ui/theme';
 
+function detail(summary: string): string {
+  const rest = summary.split(' — ')[1] ?? summary;
+  return rest.charAt(0).toUpperCase() + rest.slice(1);
+}
+
 export default function ResultScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const app = useApp();
@@ -86,8 +91,9 @@ export default function ResultScreen() {
           <Ionicons name={v.icon} size={30} color={v.fg} />
           <Text style={{ color: v.fg, fontSize: 22, fontWeight: '700', flex: 1 }}>{v.label}</Text>
         </View>
-        <Text testID="summary" style={{ color: c.text, fontSize: 17, lineHeight: 23 }}>
-          {result.summary}
+        {/* The PRD sentence is "Not Approved — contains …"; the heading already says the verdict, so show the rest. */}
+        <Text testID="summary" accessibilityLabel={result.summary} style={{ color: c.text, fontSize: 17, lineHeight: 23 }}>
+          {detail(result.summary)}
         </Text>
         {entry.brand || entry.barcode ? (
           <Text style={{ color: c.muted, fontSize: 13 }}>{[entry.brand, entry.barcode].filter(Boolean).join(' · ')}</Text>
