@@ -10,7 +10,9 @@
     "bundle:build": "tsx scripts/compile-bundle.ts",
     "off:import": "tsx scripts/import-off-taxonomy/index.ts",
     "check:sql": "scripts/check-sql.sh",
-    "deno:shared": "tsx scripts/build-deno-shared.ts"
+    "deno:shared": "tsx scripts/build-deno-shared.ts",
+    "benchmark:fetch": "tsx scripts/benchmark/fetch.ts",
+    "benchmark": "tsx scripts/benchmark/run.ts"
   },
   "devDependencies": {
     "@types/node": "^22.10.0",

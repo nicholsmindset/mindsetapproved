@@ -11,10 +11,10 @@ export function isAdmin(user: Pick<User, 'app_metadata'> | null | undefined): bo
 
 /** For data pages: returns a client for the signed-in admin, or redirects to /login. */
 export async function requireAdmin(): Promise<{ supabase: SupabaseClient; user: User }> {
-  if (!hasSupabase) redirect('/setup');
+  if (!hasSupabase) redirect('/admin/setup');
   const supabase = await createClient();
   const { data } = await supabase.auth.getUser();
-  if (!data.user) redirect('/login');
-  if (!isAdmin(data.user)) redirect('/login?error=not_admin');
+  if (!data.user) redirect('/admin/login');
+  if (!isAdmin(data.user)) redirect('/admin/login?error=not_admin');
   return { supabase, user: data.user };
 }

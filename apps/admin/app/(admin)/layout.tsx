@@ -15,7 +15,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   return (
     <div className={styles.shell}>
       <aside className={styles.side}>
-        <Link href="/test-bench" className={styles.brand}>
+        <Link href="/admin/test-bench" className={styles.brand}>
           <span className={styles.mark} aria-hidden>
             MA
           </span>

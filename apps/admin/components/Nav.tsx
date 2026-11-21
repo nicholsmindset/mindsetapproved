@@ -4,13 +4,14 @@ import { usePathname } from 'next/navigation';
 import styles from './Nav.module.css';
 
 const LINKS = [
-  ['/test-bench', 'Test bench'],
-  ['/ingredients', 'Ingredients'],
-  ['/unmatched', 'Unmatched'],
-  ['/reports', 'Reports'],
-  ['/publish', 'Publish'],
-  ['/products', 'Products'],
-  ['/stats', 'Stats'],
+  ['/admin/test-bench', 'Test bench'],
+  ['/admin/ingredients', 'Ingredients'],
+  ['/admin/unmatched', 'Unmatched'],
+  ['/admin/reports', 'Reports'],
+  ['/admin/corrections', 'Corrections'],
+  ['/admin/publish', 'Publish'],
+  ['/admin/products', 'Products'],
+  ['/admin/stats', 'Stats'],
 ] as const;
 
 export function Nav() {

@@ -3,10 +3,13 @@ import { NextResponse, type NextRequest } from 'next/server';
 
 const URL_ = process.env.NEXT_PUBLIC_SUPABASE_URL ?? '';
 const KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? '';
-const PUBLIC_PATHS = ['/login', '/auth', '/setup', '/v'];
+/** Only /admin is private; the site, share pages and auth callback are public. */
+const OPEN_ADMIN_PATHS = ['/admin/login', '/admin/setup'];
 
-/** Refreshes the Supabase session and keeps non-admins out of every page but /login. */
+/** Refreshes the Supabase session on /admin and keeps non-admins out of it. */
 export async function proxy(request: NextRequest) {
+  const isAdmin = request.nextUrl.pathname === '/admin' || request.nextUrl.pathname.startsWith('/admin/');
+  if (!isAdmin) return NextResponse.next();
   // Offline mode: no project configured, pages fall back to the starter rules or a setup notice.
   if (!URL_ || !KEY) return NextResponse.next();
 
@@ -23,11 +26,11 @@ export async function proxy(request: NextRequest) {
   });
   const { data } = await supabase.auth.getUser();
   const path = request.nextUrl.pathname;
-  if (PUBLIC_PATHS.some((p) => path === p || path.startsWith(`${p}/`))) return response;
+  if (OPEN_ADMIN_PATHS.some((p) => path === p || path.startsWith(`${p}/`))) return response;
 
   if (data.user?.app_metadata?.['role'] !== 'admin') {
     const login = request.nextUrl.clone();
-    login.pathname = '/login';
+    login.pathname = '/admin/login';
     login.search = data.user ? '?error=not_admin' : `?next=${encodeURIComponent(path)}`;
     return NextResponse.redirect(login);
   }
@@ -35,5 +38,5 @@ export async function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/((?!_next/static|_next/image|favicon.ico|icon.svg).*)'],
+  matcher: ['/admin', '/admin/:path*'],
 };

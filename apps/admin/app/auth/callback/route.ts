@@ -15,9 +15,9 @@ export async function GET(request: NextRequest) {
   const params = request.nextUrl.searchParams;
   const code = params.get('code');
   const nextParam = params.get('next');
-  const next = nextParam?.startsWith('/') && !nextParam.startsWith('//') ? nextParam : '/test-bench';
-  if (!code) return redirectTo('/login?error=Missing%20sign-in%20code');
+  const next = nextParam?.startsWith('/') && !nextParam.startsWith('//') ? nextParam : '/admin/test-bench';
+  if (!code) return redirectTo('/admin/login?error=Missing%20sign-in%20code');
   const { error } = await (await createClient()).auth.exchangeCodeForSession(code);
-  if (error) return redirectTo(`/login?error=${encodeURIComponent(error.message)}`);
+  if (error) return redirectTo(`/admin/login?error=${encodeURIComponent(error.message)}`);
   return redirectTo(next);
 }

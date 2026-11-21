@@ -1,0 +1,14 @@
+.legend { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin: 8px 0 8px; }
+.category { margin-top: 32px; }
+.category h2 { font-size: 1.3rem; }
+.list { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 12px; }
+.rule { background: var(--surface); border: 1px solid var(--border); border-left-width: 4px; border-radius: 12px; padding: 14px 16px; }
+.rule header { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.rule h3 { margin: 0; font-size: 1.02rem; flex: 1 1 auto; }
+.rule p { margin: 8px 0 0; line-height: 1.5; }
+.rule summary { cursor: pointer; color: var(--muted); font-size: 0.85rem; margin-top: 8px; }
+.aliases { font-family: var(--mono); font-size: 0.8rem; color: var(--muted); }
+.edge_bad { border-left-color: var(--bad); }
+.edge_borderline { border-left-color: var(--borderline); }
+.edge_good { border-left-color: var(--good); }
+.edge_neutral { border-left-color: var(--neutral); }

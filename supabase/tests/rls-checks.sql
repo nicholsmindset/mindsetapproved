@@ -231,4 +231,46 @@ reset role;
 do $$ begin
   assert not exists (select 1 from public.shared_verdicts where scan_id = '30000000-0000-0000-0000-000000000001'), 'delete-my-data removes shares';
 end $$;
+-- corrections and history sync
+set role anon;
+set request.jwt.claims = '{}';
+do $$
+declare i int;
+begin
+  for i in 1..5 loop
+    perform public.submit_correction('manufacturer', 'Crunchy Corn Chips', 'Our recipe changed in 2026; it no longer contains Red 40.', 'abcdef0123456789abcdef', '9556001000017', 'qa@example.test');
+  end loop;
+  begin
+    perform public.submit_correction('shopper', 'X', 'This is the sixth message.', 'abcdef0123456789abcdef');
+    raise exception 'rate limit not enforced';
+  exception when raise_exception then null;
+  end;
+  perform public.submit_correction('shopper', 'Y', 'Another sender is fine.', 'fedcba9876543210fedcba');
+  begin
+    perform public.submit_correction('shopper', 'Y', 'short', 'fedcba9876543210fedcba');
+    raise exception 'short message accepted';
+  exception when check_violation then null;
+  end;
+  assert (select count(*) from public.corrections) = 0, 'anon cannot read corrections';
+end $$;
+reset role;
+do $$ begin
+  assert (select count(*) from public.corrections) = 6, 'six corrections stored';
+end $$;
+insert into public.scans (id, user_id, verdict) values ('50000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-000000000002', 'caution');
+set role authenticated;
+set request.jwt.claims = '{"sub": "00000000-0000-0000-0000-000000000001", "role": "authenticated"}';
+do $$ begin
+  begin
+    perform public.update_my_scan('50000000-0000-0000-0000-000000000001', true);
+    raise exception 'updated another user''s scan';
+  exception when no_data_found then null;
+  end;
+end $$;
+set request.jwt.claims = '{"sub": "00000000-0000-0000-0000-000000000002", "role": "authenticated"}';
+select public.update_my_scan('50000000-0000-0000-0000-000000000001', true, 'Ingredients: water', 'approved');
+reset role;
+do $$ begin
+  assert (select favourite and verdict = 'approved' from public.scans where id = '50000000-0000-0000-0000-000000000001'), 'own scan updated';
+end $$;
 \echo 'All SQL checks passed'
