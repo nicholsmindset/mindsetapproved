@@ -5,7 +5,7 @@ import { Linking, Pressable, StyleSheet, Text, View } from 'react-native';
 import { Camera, useCameraDevice, useCameraPermission, usePhotoOutput } from 'react-native-vision-camera';
 import { useBarcodeScannerOutput, type Barcode } from 'react-native-vision-camera-barcode-scanner';
 import { Button, P } from '@/ui/kit';
-import { font, radius, space, useColors } from '@/ui/theme';
+import { radius, space, type, useColors } from '@/ui/theme';
 import type { ScannerProps } from './types';
 
 const FORMATS = ['ean-13', 'ean-8', 'upc-a', 'upc-e'] as const;
@@ -128,12 +128,12 @@ export function Scanner({ mode, active, onBarcode, onPhoto }: ScannerProps) {
 }
 
 const styles = StyleSheet.create({
-  fill: { flex: 1, backgroundColor: '#000', borderRadius: radius.md, overflow: 'hidden' },
+  fill: { flex: 1, backgroundColor: '#000', borderRadius: radius.xl, borderCurve: 'continuous', overflow: 'hidden' },
   center: { alignItems: 'center', justifyContent: 'center' },
-  corner: { position: 'absolute', width: 28, height: 28, borderColor: '#fff' },
-  scanLine: { position: 'absolute', left: '8%', right: '8%', top: '50%', height: 2, backgroundColor: 'rgba(255,90,70,0.9)' },
-  hint: { color: '#fff', marginTop: space.lg, fontSize: 17, fontFamily: font.display, letterSpacing: 0.8, textTransform: 'uppercase', textShadowColor: 'rgba(0,0,0,0.7)', textShadowRadius: 6 },
+  corner: { position: 'absolute', width: 34, height: 34, borderColor: '#fff', borderRadius: 14 },
+  scanLine: { position: 'absolute', left: '8%', right: '8%', top: '50%', height: 2, borderRadius: 1, backgroundColor: 'rgba(255,255,255,0.75)' },
+  hint: { ...type.headline, color: '#fff', marginTop: space.lg, textShadowColor: 'rgba(0,0,0,0.6)', textShadowRadius: 8 },
   controls: { position: 'absolute', bottom: space.lg, left: space.lg, right: space.lg, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
-  round: { width: 48, height: 48, borderRadius: 24, backgroundColor: 'rgba(0,0,0,0.45)', alignItems: 'center', justifyContent: 'center' },
+  round: { width: 48, height: 48, borderRadius: 24, backgroundColor: 'rgba(255,255,255,0.18)', alignItems: 'center', justifyContent: 'center', borderWidth: StyleSheet.hairlineWidth, borderColor: 'rgba(255,255,255,0.35)' },
   shutter: { width: 72, height: 72, borderRadius: 36, backgroundColor: '#fff', borderWidth: 5, borderColor: 'rgba(255,255,255,0.45)' },
 });

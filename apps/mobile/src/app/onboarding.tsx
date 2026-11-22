@@ -1,81 +1,88 @@
-import { analyze } from '@mindset/rules-engine';
-import { useMemo, useState } from 'react';
-import { Text, View } from 'react-native';
+import { useState } from 'react';
+import { ScrollView, Text, View } from 'react-native';
+import Animated from 'react-native-reanimated';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useApp } from '@/state/app';
-import { AnnotatedLabel } from '@/ui/chips';
 import { DISCLAIMER } from '@/ui/copy';
-import { Button, Mono, P, Screen, Stamp } from '@/ui/kit';
-import { font, space, useColors } from '@/ui/theme';
+import { Button, enter, IconTile } from '@/ui/kit';
+import { Icon, type IconName } from '@/ui/Icon';
+import { MAX_WIDTH, space, type, useColors } from '@/ui/theme';
 
-const SAMPLE = 'Ingredients: Wheat flour, sugar, canola oil, cocoa powder (4%), salt, natural flavour.';
-
-const STEPS = [
+const FEATURES: { symbol: IconName; color: 'accent' | 'good' | 'borderline' | 'bad'; title: string; body: string }[] = [
   {
-    kicker: 'How it works',
-    title: 'Scan the barcode. Or the label.',
-    body: 'A barcode gives an instant answer. If the product isn’t in a database, photograph the ingredient list instead. That works for local and imported products, in English, Malay, Chinese, Japanese and Korean.',
+    symbol: 'barcode.viewfinder',
+    color: 'accent',
+    title: 'Scan a barcode or a label',
+    body: 'Barcodes give an instant answer. For anything else, photograph the ingredient list, in English, Malay, Chinese, Japanese or Korean.',
   },
   {
-    kicker: 'Every reason shown',
-    title: 'Read the label the way we do.',
-    body: 'Flagged ingredients are marked right on the ingredient list, in the order the pack lists them. Tap one to see the rule behind it.',
-    sample: true,
+    symbol: 'checkmark.seal.fill',
+    color: 'good',
+    title: 'A clear verdict',
+    body: 'Approved, Caution or Not Approved, with every flagged ingredient marked on the label and the rule behind it.',
   },
   {
-    kicker: 'Three verdicts',
-    title: 'Approved, Caution or Not Approved.',
-    body: 'Turn on Strict mode, or switch off categories you don’t care about, like added sugar. Verdicts follow Mindset’s ingredient preferences, and you can change them.',
-    stamps: true,
+    symbol: 'slider.horizontal.3',
+    color: 'borderline',
+    title: 'Your rules',
+    body: 'Turn on Strict mode, or switch off what you don’t care about. Every verdict follows your settings.',
   },
 ];
 
+/** Apple-style welcome: the app's promise in three lines, then the medical disclaimer. */
 export default function Onboarding() {
-  const { completeOnboarding, rules } = useApp();
+  const { completeOnboarding } = useApp();
   const c = useColors();
-  const [step, setStep] = useState(0);
-  const last = step === STEPS.length;
-  const sample = useMemo(() => analyze(SAMPLE, rules), [rules]);
-  const s = STEPS[step];
+  const [disclaimer, setDisclaimer] = useState(false);
 
   return (
-    <Screen edges={['top', 'bottom']}>
-      <View style={{ flexDirection: 'row', gap: 4 }} accessibilityLabel={`Step ${step + 1} of ${STEPS.length + 1}`}>
-        {[...STEPS, null].map((_, i) => (
-          <View key={i} style={{ flex: 1, height: 4, backgroundColor: i <= step ? c.rule : c.border }} />
-        ))}
-      </View>
-
-      <View style={{ flex: 1, justifyContent: 'center', gap: space.lg, paddingVertical: space.xl }}>
-        <Mono>{last ? 'BEFORE YOU START' : `${String(step + 1).padStart(2, '0')} / ${s!.kicker.toUpperCase()}`}</Mono>
-        <Text accessibilityRole="header" style={{ fontFamily: font.heavy, fontSize: 44, lineHeight: 44, color: c.text, textTransform: 'uppercase' }}>
-          {last ? 'Not a medical device.' : s!.title}
-        </Text>
-        <View style={{ height: 6, backgroundColor: c.rule }} />
-        {last ? (
-          <P style={{ fontSize: 17, lineHeight: 25 }}>{DISCLAIMER}</P>
-        ) : (
-          <>
-            <P style={{ fontSize: 17, lineHeight: 25 }}>{s!.body}</P>
-            {s!.sample ? <AnnotatedLabel result={sample} selected={null} onSelect={() => {}} /> : null}
-            {s!.stamps ? (
-              <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: space.lg, paddingTop: space.sm }}>
-                <Stamp verdict="approved" size="md" />
-                <Stamp verdict="caution" size="md" />
-                <Stamp verdict="not_approved" size="md" />
+    <SafeAreaView style={{ flex: 1, backgroundColor: c.surface }} edges={['top', 'bottom']}>
+      <ScrollView contentContainerStyle={{ flexGrow: 1, alignItems: 'center' }}>
+        <View style={{ width: '100%', maxWidth: MAX_WIDTH, flexGrow: 1, paddingHorizontal: space.xl, paddingTop: 56, paddingBottom: space.xl }}>
+          {disclaimer ? (
+            <Animated.View key="d" entering={enter()} style={{ gap: space.lg, alignItems: 'center' }}>
+              <IconTile symbol="hand.raised.fill" color={c.borderline} size={72} />
+              <Text accessibilityRole="header" style={[type.largeTitle, { color: c.text, textAlign: 'center' }]}>
+                Before you start
+              </Text>
+              <Text style={[type.body, { color: c.muted, textAlign: 'center' }]}>{DISCLAIMER}</Text>
+            </Animated.View>
+          ) : (
+            <Animated.View key="w" entering={enter()} style={{ gap: space.xl }}>
+              <View style={{ alignItems: 'center', gap: space.lg }}>
+                <IconTile symbol="checkmark.seal.fill" color={c.accent} size={84} />
+                <Text accessibilityRole="header" style={[type.largeTitle, { color: c.text, textAlign: 'center' }]}>
+                  Welcome to{'\n'}Mindset Approved
+                </Text>
               </View>
-            ) : null}
-          </>
-        )}
-      </View>
-
-      <View style={{ flexDirection: 'row', gap: space.sm, justifyContent: 'flex-end' }}>
-        {step > 0 ? <Button kind="ghost" label="Back" onPress={() => setStep(step - 1)} /> : null}
-        {last ? (
-          <Button kind="primary" label="I understand" icon="checkmark" onPress={completeOnboarding} />
-        ) : (
-          <Button kind="primary" label="Next" icon="arrow-forward" onPress={() => setStep(step + 1)} />
-        )}
-      </View>
-    </Screen>
+              <View style={{ gap: space.xl, marginTop: space.md }}>
+                {FEATURES.map((f, i) => (
+                  <Animated.View key={f.title} entering={enter(120 + i * 90)} style={{ flexDirection: 'row', gap: space.lg, alignItems: 'flex-start' }}>
+                    <View style={{ width: 44, alignItems: 'center', paddingTop: 2 }}>
+                      <Icon name={f.symbol} size={32} color={c[f.color]} />
+                    </View>
+                    <View style={{ flex: 1, gap: 2 }}>
+                      <Text style={[type.headline, { color: c.text }]}>{f.title}</Text>
+                      <Text style={[type.subhead, { color: c.muted }]}>{f.body}</Text>
+                    </View>
+                  </Animated.View>
+                ))}
+              </View>
+            </Animated.View>
+          )}
+          <View style={{ flex: 1, minHeight: space.xl }} />
+          <View style={{ gap: space.md }}>
+            {disclaimer ? (
+              <>
+                <Button kind="primary" label="I understand" onPress={completeOnboarding} />
+                <Button kind="ghost" label="Back" onPress={() => setDisclaimer(false)} />
+              </>
+            ) : (
+              <Button kind="primary" label="Continue" onPress={() => setDisclaimer(true)} />
+            )}
+          </View>
+        </View>
+      </ScrollView>
+    </SafeAreaView>
   );
 }

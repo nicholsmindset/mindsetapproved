@@ -1,8 +1,10 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { analyze } from '@mindset/rules-engine';
 import { Stack, useLocalSearchParams } from 'expo-router';
-import { type ComponentRef, useMemo, useRef, useState } from 'react';
+import * as Haptics from 'expo-haptics';
+import { type ComponentRef, useEffect, useMemo, useRef, useState } from 'react';
 import { ActivityIndicator, Platform, Pressable, Text, TextInput, View } from 'react-native';
+import Animated from 'react-native-reanimated';
 import { consume, FREE_LIMITS, refund, remaining } from '@/core/limits';
 import { aiToText } from '@/core/ocr-text';
 import { aiAvailable, aiRecheck } from '@/platform/ai';
@@ -12,9 +14,10 @@ import { SHARE_BASE_URL, supabase } from '@/platform/supabase';
 import { photoByEntry, useApp } from '@/state/app';
 import { AnnotatedLabel, IngredientChip } from '@/ui/chips';
 import { REPORT_REASONS } from '@/ui/copy';
-import { Button, Card, H2, Mono, Notice, P, Screen, Stamp } from '@/ui/kit';
+import { Button, Card, enter, Footnote, H2, Notice, P, Row, Screen, Section, VerdictHero } from '@/ui/kit';
+import { Icon, type IconName } from '@/ui/Icon';
 import { ShareCard } from '@/ui/ShareCard';
-import { font, radius, space, useColors, verdictStyle } from '@/ui/theme';
+import { radius, space, type, useColors, verdictStyle } from '@/ui/theme';
 
 function detail(summary: string): string {
   const rest = summary.split(' — ')[1] ?? summary;
@@ -42,6 +45,14 @@ export default function ResultScreen() {
   const [shareBusy, setShareBusy] = useState(false);
   const cardRef = useRef<ComponentRef<typeof View>>(null);
 
+  // A tap of feedback matched to the verdict, as the result appears (and again if a re-check changes it).
+  const verdict = result?.verdict;
+  useEffect(() => {
+    if (!verdict || Platform.OS === 'web') return;
+    const kind = verdict === 'approved' ? Haptics.NotificationFeedbackType.Success : verdict === 'not_approved' ? Haptics.NotificationFeedbackType.Error : Haptics.NotificationFeedbackType.Warning;
+    void Haptics.notificationAsync(kind).catch(() => {});
+  }, [verdict]);
+
   if (!entry || !result) {
     return (
       <Screen edges={[]}>
@@ -53,7 +64,7 @@ export default function ResultScreen() {
   const v = verdictStyle(c, result.verdict);
   const photo = photoByEntry.get(entry.id);
   const canAi = aiAvailable && Boolean(photo) && entry.source !== 'ai';
-  const input = { borderWidth: 1.5, borderColor: c.text, borderRadius: radius.sm, padding: space.md, color: c.text, backgroundColor: c.surface, fontSize: 16, fontFamily: font.body };
+  const input = { borderRadius: radius.md, borderCurve: 'continuous' as const, padding: space.md, color: c.text, backgroundColor: c.fill, fontSize: 17 };
 
   async function runAi() {
     if (!photo) return;
@@ -116,55 +127,32 @@ export default function ResultScreen() {
     );
   }
 
-  const sourceLabel = { cache: 'Saved product', off: 'Open Food Facts', label: Platform.OS === 'web' ? 'Label text' : 'Label photo', ai: 'Label photo · AI read' }[entry.source] ?? '';
-  const meta = [entry.brand, entry.barcode, sourceLabel].filter(Boolean).join('  ·  ');
+  const sourceLabel = { cache: 'Saved product', off: 'Open Food Facts', label: Platform.OS === 'web' ? 'Label text' : 'Label photo', ai: 'Label photo · read by AI' }[entry.source] ?? '';
+  const meta = [entry.brand, entry.barcode, sourceLabel].filter(Boolean).join(' · ');
   const toggle = (id: string) => setOpenId(openId === id ? null : id);
 
   return (
     <Screen edges={[]}>
       <Stack.Screen options={{ title: '' }} />
 
-      <View testID="verdict" accessibilityLabel={`${v.label}. ${result.summary}`} style={{ gap: space.md, paddingBottom: space.lg, borderBottomWidth: 6, borderBottomColor: c.rule }}>
-        <View style={{ gap: 2 }}>
-          <Text accessibilityRole="header" style={{ fontFamily: font.heavy, fontSize: 30, lineHeight: 32, color: c.text, textTransform: 'uppercase' }}>
-            {entry.productName ?? 'Label scan'}
-          </Text>
-          {meta ? <Mono>{meta}</Mono> : null}
-        </View>
-        <View style={{ paddingVertical: space.sm }}>
-          <Stamp verdict={result.verdict} />
-        </View>
-        {/* The PRD sentence is "Not Approved — contains …"; the stamp already says the verdict, so show the rest. */}
-        <Text testID="summary" accessibilityLabel={result.summary} style={{ fontFamily: font.medium, color: c.text, fontSize: 20, lineHeight: 27 }}>
-          {detail(result.summary)}
-        </Text>
+      <View testID="verdict" accessibilityLabel={`${v.label}. ${result.summary}`}>
+        <VerdictHero verdict={result.verdict} title={entry.productName ?? 'Label scan'} meta={meta} summary={detail(result.summary)} />
       </View>
 
-      <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: space.sm, marginTop: space.md }}>
-        <Button
-          icon={entry.favourite ? 'heart' : 'heart-outline'}
-          label={entry.favourite ? 'Saved' : 'Save'}
-          onPress={() => app.setFavourite(entry.id, !entry.favourite)}
-        />
-        <Button icon="share-outline" label="Share" onPress={() => setSharing(!sharing)} />
-        <Button
-          icon="create-outline"
-          label="Fix text"
+      <Animated.View entering={enter(80)} style={{ flexDirection: 'row', gap: space.sm, marginTop: space.md }}>
+        <Action symbol={entry.favourite ? 'heart.fill' : 'heart'} label={entry.favourite ? 'Saved' : 'Save'} onPress={() => app.setFavourite(entry.id, !entry.favourite)} />
+        <Action symbol="square.and.arrow.up" label="Share" onPress={() => setSharing(!sharing)} />
+        <Action
+          symbol="pencil"
+          label="Edit"
           onPress={() => {
             setDraft(entry.text);
             setEditing(true);
           }}
         />
-        {canAi ? (
-          <Button
-            icon="sparkles-outline"
-            label={aiBusy ? 'Re-checking…' : `AI re-check · ${remaining(app.store, 'ai')} left`}
-            disabled={aiBusy}
-            onPress={() => void runAi()}
-          />
-        ) : null}
-        {aiBusy ? <ActivityIndicator color={c.accent} /> : null}
-      </View>
+        {canAi ? <Action symbol="sparkles" label={aiBusy ? 'Reading…' : `AI · ${remaining(app.store, 'ai')}`} disabled={aiBusy} onPress={() => void runAi()} /> : null}
+      </Animated.View>
+      {aiBusy ? <ActivityIndicator style={{ marginTop: space.md }} color={c.accent} /> : null}
 
       {status ? (
         <View style={{ marginTop: space.md }}>
@@ -174,39 +162,41 @@ export default function ResultScreen() {
 
       {result.verdict === 'cant_verify' ? (
         <View style={{ marginTop: space.md }}>
-          <Notice tone="info">The text wasn’t clear enough to be sure, so this isn’t marked Approved. Retake the photo closer, fix the text, or re-check with AI.</Notice>
+          <Notice tone="info">The text wasn’t clear enough to be sure, so this isn’t marked Approved. Retake the photo closer, edit the text, or re-check with AI.</Notice>
         </View>
       ) : null}
 
       {sharing ? (
         <Card style={{ marginTop: space.md, gap: space.md }}>
           <ShareCard ref={cardRef} result={result} productName={entry.productName} />
-          <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: space.sm }}>
+          <View style={{ gap: space.sm }}>
             {canShareImage ? (
               <Button
                 kind="primary"
-                icon="image-outline"
+                symbol="photo"
                 label="Share image"
                 onPress={() => void shareCardImage(cardRef).catch((e: Error) => setStatus({ text: e.message, tone: 'error' }))}
               />
             ) : null}
             {SHARE_BASE_URL && supabase && entry.remoteScanId ? (
-              <>
-                <Button kind={canShareImage ? 'secondary' : 'primary'} icon="link-outline" label="Share link" disabled={shareBusy} onPress={() => void onShareLink(false)} />
-                <Button icon="copy-outline" label="Copy link" disabled={shareBusy} onPress={() => void onShareLink(true)} />
-              </>
+              <View style={{ flexDirection: 'row', gap: space.sm }}>
+                <Button style={{ flex: 1 }} kind={canShareImage ? 'secondary' : 'primary'} symbol="link" label="Share link" disabled={shareBusy} onPress={() => void onShareLink(false)} />
+                <Button style={{ flex: 1 }} symbol="doc.on.doc" label="Copy link" disabled={shareBusy} onPress={() => void onShareLink(true)} />
+              </View>
             ) : null}
           </View>
-          <P muted style={{ fontSize: 13 }}>The link shows the verdict and the ingredients behind it, never your history or photos.</P>
+          <Footnote>The link shows the verdict and the ingredients behind it, never your history or photos.</Footnote>
         </Card>
       ) : null}
 
       {editing ? (
-        <Card style={{ marginTop: space.md, gap: space.sm }}>
-          <Text style={{ fontFamily: font.semi, color: c.text, fontSize: 16 }}>Fix any misread words, then check again</Text>
+        <Card style={{ marginTop: space.md, gap: space.md }}>
+          <Text style={[type.headline, { color: c.text }]}>Fix any misread words</Text>
           <TextInput accessibilityLabel="Ingredient text" multiline value={draft} onChangeText={setDraft} style={[input, { minHeight: 140, textAlignVertical: 'top' }]} />
           <View style={{ flexDirection: 'row', gap: space.sm }}>
+            <Button kind="ghost" label="Cancel" onPress={() => setEditing(false)} />
             <Button
+              style={{ flex: 1 }}
               kind="primary"
               label="Check again"
               disabled={!draft.trim()}
@@ -216,48 +206,43 @@ export default function ResultScreen() {
                 setStatus(null);
               }}
             />
-            <Button kind="ghost" label="Cancel" onPress={() => setEditing(false)} />
           </View>
         </Card>
-      ) : null}
-
-      <H2>On the label</H2>
-      <AnnotatedLabel result={result} selected={openId} onSelect={toggle} />
-      {result.unmatched.length ? (
-        <P muted style={{ marginTop: space.sm, fontSize: 14 }}>
-          Dotted words aren’t in the rules yet. We review new words every week.
-        </P>
       ) : null}
 
       {result.flagged.length ? (
         <>
           <H2 count={result.flagged.length}>Flagged</H2>
-          <View style={{ borderTopWidth: 1, borderTopColor: c.border }}>
+          <Section>
             {result.flagged.map((chip) => (
               <IngredientChip key={chip.ingredientId} chip={chip} open={openId === chip.ingredientId} onToggle={() => toggle(chip.ingredientId)} />
             ))}
-          </View>
-          {result.flagged.some((f) => f.possible) ? <P muted style={{ marginTop: space.sm, fontSize: 14 }}>“Possible match” means the text was hard to read. Check it against the pack.</P> : null}
+          </Section>
+          {result.flagged.some((f) => f.possible) ? <Footnote style={{ marginTop: space.sm, paddingHorizontal: space.lg }}>“Possible match” means the text was hard to read. Check it against the pack.</Footnote> : null}
         </>
       ) : null}
 
       {result.good.length ? (
         <>
           <H2 count={result.good.length}>Good signs</H2>
-          <View style={{ borderTopWidth: 1, borderTopColor: c.border }}>
+          <Section>
             {result.good.map((chip) => (
               <IngredientChip key={chip.ingredientId} chip={chip} open={openId === chip.ingredientId} onToggle={() => toggle(chip.ingredientId)} />
             ))}
-          </View>
+          </Section>
         </>
       ) : null}
 
+      <H2>On the label</H2>
+      <AnnotatedLabel result={result} selected={openId} onSelect={toggle} />
+      {result.unmatched.length ? <Footnote style={{ marginTop: space.sm, paddingHorizontal: space.lg }}>Grey words aren’t in the rules yet. We review new words every week.</Footnote> : null}
+
       <View style={{ marginTop: space.xl, gap: space.md }}>
         {entry.reported ? (
-          <P muted>You reported this verdict. Thank you.</P>
+          <Footnote>You reported this verdict. Thank you.</Footnote>
         ) : reporting ? (
           <Card style={{ gap: space.sm }}>
-            <Text style={{ fontFamily: font.semi, color: c.text, fontSize: 16 }}>What’s wrong?</Text>
+            <Text style={[type.headline, { color: c.text }]}>What’s wrong?</Text>
             {REPORT_REASONS.map((r) => (
               <Pressable
                 key={r}
@@ -266,24 +251,42 @@ export default function ResultScreen() {
                 onPress={() => setReason(r)}
                 style={{ flexDirection: 'row', alignItems: 'center', gap: space.sm, minHeight: 40 }}
               >
-                <Ionicons name={reason === r ? 'radio-button-on' : 'radio-button-off'} size={20} color={reason === r ? c.accent : c.muted} />
-                <Text style={{ fontFamily: font.body, color: c.text, fontSize: 15 }}>{r}</Text>
+                <Ionicons name={reason === r ? 'checkmark-circle' : 'ellipse-outline'} size={22} color={reason === r ? c.accent : c.faint} />
+                <Text style={[type.body, { color: c.text }]}>{r}</Text>
               </Pressable>
             ))}
             <TextInput accessibilityLabel="Comment (optional)" placeholder="Comment (optional)" placeholderTextColor={c.muted} value={comment} onChangeText={setComment} style={input} />
             <View style={{ flexDirection: 'row', gap: space.sm }}>
-              <Button kind="primary" label="Send report" onPress={() => void sendReport()} />
               <Button kind="ghost" label="Cancel" onPress={() => setReporting(false)} />
+              <Button style={{ flex: 1 }} kind="primary" label="Send report" onPress={() => void sendReport()} />
             </View>
           </Card>
         ) : (
-          <Button kind="ghost" icon="flag-outline" label="Report a wrong verdict" style={{ alignSelf: 'flex-start' }} onPress={() => setReporting(true)} />
+          <Section style={{ marginTop: 0 }}>
+            <Row title={<Text style={[type.body, { color: c.bad }]}>Report a wrong verdict</Text>} leading={<Icon name="flag" size={20} color={c.bad} />} chevron onPress={() => setReporting(true)} />
+          </Section>
         )}
-        <View style={{ borderTopWidth: 1, borderTopColor: c.border, paddingTop: space.sm, gap: 4 }}>
-          <Mono>RULES V{result.rulesVersion}  ·  {new Date(entry.createdAt).toLocaleString()}</Mono>
-          <P muted style={{ fontSize: 13, lineHeight: 18 }}>Verdicts reflect Mindset’s ingredient preferences, not medical advice.</P>
-        </View>
+        <Footnote style={{ textAlign: 'center' }}>
+          Checked with rules v{result.rulesVersion} on {new Date(entry.createdAt).toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' })}.{'\n'}Verdicts reflect Mindset’s ingredient preferences, not medical advice.
+        </Footnote>
       </View>
     </Screen>
+  );
+}
+
+/** A square action under the verdict, like the buttons on a contact card. */
+function Action({ symbol, label, onPress, disabled }: { symbol: IconName; label: string; onPress: () => void; disabled?: boolean }) {
+  const c = useColors();
+  return (
+    <Pressable
+      accessibilityRole="button"
+      accessibilityLabel={label}
+      disabled={disabled}
+      onPress={onPress}
+      style={({ pressed }) => ({ flex: 1, alignItems: 'center', gap: 6, paddingVertical: space.md, borderRadius: radius.md, borderCurve: 'continuous', backgroundColor: c.surface, boxShadow: c.shadow, opacity: disabled ? 0.4 : pressed ? 0.6 : 1 })}
+    >
+      <Icon name={symbol} size={20} color={c.accent} />
+      <Text numberOfLines={1} style={[type.caption, { color: c.accent, fontWeight: '600' }]}>{label}</Text>
+    </Pressable>
   );
 }

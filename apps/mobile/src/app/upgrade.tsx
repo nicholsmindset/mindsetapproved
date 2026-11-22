@@ -1,29 +1,29 @@
-import { Text, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 import { PLAN_FEATURES, PREMIUM_PLANS, PURCHASES_LIVE } from '@/core/premium';
 import { useApp } from '@/state/app';
 import { Button, Card, H2, P, Screen, Title } from '@/ui/kit';
-import { font, radius, space, useColors } from '@/ui/theme';
+import { radius, space, type, useColors } from '@/ui/theme';
 
 export default function Upgrade() {
   const c = useColors();
   const { store } = useApp();
   const premium = store.isPremium();
-  const head = { fontFamily: font.display, fontSize: 15, letterSpacing: 0.6, textTransform: 'uppercase' as const };
+  const head = { ...type.footnote, fontWeight: '600' as const, textTransform: 'uppercase' as const };
   return (
     <Screen edges={[]}>
       <Title sub="Unlimited label scans and AI re-checks, plus your full history synced and exportable. The core scan stays free.">Premium</Title>
 
-      <Card style={{ padding: 0, borderTopWidth: 6, borderTopColor: c.rule }}>
-        <View style={{ flexDirection: 'row', padding: space.md, borderBottomWidth: 1, borderColor: c.border }}>
+      <Card style={{ padding: 0 }}>
+        <View style={{ flexDirection: 'row', padding: space.md, borderBottomWidth: StyleSheet.hairlineWidth, borderColor: c.border }}>
           <Text style={{ flex: 1.4 }}> </Text>
           <Text style={[head, { flex: 1, color: c.muted }]}>Free</Text>
           <Text style={[head, { flex: 1, color: c.accent }]}>Premium</Text>
         </View>
         {PLAN_FEATURES.map((f, i) => (
-          <View key={f.feature} style={{ flexDirection: 'row', padding: space.md, borderBottomWidth: i < PLAN_FEATURES.length - 1 ? 1 : 0, borderColor: c.border }}>
-            <Text style={{ flex: 1.4, color: c.text, fontFamily: font.semi }}>{f.feature}</Text>
-            <Text style={{ flex: 1, color: c.muted, fontFamily: font.body }}>{f.free}</Text>
-            <Text style={{ flex: 1, color: c.text, fontFamily: font.medium }}>{f.premium}</Text>
+          <View key={f.feature} style={{ flexDirection: 'row', padding: space.md, borderBottomWidth: i < PLAN_FEATURES.length - 1 ? StyleSheet.hairlineWidth : 0, borderColor: c.border }}>
+            <Text style={[type.subhead, { flex: 1.4, color: c.text, fontWeight: '600' }]}>{f.feature}</Text>
+            <Text style={[type.subhead, { flex: 1, color: c.muted }]}>{f.free}</Text>
+            <Text style={[type.subhead, { flex: 1, color: c.text }]}>{f.premium}</Text>
           </View>
         ))}
       </Card>
@@ -31,10 +31,10 @@ export default function Upgrade() {
       <H2>Plans</H2>
       <View style={{ gap: space.sm }}>
         {PREMIUM_PLANS.map((p) => (
-          <View key={p.id} style={{ borderWidth: 1, borderColor: c.border, backgroundColor: c.surface, borderRadius: radius.md, padding: space.lg, gap: 2 }}>
-            <Text style={[head, { color: c.text, fontSize: 20 }]}>{p.label}</Text>
-            <Text style={{ color: c.text, fontSize: 17, fontFamily: font.mono }}>{p.price}</Text>
-            <Text style={{ color: c.muted, fontFamily: font.body }}>{p.note}</Text>
+          <View key={p.id} style={{ backgroundColor: c.surface, boxShadow: c.shadow, borderRadius: radius.lg, borderCurve: 'continuous', padding: space.lg, gap: 2 }}>
+            <Text style={[type.headline, { color: c.text }]}>{p.label}</Text>
+            <Text style={[type.title2, { color: c.text }]}>{p.price}</Text>
+            <Text style={[type.subhead, { color: c.muted }]}>{p.note}</Text>
           </View>
         ))}
       </View>

@@ -1,12 +1,12 @@
-import Ionicons from '@expo/vector-icons/Ionicons';
 import type { Verdict } from '@mindset/rules-engine';
 import { router } from 'expo-router';
 import { useMemo, useState } from 'react';
-import { FlatList, Pressable, Text, View } from 'react-native';
+import { FlatList, Pressable, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useApp } from '@/state/app';
-import { Mono, P, Stamp, Title } from '@/ui/kit';
-import { font, MAX_WIDTH, radius, space, useColors } from '@/ui/theme';
+import { IconTile, Title } from '@/ui/kit';
+import { Icon } from '@/ui/Icon';
+import { MAX_WIDTH, radius, space, type, useColors, verdictStyle } from '@/ui/theme';
 
 /** "Not Approved — contains canola oil." -> "Contains canola oil." (the stamp says the verdict). */
 function sentence(summary: string): string {
@@ -34,15 +34,21 @@ export default function History() {
     return all.filter((e) => e.verdict === filter);
   }, [app.history, filter]);
 
+  const today = new Date().toDateString();
+  const when = (iso: string) => {
+    const d = new Date(iso);
+    return d.toDateString() === today ? d.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' }) : d.toLocaleDateString(undefined, { day: 'numeric', month: 'short' });
+  };
+
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: c.bg }} edges={['top']}>
       <FlatList
         data={list}
         keyExtractor={(e) => e.id}
-        contentContainerStyle={{ padding: space.lg, width: '100%', maxWidth: MAX_WIDTH, alignSelf: 'center' }}
+        contentContainerStyle={{ paddingHorizontal: space.lg, paddingTop: space.md, paddingBottom: 120, width: '100%', maxWidth: MAX_WIDTH, alignSelf: 'center' }}
         ListHeaderComponent={
-          <View style={{ gap: space.md, marginBottom: space.md }}>
-            <Title aside={<Mono>{app.history.length} SCANS</Mono>}>History</Title>
+          <View style={{ gap: space.md, marginBottom: space.lg }}>
+            <Title sub={`${app.history.length} ${app.history.length === 1 ? 'scan' : 'scans'}, kept on this phone`}>History</Title>
             <FlatList
               horizontal
               data={FILTERS}
@@ -56,9 +62,9 @@ export default function History() {
                     accessibilityRole="button"
                     accessibilityState={{ selected: on }}
                     onPress={() => setFilter(k)}
-                    style={{ paddingHorizontal: 12, minHeight: 34, justifyContent: 'center', borderRadius: radius.sm, backgroundColor: on ? c.text : 'transparent', borderWidth: 1.5, borderColor: on ? c.text : c.border }}
+                    style={{ paddingHorizontal: 14, minHeight: 34, justifyContent: 'center', borderRadius: radius.pill, backgroundColor: on ? c.accent : c.surface, boxShadow: on ? undefined : c.shadow }}
                   >
-                    <Text style={{ fontFamily: font.display, fontSize: 15, letterSpacing: 0.6, textTransform: 'uppercase', color: on ? c.bg : c.text }}>{label}</Text>
+                    <Text style={[type.subhead, { fontWeight: '600', color: on ? c.onAccent : c.text }]}>{label}</Text>
                   </Pressable>
                 );
               }}
@@ -66,35 +72,60 @@ export default function History() {
           </View>
         }
         ListEmptyComponent={
-          <View style={{ paddingVertical: space.xxl, gap: space.sm, alignItems: 'flex-start' }}>
-            <Text style={{ fontFamily: font.display, fontSize: 22, textTransform: 'uppercase', color: c.text }}>{filter === 'all' ? 'Nothing scanned yet' : 'Nothing here yet'}</Text>
-            <P muted>{filter === 'all' ? 'Every barcode and label you check is kept here, on this phone.' : 'Scans with this verdict will appear here.'}</P>
+          <View style={{ alignItems: 'center', paddingVertical: 56, gap: space.md }}>
+            <IconTile symbol="clock.fill" color={c.faint} size={56} />
+            <Text style={[type.title3, { color: c.text }]}>{filter === 'all' ? 'No scans yet' : 'Nothing here yet'}</Text>
+            <Text style={[type.subhead, { color: c.muted, textAlign: 'center', maxWidth: 280 }]}>
+              {filter === 'all' ? 'Every barcode and label you check is kept here, on this phone.' : 'Scans that match this filter will appear here.'}
+            </Text>
           </View>
         }
-        renderItem={({ item: e }) => (
-          <Pressable
-            accessibilityRole="button"
-            accessibilityLabel={`${e.productName ?? 'Label scan'}: ${e.summary}`}
-            onPress={() => router.push({ pathname: '/result/[id]', params: { id: e.id } })}
-            style={({ pressed }) => ({ borderBottomWidth: 1, borderBottomColor: c.border, paddingVertical: space.md, gap: space.sm, backgroundColor: pressed ? c.surface2 : 'transparent' })}
-          >
-            <View style={{ flexDirection: 'row', alignItems: 'flex-start', gap: space.md }}>
+        ItemSeparatorComponent={() => (
+          <View style={{ backgroundColor: c.surface }}>
+            <View style={{ height: StyleSheet.hairlineWidth, backgroundColor: c.border, marginLeft: 66 }} />
+          </View>
+        )}
+        renderItem={({ item: e, index }) => {
+          const v = verdictStyle(c, e.verdict);
+          const first = index === 0;
+          const last = index === list.length - 1;
+          return (
+            <Pressable
+              accessibilityRole="button"
+              accessibilityLabel={`${e.productName ?? 'Label scan'}: ${e.summary}`}
+              onPress={() => router.push({ pathname: '/result/[id]', params: { id: e.id } })}
+              style={({ pressed }) => ({
+                flexDirection: 'row',
+                alignItems: 'center',
+                gap: space.md,
+                paddingHorizontal: space.lg,
+                paddingVertical: space.md,
+                backgroundColor: pressed ? c.surface2 : c.surface,
+                borderTopLeftRadius: first ? radius.lg : 0,
+                borderTopRightRadius: first ? radius.lg : 0,
+                borderBottomLeftRadius: last ? radius.lg : 0,
+                borderBottomRightRadius: last ? radius.lg : 0,
+              })}
+            >
+              <View style={{ width: 38, height: 38, borderRadius: 19, backgroundColor: v.bg, alignItems: 'center', justifyContent: 'center' }}>
+                <Icon name={v.symbol} size={20} color={v.fg} />
+              </View>
               <View style={{ flex: 1, gap: 2 }}>
-                <Text numberOfLines={1} style={{ fontFamily: font.display, fontSize: 20, lineHeight: 24, color: c.text, textTransform: 'uppercase' }}>
-                  {e.productName ?? (e.barcode ? `Barcode ${e.barcode}` : 'Label scan')}
-                </Text>
-                <Text numberOfLines={2} style={{ fontFamily: font.body, color: c.muted, fontSize: 14, lineHeight: 19 }}>
-                  {sentence(e.summary)}
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+                  <Text numberOfLines={1} style={[type.headline, { color: c.text, flexShrink: 1 }]}>
+                    {e.productName ?? (e.barcode ? `Barcode ${e.barcode}` : 'Label scan')}
+                  </Text>
+                  {e.favourite ? <Icon name="heart.fill" size={12} color={c.bad} /> : null}
+                </View>
+                <Text numberOfLines={1} style={[type.subhead, { color: c.muted }]}>
+                  <Text style={{ color: v.fg, fontWeight: '600' }}>{v.stamp}</Text> · {sentence(e.summary)}
                 </Text>
               </View>
-              <Stamp verdict={e.verdict} size="sm" />
-            </View>
-            <View style={{ flexDirection: 'row', alignItems: 'center', gap: space.sm }}>
-              <Mono>{new Date(e.createdAt).toLocaleString(undefined, { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }).toUpperCase()}</Mono>
-              {e.favourite ? <Ionicons name="heart" size={13} color={c.bad} accessibilityLabel="Saved" /> : null}
-            </View>
-          </Pressable>
-        )}
+              <Text style={[type.footnote, { color: c.faint }]}>{when(e.createdAt)}</Text>
+              <Icon name="chevron.right" size={13} color={c.faint} weight="bold" />
+            </Pressable>
+          );
+        }}
       />
     </SafeAreaView>
   );
