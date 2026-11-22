@@ -21,4 +21,6 @@ alter table storage.objects enable row level security;
 grant usage on schema public, auth, extensions, storage to anon, authenticated, service_role;
 grant execute on all functions in schema auth to anon, authenticated, service_role;
 alter default privileges in schema public grant all on tables to anon, authenticated, service_role;
+-- Like Supabase: new functions are executable by these roles explicitly, so "revoke from public" is not enough.
+alter default privileges in schema public grant execute on functions to anon, authenticated, service_role;
 alter default privileges in schema public grant all on sequences to anon, authenticated;

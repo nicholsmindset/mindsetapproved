@@ -264,7 +264,11 @@ declare
   sig1 text := encode(extensions.hmac(h1, 'test-secret-0123456789abcdef0123456789abcdef', 'sha256'), 'hex');
   sig2 text := encode(extensions.hmac(h2, 'test-secret-0123456789abcdef0123456789abcdef', 'sha256'), 'hex');
 begin
-  assert (select count(*) from public.app_secrets) = 0, 'anon cannot read secrets';
+  begin
+    perform 1 from public.app_secrets;
+    raise exception 'anon could read app_secrets';
+  exception when insufficient_privilege then null;
+  end;
   begin
     perform public.submit_correction('shopper', 'X', 'Forged sender rotating hashes.', 'aaaaaaaaaaaaaaaaaaaa', 'not-a-valid-signature');
     raise exception 'forged signature accepted';
@@ -350,5 +354,18 @@ reset role;
 do $$ begin
   assert (select status from public.product_submissions where submitter = 'q2') = 'accepted', 'agreeing submission accepted too';
   assert (select status from public.product_submissions where submitter = 'q3') = 'rejected', 'conflicting submission rejected';
+end $$;
+-- function grants match intent (Supabase grants new functions to anon/authenticated by default)
+do $$ begin
+  assert not has_function_privilege('anon', 'public.refund_ai_recheck(uuid)', 'execute'), 'anon cannot refund AI re-checks';
+  assert not has_function_privilege('authenticated', 'public.refund_ai_recheck(uuid)', 'execute'), 'users cannot refund AI re-checks';
+  assert not has_function_privilege('anon', 'public.use_ai_recheck(uuid, int)', 'execute'), 'anon cannot spend AI quota directly';
+  assert has_function_privilege('service_role', 'public.refund_ai_recheck(uuid)', 'execute'), 'service role can refund';
+  assert not has_function_privilege('anon', 'public.delete_my_data()', 'execute'), 'delete_my_data needs sign-in';
+  assert not has_function_privilege('anon', 'public.claim_install(uuid)', 'execute'), 'claim_install needs sign-in';
+  assert not has_function_privilege('anon', 'public.export_rules()', 'execute'), 'export_rules needs sign-in';
+  assert not has_table_privilege('anon', 'public.app_secrets', 'select'), 'anon has no grant on app_secrets';
+  assert has_function_privilege('anon', 'public.submit_product(text, text, uuid, text, text)', 'execute'), 'anon can submit products';
+  assert has_function_privilege('anon', 'public.log_unmatched(text[], text)', 'execute'), 'anon can log unmatched terms';
 end $$;
 \echo 'All SQL checks passed'
