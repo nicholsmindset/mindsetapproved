@@ -9,8 +9,8 @@
       "distribution": "internal",
       "env": {
         "APP_VARIANT": "development",
-        "EXPO_PUBLIC_SUPABASE_URL": "https://hombnfjwqhheyyvwemlk.supabase.co",
-        "EXPO_PUBLIC_SUPABASE_ANON_KEY": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhvbWJuZmp3cWhoZXl5dndlbWxrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODcyNzI1ODUsImV4cCI6MjEwMjg0ODU4NX0.Nf3GC5fBY30yUUIbVYonY9nKS23eQFvk5Yh56Ea0uEM",
+        "EXPO_PUBLIC_SUPABASE_URL": "https://ywunhcftvroykiquejpg.supabase.co",
+        "EXPO_PUBLIC_SUPABASE_ANON_KEY": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl3dW5oY2Z0dnJveWtpcXVlanBnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTUzNDIyMzUsImV4cCI6MjExMDkxODIzNX0.NjiCWZRXZfyjKgNZ5o_6uSCEAapAOs1a4H_u1WhTiBk",
         "SENTRY_DISABLE_AUTO_UPLOAD": "true"
       }
     },
@@ -21,8 +21,8 @@
         "buildType": "apk"
       },
       "env": {
-        "EXPO_PUBLIC_SUPABASE_URL": "https://hombnfjwqhheyyvwemlk.supabase.co",
-        "EXPO_PUBLIC_SUPABASE_ANON_KEY": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhvbWJuZmp3cWhoZXl5dndlbWxrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODcyNzI1ODUsImV4cCI6MjEwMjg0ODU4NX0.Nf3GC5fBY30yUUIbVYonY9nKS23eQFvk5Yh56Ea0uEM",
+        "EXPO_PUBLIC_SUPABASE_URL": "https://ywunhcftvroykiquejpg.supabase.co",
+        "EXPO_PUBLIC_SUPABASE_ANON_KEY": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl3dW5oY2Z0dnJveWtpcXVlanBnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTUzNDIyMzUsImV4cCI6MjExMDkxODIzNX0.NjiCWZRXZfyjKgNZ5o_6uSCEAapAOs1a4H_u1WhTiBk",
         "SENTRY_DISABLE_AUTO_UPLOAD": "true",
         "APP_VARIANT": "preview"
       }
@@ -31,8 +31,8 @@
       "channel": "production",
       "autoIncrement": true,
       "env": {
-        "EXPO_PUBLIC_SUPABASE_URL": "https://hombnfjwqhheyyvwemlk.supabase.co",
-        "EXPO_PUBLIC_SUPABASE_ANON_KEY": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhvbWJuZmp3cWhoZXl5dndlbWxrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODcyNzI1ODUsImV4cCI6MjEwMjg0ODU4NX0.Nf3GC5fBY30yUUIbVYonY9nKS23eQFvk5Yh56Ea0uEM",
+        "EXPO_PUBLIC_SUPABASE_URL": "https://ywunhcftvroykiquejpg.supabase.co",
+        "EXPO_PUBLIC_SUPABASE_ANON_KEY": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl3dW5oY2Z0dnJveWtpcXVlanBnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTUzNDIyMzUsImV4cCI6MjExMDkxODIzNX0.NjiCWZRXZfyjKgNZ5o_6uSCEAapAOs1a4H_u1WhTiBk",
         "SENTRY_DISABLE_AUTO_UPLOAD": "true",
         "APP_VARIANT": "production"
       }

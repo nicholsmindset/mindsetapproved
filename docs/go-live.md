@@ -7,15 +7,13 @@ Everything in the repo is built and tested. These are the steps only you can do,
 
 ---
 
-## 1. Finish Supabase (5 minutes)
-The database and the AI function are live in the **Onnify Growth OS** project.
+## 1. Finish Supabase (10 minutes)
+Mindset has its own project, **mindset-approved** (`ywunhcftvroykiquejpg`). The database and the AI function are live.
 
-- [ ] **Remove two temporary helpers.** In the Supabase dashboard, open SQL Editor and run:
-  ```sql
-  drop function if exists public.mindset_apply_file(text, text, text, boolean);
-  drop extension if exists http;
-  ```
 - [ ] **AI re-check key.** Go to Edge Functions → Secrets → Add `GEMINI_API_KEY`, using a key from [Google AI Studio](https://aistudio.google.com/apikey). Don't paste the key into chat.
+- [ ] **Sign-in email.** Authentication → Emails → Magic Link: make sure the email contains the code, for example `Your Mindset Approved code: {{ .Token }}`. The app signs in with the 6-digit code; the website uses the link.
+- [ ] **Email sending, before real users.** Supabase's built-in sender is for testing only (a few emails an hour). Create a free [Resend](https://resend.com) account, verify your domain, then go to Authentication → Emails → SMTP Settings and enter Resend's details, with the sender set to something like `hello@yourdomain.com`.
+- [ ] **Tidy Onnify (optional).** Run `supabase/cleanup-onnify.sql` in the **Onnify Growth OS** project's SQL editor. It removes the earlier Mindset copy and keeps everything Onnify uses. Then delete the empty `rules-bundles` bucket under Storage there.
 
 ## 2. Install the app on your phone and try it (about 1 hour)
 The build settings already point at the live backend (`apps/mobile/eas.json`).
@@ -41,7 +39,7 @@ The build settings already point at the live backend (`apps/mobile/eas.json`).
 
   | Name | Value |
   |---|---|
-  | `NEXT_PUBLIC_SUPABASE_URL` | `https://hombnfjwqhheyyvwemlk.supabase.co` |
+  | `NEXT_PUBLIC_SUPABASE_URL` | `https://ywunhcftvroykiquejpg.supabase.co` |
   | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | the anon key in `apps/admin/.env.example` |
   | `NEXT_PUBLIC_SITE_URL` | your domain, e.g. `https://mindsetapproved.com` |
   | `CORRECTIONS_SECRET` | the result of `select value from public.app_secrets where name = 'corrections';` in the Supabase SQL editor |
@@ -52,9 +50,8 @@ The build settings already point at the live backend (`apps/mobile/eas.json`).
   npx supabase login
   ```
   ```bash
-  npx supabase functions deploy publish-bundle --project-ref hombnfjwqhheyyvwemlk
+  npx supabase functions deploy publish-bundle --project-ref ywunhcftvroykiquejpg
   ```
-- [ ] **Shared sign-in email.** Supabase → Authentication → Emails → Magic Link: add `Your code: {{ .Token }}` under the existing link, so Onnify's link keeps working.
 - [ ] **Redirect URL.** Authentication → URL Configuration → add `https://<your domain>/auth/callback`.
 - [ ] **Make yourself admin.** Sign in once at `https://<your domain>/admin`. Then go to Authentication → Users → your user → set `app_metadata` to `{"role": "admin"}`, and sign in again.
 - [ ] **Publish rules v1:** Admin → Publish → Publish v1.
@@ -82,13 +79,8 @@ The build settings already point at the live backend (`apps/mobile/eas.json`).
 - [ ] Run a trademark search for "Mindset Approved" with IPOS (Singapore) and USPTO, and file under ONN Group LLP.
 - [ ] Review the rules and translations listed in `docs/rules-review.md`.
 
-## 6. Strongly recommended before a public launch
-- [ ] **Give Mindset its own Supabase project on the Pro plan** (US$25 a month). The current shared Free project:
-  - pauses after a week without activity;
-  - has no daily backups;
-  - shares sign-in emails with Onnify.
-
-  The move is in [deployment.md](deployment.md#moving-to-a-dedicated-project-later): about 30 minutes, and Claude can do most of it.
+## 6. Before launch: the Supabase plan
+- [ ] Upgrade **mindset-approved** to the Pro plan (US$25 a month). That gets you daily backups and no pausing after a week of no use.
 
 ## 7. Optional
 - [ ] **Crash reports:** create a project at [sentry.io](https://sentry.io). Add its DSN as `EXPO_PUBLIC_SENTRY_DSN` in `eas.json`, and `SENTRY_AUTH_TOKEN` as an EAS secret for readable stack traces. Until then, crash reporting stays off.
