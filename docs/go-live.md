@@ -80,7 +80,11 @@ The build settings already point at the live backend (`apps/mobile/eas.json`).
 - [ ] Review the rules and translations listed in `docs/rules-review.md`.
 
 ## 6. Before launch: the Supabase plan
-- [ ] Upgrade **mindset-approved** to the Pro plan (US$25 a month). That gets you daily backups and no pausing after a week of no use.
+The project is on the **Free plan** for now. That's fine for building and testing:
+- **Pausing:** `.github/workflows/supabase-keepalive.yml` pings it once a day so it doesn't pause after 7 quiet days.
+- **No automatic backups:** before real users, either upgrade to Pro (US$25 a month, daily backups) or export now and then with `npx supabase db dump --project-ref ywunhcftvroykiquejpg > backup.sql`.
+
+- [ ] Upgrade **mindset-approved** to Pro before a public launch, then delete the keep-alive workflow.
 
 ## 7. Optional
 - [ ] **Crash reports:** create a project at [sentry.io](https://sentry.io). Add its DSN as `EXPO_PUBLIC_SENTRY_DSN` in `eas.json`, and `SENTRY_AUTH_TOKEN` as an EAS secret for readable stack traces. Until then, crash reporting stays off.
