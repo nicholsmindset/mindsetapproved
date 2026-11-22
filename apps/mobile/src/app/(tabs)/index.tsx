@@ -33,7 +33,7 @@ export default function ScanScreen() {
   const app = useApp();
   const focused = useIsFocused();
   const appActive = useAppActive();
-  const [mode, setMode] = useState<ScanMode>("barcode");
+  const [mode, setMode] = useState<ScanMode>(() => app.store.getScanMode());
   const [busy, setBusy] = useState<string | null>(null);
   const [notice, setNotice] = useState<{
     text: string;
@@ -183,6 +183,7 @@ export default function ScanScreen() {
             ]}
             onChange={(m) => {
               setMode(m);
+            app.store.setScanMode(m);
               setNotice(null);
             }}
           />

@@ -353,3 +353,12 @@ describe('appearance', () => {
     expect(store.getAppearance()).toBe('system');
   });
 });
+
+describe('scan mode', () => {
+  it('opens on the barcode tab until the person picks the label tab, then remembers it', () => {
+    const store = testStore();
+    expect(store.getScanMode()).toBe('barcode');
+    store.setScanMode('label');
+    expect(store.getScanMode()).toBe('label');
+  });
+});

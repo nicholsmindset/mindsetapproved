@@ -4,7 +4,7 @@ import { useMemo, useState } from 'react';
 import { FlatList, Pressable, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useApp } from '@/state/app';
-import { IconTile, Title } from '@/ui/kit';
+import { Button, IconTile, Title } from '@/ui/kit';
 import { Icon } from '@/ui/Icon';
 import { MAX_WIDTH, radius, space, type, useColors, verdictStyle } from '@/ui/theme';
 
@@ -79,6 +79,7 @@ export default function History() {
             <Text style={[type.subhead, { color: c.muted, textAlign: 'center', maxWidth: 280 }]}>
               {filter === 'all' ? 'Every barcode and label you check is kept here, on this phone.' : 'Scans that match this filter will appear here.'}
             </Text>
+            {filter === 'all' ? <Button kind="primary" symbol="barcode.viewfinder" label="Scan your first product" onPress={() => router.navigate('/')} /> : null}
           </View>
         }
         ItemSeparatorComponent={() => (

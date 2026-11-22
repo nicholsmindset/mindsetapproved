@@ -45,7 +45,11 @@ const K = {
   premium: 'premium.v1',
   labelScript: 'label-script.v1',
   appearance: 'appearance.v1',
+  scanMode: 'scan-mode.v1',
 } as const;
+
+/** Which scan tab opens first: the one the person used last. */
+export type ScanModePref = 'barcode' | 'label';
 
 /** Light, dark, or follow the phone. */
 export type AppearancePref = 'system' | 'light' | 'dark';
@@ -146,6 +150,8 @@ export function createStore(kv: KV, newId: () => string) {
       return LABEL_SCRIPTS.some((x) => x.id === v) ? (v as LabelScript) : 'latin';
     },
     setLabelScript: (v: LabelScript) => kv.set(K.labelScript, v),
+    getScanMode: (): ScanModePref => (kv.getString(K.scanMode) === 'label' ? 'label' : 'barcode'),
+    setScanMode: (v: ScanModePref) => kv.set(K.scanMode, v),
     getAppearance: (): AppearancePref => readAppearance(kv),
     setAppearance: (v: AppearancePref) => writeAppearance(kv, v),
     /** Set by the purchases adapter (RevenueCat) when an active entitlement exists. */

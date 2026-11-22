@@ -1,6 +1,6 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { analyze } from '@mindset/rules-engine';
-import { Stack, useLocalSearchParams } from 'expo-router';
+import { router, Stack, useLocalSearchParams } from 'expo-router';
 import * as Haptics from 'expo-haptics';
 import { type ComponentRef, useEffect, useMemo, useRef, useState } from 'react';
 import { ActivityIndicator, Platform, Pressable, Text, TextInput, View } from 'react-native';
@@ -153,6 +153,11 @@ export default function ResultScreen() {
         {canAi ? <Action symbol="sparkles" label={aiBusy ? 'Reading…' : `AI · ${remaining(app.store, 'ai')}`} disabled={aiBusy} onPress={() => void runAi()} /> : null}
       </Animated.View>
       {aiBusy ? <ActivityIndicator style={{ marginTop: space.md }} color={c.accent} /> : null}
+
+      {/* The next useful action, one tap away: most people check several products in one shop. */}
+      <Animated.View entering={enter(140)} style={{ marginTop: space.md }}>
+        <Button kind="primary" symbol="barcode.viewfinder" label="Scan another" onPress={() => (router.canGoBack() ? router.back() : router.replace('/'))} />
+      </Animated.View>
 
       {status ? (
         <View style={{ marginTop: space.md }}>
