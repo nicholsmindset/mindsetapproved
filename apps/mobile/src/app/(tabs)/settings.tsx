@@ -10,7 +10,8 @@ import { SHARE_BASE_URL, supabase } from '@/platform/supabase';
 import { H2, IconTile, Notice, Row, Screen, Section, Title } from '@/ui/kit';
 import { Icon } from '@/ui/Icon';
 import { space, type, useColors } from '@/ui/theme';
-import { LABEL_SCRIPTS, type LabelScript } from '@/core/store';
+import { APPEARANCES, LABEL_SCRIPTS, type LabelScript } from '@/core/store';
+import { setAppearance, useAppearance } from '@/state/appearance';
 
 function confirm(title: string, message: string): Promise<boolean> {
   if (Platform.OS === 'web') return Promise.resolve(window.confirm(`${title}\n\n${message}`));
@@ -28,6 +29,7 @@ export default function Settings() {
   const [msg, setMsg] = useState<string | null>(null);
   const [checking, setChecking] = useState(false);
   const [script, setScript] = useState<LabelScript>(() => app.store.getLabelScript());
+  const appearance = useAppearance();
   const open = (path: string) => void Linking.openURL(`${SHARE_BASE_URL}${path}`);
 
   return (
@@ -50,6 +52,20 @@ export default function Settings() {
           <AccountCard />
         </>
       ) : null}
+
+      <Section header="Appearance">
+        {APPEARANCES.map((a) => (
+          <Row
+            key={a.id}
+            title={a.label}
+            subtitle={a.id === 'system' ? 'Match the phone’s light or dark setting' : undefined}
+            tile={{ symbol: a.id === 'dark' ? 'moon.fill' : a.id === 'light' ? 'sun.max.fill' : 'circle.lefthalf.filled', color: a.id === 'dark' ? '#5856d6' : a.id === 'light' ? '#ff9f0a' : '#8e8e93' }}
+            accessibilityLabel={`${a.label}${appearance === a.id ? ', selected' : ''}`}
+            trailing={appearance === a.id ? <Icon name="checkmark" size={17} color={c.accent} weight="bold" /> : null}
+            onPress={() => setAppearance(a.id)}
+          />
+        ))}
+      </Section>
 
       <Section header="Label language" footer="The language of the ingredient lists you photograph. Every option also reads English.">
         {LABEL_SCRIPTS.map((s) => (

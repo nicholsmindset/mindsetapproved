@@ -1,8 +1,8 @@
 import { DarkTheme, DefaultTheme, Stack, ThemeProvider } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import { useColorScheme } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { AppProvider, useApp } from '@/state/app';
+import { useScheme } from '@/state/appearance';
 import { useColors } from '@/ui/theme';
 
 function RootStack() {
@@ -32,12 +32,12 @@ function RootStack() {
 }
 
 export default function RootLayout() {
-  const scheme = useColorScheme();
+  const scheme = useScheme();
   return (
     <SafeAreaProvider>
       <ThemeProvider value={scheme === 'dark' ? DarkTheme : DefaultTheme}>
         <AppProvider>
-          <StatusBar style="auto" />
+          <StatusBar style={scheme === 'dark' ? 'light' : 'dark'} />
           <RootStack />
         </AppProvider>
       </ThemeProvider>

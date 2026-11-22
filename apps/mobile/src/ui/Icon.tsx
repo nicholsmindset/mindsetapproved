@@ -55,6 +55,10 @@ const FALLBACK = {
   'pawprint.fill': 'paw',
   'bolt.fill': 'flash',
   'xmark': 'close',
+  'moon.fill': 'moon',
+  'sun.max.fill': 'sunny',
+  'circle.lefthalf.filled': 'contrast',
+  'arrow.triangle.2.circlepath': 'refresh',
 } as const satisfies Record<string, keyof typeof Ionicons.glyphMap>;
 
 export type IconName = keyof typeof FALLBACK;

@@ -1,7 +1,8 @@
 import { BlurView } from 'expo-blur';
 import { Tabs } from 'expo-router';
-import { type ColorValue, StyleSheet, useColorScheme } from 'react-native';
+import { type ColorValue, StyleSheet } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useScheme } from '@/state/appearance';
 import { Icon, type IconName } from '@/ui/Icon';
 import { useColors } from '@/ui/theme';
 
@@ -10,7 +11,7 @@ import { useColors } from '@/ui/theme';
  */
 export default function TabsLayout() {
   const c = useColors();
-  const scheme = useColorScheme();
+  const scheme = useScheme();
   const insets = useSafeAreaInsets();
   const icon = (name: IconName, active: IconName) => {
     function TabIcon({ color, focused }: { color: ColorValue; focused: boolean }) {

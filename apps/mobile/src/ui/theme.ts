@@ -1,5 +1,6 @@
 import type { Tier, Verdict } from '@mindset/rules-engine';
-import { Platform, useColorScheme } from 'react-native';
+import { Platform } from 'react-native';
+import { useScheme } from '@/state/appearance';
 import type { IconName } from './Icon';
 
 /*
@@ -61,7 +62,7 @@ const dark: typeof light = {
 export type Colors = typeof light;
 
 export function useColors(): Colors {
-  return useColorScheme() === 'dark' ? dark : light;
+  return useScheme() === 'dark' ? dark : light;
 }
 /** Fixed light palette, e.g. for share images. */
 useColors.light = light;

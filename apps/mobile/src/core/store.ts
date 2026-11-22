@@ -44,7 +44,23 @@ const K = {
   limits: 'limits.v1',
   premium: 'premium.v1',
   labelScript: 'label-script.v1',
+  appearance: 'appearance.v1',
 } as const;
+
+/** Light, dark, or follow the phone. */
+export type AppearancePref = 'system' | 'light' | 'dark';
+export const APPEARANCES: { id: AppearancePref; label: string }[] = [
+  { id: 'system', label: 'Automatic' },
+  { id: 'light', label: 'Light' },
+  { id: 'dark', label: 'Dark' },
+];
+export function writeAppearance(kv: KV, v: AppearancePref): void {
+  kv.set(K.appearance, v);
+}
+export function readAppearance(kv: KV): AppearancePref {
+  const v = kv.getString(K.appearance);
+  return APPEARANCES.some((x) => x.id === v) ? (v as AppearancePref) : 'system';
+}
 
 /** Which ML Kit model reads label photos. Each non-Latin model also reads Latin text. */
 export type LabelScript = 'latin' | 'chinese' | 'japanese' | 'korean';
@@ -125,12 +141,14 @@ export function createStore(kv: KV, newId: () => string) {
     getCachedBundle: (): RulesBundle | null => readJSON<RulesBundle | null>(kv, K.rules, null),
     setCachedBundle: (b: RulesBundle) => kv.set(K.rules, JSON.stringify(b)),
 
-    /** Set by the purchases adapter (RevenueCat) when an active entitlement exists. */
     getLabelScript: (): LabelScript => {
       const v = kv.getString(K.labelScript);
       return LABEL_SCRIPTS.some((x) => x.id === v) ? (v as LabelScript) : 'latin';
     },
     setLabelScript: (v: LabelScript) => kv.set(K.labelScript, v),
+    getAppearance: (): AppearancePref => readAppearance(kv),
+    setAppearance: (v: AppearancePref) => writeAppearance(kv, v),
+    /** Set by the purchases adapter (RevenueCat) when an active entitlement exists. */
     isPremium: () => kv.getString(K.premium) === '1',
     setPremium: (on: boolean) => (on ? kv.set(K.premium, '1') : kv.remove(K.premium)),
 

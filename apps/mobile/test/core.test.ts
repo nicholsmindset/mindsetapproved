@@ -336,3 +336,20 @@ describe('label language', () => {
     expect(estimateConfidence('원재료명: 밀가루, 설탕, 팜유, 정제염')).toBeGreaterThanOrEqual(0.8);
   });
 });
+
+describe('appearance', () => {
+  it('follows the phone until chosen, then remembers the choice', () => {
+    const store = testStore();
+    expect(store.getAppearance()).toBe('system');
+    store.setAppearance('dark');
+    expect(store.getAppearance()).toBe('dark');
+    store.setAppearance('light');
+    expect(store.getAppearance()).toBe('light');
+  });
+
+  it('ignores an unknown stored value', () => {
+    const store = testStore();
+    store.kv.set('appearance.v1', 'sepia');
+    expect(store.getAppearance()).toBe('system');
+  });
+});
