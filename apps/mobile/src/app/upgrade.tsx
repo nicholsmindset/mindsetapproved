@@ -1,35 +1,29 @@
-import Ionicons from '@expo/vector-icons/Ionicons';
 import { Text, View } from 'react-native';
 import { PLAN_FEATURES, PREMIUM_PLANS, PURCHASES_LIVE } from '@/core/premium';
 import { useApp } from '@/state/app';
-import { Button, Card, H2, P, Screen } from '@/ui/kit';
-import { radius, space, useColors } from '@/ui/theme';
+import { Button, Card, H2, P, Screen, Title } from '@/ui/kit';
+import { font, radius, space, useColors } from '@/ui/theme';
 
 export default function Upgrade() {
   const c = useColors();
   const { store } = useApp();
   const premium = store.isPremium();
+  const head = { fontFamily: font.display, fontSize: 15, letterSpacing: 0.6, textTransform: 'uppercase' as const };
   return (
     <Screen edges={[]}>
-      <View style={{ gap: space.sm, marginBottom: space.lg }}>
-        <Ionicons name="sparkles" size={32} color={c.accent} />
-        <Text accessibilityRole="header" style={{ color: c.text, fontSize: 26, fontWeight: '700' }}>
-          Mindset Approved Premium
-        </Text>
-        <P muted>Unlimited label scans and AI re-checks, plus your full history synced and exportable. The core scan stays free.</P>
-      </View>
+      <Title sub="Unlimited label scans and AI re-checks, plus your full history synced and exportable. The core scan stays free.">Premium</Title>
 
-      <Card style={{ padding: 0 }}>
+      <Card style={{ padding: 0, borderTopWidth: 6, borderTopColor: c.rule }}>
         <View style={{ flexDirection: 'row', padding: space.md, borderBottomWidth: 1, borderColor: c.border }}>
-          <Text style={{ flex: 1.4, color: c.muted, fontWeight: '600' }}> </Text>
-          <Text style={{ flex: 1, color: c.muted, fontWeight: '600' }}>Free</Text>
-          <Text style={{ flex: 1, color: c.accent, fontWeight: '700' }}>Premium</Text>
+          <Text style={{ flex: 1.4 }}> </Text>
+          <Text style={[head, { flex: 1, color: c.muted }]}>Free</Text>
+          <Text style={[head, { flex: 1, color: c.accent }]}>Premium</Text>
         </View>
         {PLAN_FEATURES.map((f, i) => (
           <View key={f.feature} style={{ flexDirection: 'row', padding: space.md, borderBottomWidth: i < PLAN_FEATURES.length - 1 ? 1 : 0, borderColor: c.border }}>
-            <Text style={{ flex: 1.4, color: c.text, fontWeight: '600' }}>{f.feature}</Text>
-            <Text style={{ flex: 1, color: c.muted }}>{f.free}</Text>
-            <Text style={{ flex: 1, color: c.text }}>{f.premium}</Text>
+            <Text style={{ flex: 1.4, color: c.text, fontFamily: font.semi }}>{f.feature}</Text>
+            <Text style={{ flex: 1, color: c.muted, fontFamily: font.body }}>{f.free}</Text>
+            <Text style={{ flex: 1, color: c.text, fontFamily: font.medium }}>{f.premium}</Text>
           </View>
         ))}
       </Card>
@@ -37,10 +31,10 @@ export default function Upgrade() {
       <H2>Plans</H2>
       <View style={{ gap: space.sm }}>
         {PREMIUM_PLANS.map((p) => (
-          <View key={p.id} style={{ borderWidth: 1, borderColor: c.border, backgroundColor: c.surface, borderRadius: radius.md, padding: space.lg }}>
-            <Text style={{ color: c.text, fontSize: 17, fontWeight: '700' }}>{p.label}</Text>
-            <Text style={{ color: c.text, fontSize: 16 }}>{p.price}</Text>
-            <Text style={{ color: c.muted }}>{p.note}</Text>
+          <View key={p.id} style={{ borderWidth: 1, borderColor: c.border, backgroundColor: c.surface, borderRadius: radius.md, padding: space.lg, gap: 2 }}>
+            <Text style={[head, { color: c.text, fontSize: 20 }]}>{p.label}</Text>
+            <Text style={{ color: c.text, fontSize: 17, fontFamily: font.mono }}>{p.price}</Text>
+            <Text style={{ color: c.muted, fontFamily: font.body }}>{p.note}</Text>
           </View>
         ))}
       </View>

@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Text, TextInput, View } from 'react-native';
 import { useApp } from '@/state/app';
 import { Button, Card, P } from './kit';
-import { radius, space, useColors } from './theme';
+import { font, radius, space, useColors } from './theme';
 
 /** Optional sign-in with an emailed 6-digit code: syncs rules and links scans across devices. */
 export function AccountCard() {
@@ -13,13 +13,13 @@ export function AccountCard() {
   const [step, setStep] = useState<'email' | 'code'>('email');
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const input = { borderWidth: 1, borderColor: c.border, borderRadius: radius.sm, padding: space.md, color: c.text, backgroundColor: c.surface, fontSize: 16 };
+  const input = { borderWidth: 1.5, borderColor: c.text, borderRadius: radius.sm, padding: space.md, color: c.text, backgroundColor: c.surface, fontSize: 16, fontFamily: font.body };
 
   if (app.account) {
     return (
       <Card style={{ gap: space.sm }}>
         <P>
-          Signed in as <Text style={{ fontWeight: '700' }}>{app.account}</Text>. Your rules sync across your devices.
+          Signed in as <Text style={{ fontFamily: font.semi }}>{app.account}</Text>. Your rules sync across your devices.
         </P>
         <View style={{ flexDirection: 'row' }}>
           <Button label="Sign out" onPress={() => void app.signOut()} />
@@ -77,7 +77,7 @@ export function AccountCard() {
           </View>
         </>
       )}
-      {error ? <Text style={{ color: c.bad }}>{error}</Text> : null}
+      {error ? <Text style={{ color: c.bad, fontFamily: font.medium }}>{error}</Text> : null}
     </Card>
   );
 }

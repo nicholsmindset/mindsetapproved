@@ -2,7 +2,7 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import { analyze } from '@mindset/rules-engine';
 import { Stack, useLocalSearchParams } from 'expo-router';
 import { type ComponentRef, useMemo, useRef, useState } from 'react';
-import { ActivityIndicator, Pressable, Text, TextInput, View } from 'react-native';
+import { ActivityIndicator, Platform, Pressable, Text, TextInput, View } from 'react-native';
 import { consume, FREE_LIMITS, refund, remaining } from '@/core/limits';
 import { aiToText } from '@/core/ocr-text';
 import { aiAvailable, aiRecheck } from '@/platform/ai';
@@ -10,11 +10,11 @@ import { prepareForAi } from '@/platform/image';
 import { canShareImage, copyLink, shareCardImage, shareLink } from '@/platform/share';
 import { SHARE_BASE_URL, supabase } from '@/platform/supabase';
 import { photoByEntry, useApp } from '@/state/app';
-import { IngredientChip } from '@/ui/chips';
+import { AnnotatedLabel, IngredientChip } from '@/ui/chips';
 import { REPORT_REASONS } from '@/ui/copy';
-import { Button, Card, H2, P, Screen } from '@/ui/kit';
+import { Button, Card, H2, Mono, Notice, P, Screen, Stamp } from '@/ui/kit';
 import { ShareCard } from '@/ui/ShareCard';
-import { radius, space, tierStyle, useColors, verdictStyle } from '@/ui/theme';
+import { font, radius, space, useColors, verdictStyle } from '@/ui/theme';
 
 function detail(summary: string): string {
   const rest = summary.split(' — ')[1] ?? summary;
@@ -32,7 +32,7 @@ export default function ResultScreen() {
   );
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState('');
-  const [showAll, setShowAll] = useState(false);
+  const [openId, setOpenId] = useState<string | null>(null);
   const [reporting, setReporting] = useState(false);
   const [reason, setReason] = useState<string>(REPORT_REASONS[0]);
   const [comment, setComment] = useState('');
@@ -53,7 +53,7 @@ export default function ResultScreen() {
   const v = verdictStyle(c, result.verdict);
   const photo = photoByEntry.get(entry.id);
   const canAi = aiAvailable && Boolean(photo) && entry.source !== 'ai';
-  const input = { borderWidth: 1, borderColor: c.border, borderRadius: radius.sm, padding: space.md, color: c.text, backgroundColor: c.surface, fontSize: 15 };
+  const input = { borderWidth: 1.5, borderColor: c.text, borderRadius: radius.sm, padding: space.md, color: c.text, backgroundColor: c.surface, fontSize: 16, fontFamily: font.body };
 
   async function runAi() {
     if (!photo) return;
@@ -116,49 +116,40 @@ export default function ResultScreen() {
     );
   }
 
+  const sourceLabel = { cache: 'Saved product', off: 'Open Food Facts', label: Platform.OS === 'web' ? 'Label text' : 'Label photo', ai: 'Label photo · AI read' }[entry.source] ?? '';
+  const meta = [entry.brand, entry.barcode, sourceLabel].filter(Boolean).join('  ·  ');
+  const toggle = (id: string) => setOpenId(openId === id ? null : id);
+
   return (
     <Screen edges={[]}>
-      <Stack.Screen options={{ title: entry.productName ?? (entry.source === 'label' || entry.source === 'ai' ? 'Label scan' : 'Result') }} />
+      <Stack.Screen options={{ title: '' }} />
 
-      <View
-        testID="verdict"
-        accessibilityLabel={`${v.label}. ${result.summary}`}
-        style={{ backgroundColor: v.bg, borderRadius: radius.lg, padding: space.lg, gap: space.sm }}
-      >
-        <View style={{ flexDirection: 'row', alignItems: 'center', gap: space.sm }}>
-          <Ionicons name={v.icon} size={30} color={v.fg} />
-          <Text style={{ color: v.fg, fontSize: 22, fontWeight: '700', flex: 1 }}>{v.label}</Text>
+      <View testID="verdict" accessibilityLabel={`${v.label}. ${result.summary}`} style={{ gap: space.md, paddingBottom: space.lg, borderBottomWidth: 6, borderBottomColor: c.rule }}>
+        <View style={{ gap: 2 }}>
+          <Text accessibilityRole="header" style={{ fontFamily: font.heavy, fontSize: 30, lineHeight: 32, color: c.text, textTransform: 'uppercase' }}>
+            {entry.productName ?? 'Label scan'}
+          </Text>
+          {meta ? <Mono>{meta}</Mono> : null}
         </View>
-        {/* The PRD sentence is "Not Approved — contains …"; the heading already says the verdict, so show the rest. */}
-        <Text testID="summary" accessibilityLabel={result.summary} style={{ color: c.text, fontSize: 17, lineHeight: 23 }}>
+        <View style={{ paddingVertical: space.sm }}>
+          <Stamp verdict={result.verdict} />
+        </View>
+        {/* The PRD sentence is "Not Approved — contains …"; the stamp already says the verdict, so show the rest. */}
+        <Text testID="summary" accessibilityLabel={result.summary} style={{ fontFamily: font.medium, color: c.text, fontSize: 20, lineHeight: 27 }}>
           {detail(result.summary)}
         </Text>
-        {entry.brand || entry.barcode ? (
-          <Text style={{ color: c.muted, fontSize: 13 }}>{[entry.brand, entry.barcode].filter(Boolean).join(' · ')}</Text>
-        ) : null}
       </View>
-
-      {status ? (
-        <View accessibilityRole="alert" style={{ marginTop: space.md, padding: space.md, borderRadius: radius.md, backgroundColor: status.tone === 'ok' ? c.goodBg : c.badBg }}>
-          <Text style={{ color: status.tone === 'ok' ? c.good : c.bad, fontWeight: '600' }}>{status.text}</Text>
-        </View>
-      ) : null}
-
-      {result.verdict === 'cant_verify' ? (
-        <Card style={{ marginTop: space.md, gap: space.sm }}>
-          <P>The photo wasn’t clear enough to be sure, so this isn’t marked Approved. Retake it closer, fix the text below, or re-check with AI.</P>
-        </Card>
-      ) : null}
 
       <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: space.sm, marginTop: space.md }}>
         <Button
           icon={entry.favourite ? 'heart' : 'heart-outline'}
-          label={entry.favourite ? 'Favourite' : 'Add to favourites'}
+          label={entry.favourite ? 'Saved' : 'Save'}
           onPress={() => app.setFavourite(entry.id, !entry.favourite)}
         />
+        <Button icon="share-outline" label="Share" onPress={() => setSharing(!sharing)} />
         <Button
           icon="create-outline"
-          label="Edit text"
+          label="Fix text"
           onPress={() => {
             setDraft(entry.text);
             setEditing(true);
@@ -167,14 +158,25 @@ export default function ResultScreen() {
         {canAi ? (
           <Button
             icon="sparkles-outline"
-            label={aiBusy ? 'Re-checking…' : `Re-check with AI (${remaining(app.store, 'ai')} left)`}
+            label={aiBusy ? 'Re-checking…' : `AI re-check · ${remaining(app.store, 'ai')} left`}
             disabled={aiBusy}
             onPress={() => void runAi()}
           />
         ) : null}
-        <Button icon="share-outline" label="Share" onPress={() => setSharing(!sharing)} />
         {aiBusy ? <ActivityIndicator color={c.accent} /> : null}
       </View>
+
+      {status ? (
+        <View style={{ marginTop: space.md }}>
+          <Notice tone={status.tone}>{status.text}</Notice>
+        </View>
+      ) : null}
+
+      {result.verdict === 'cant_verify' ? (
+        <View style={{ marginTop: space.md }}>
+          <Notice tone="info">The text wasn’t clear enough to be sure, so this isn’t marked Approved. Retake the photo closer, fix the text, or re-check with AI.</Notice>
+        </View>
+      ) : null}
 
       {sharing ? (
         <Card style={{ marginTop: space.md, gap: space.md }}>
@@ -201,12 +203,12 @@ export default function ResultScreen() {
 
       {editing ? (
         <Card style={{ marginTop: space.md, gap: space.sm }}>
-          <Text style={{ color: c.text, fontWeight: '600' }}>Fix any misread words, then re-check</Text>
+          <Text style={{ fontFamily: font.semi, color: c.text, fontSize: 16 }}>Fix any misread words, then check again</Text>
           <TextInput accessibilityLabel="Ingredient text" multiline value={draft} onChangeText={setDraft} style={[input, { minHeight: 140, textAlignVertical: 'top' }]} />
           <View style={{ flexDirection: 'row', gap: space.sm }}>
             <Button
               kind="primary"
-              label="Re-check"
+              label="Check again"
               disabled={!draft.trim()}
               onPress={() => {
                 app.recheck(entry.id, draft);
@@ -219,77 +221,43 @@ export default function ResultScreen() {
         </Card>
       ) : null}
 
+      <H2>On the label</H2>
+      <AnnotatedLabel result={result} selected={openId} onSelect={toggle} />
+      {result.unmatched.length ? (
+        <P muted style={{ marginTop: space.sm, fontSize: 14 }}>
+          Dotted words aren’t in the rules yet. We review new words every week.
+        </P>
+      ) : null}
+
       {result.flagged.length ? (
         <>
-          <H2>Flagged ({result.flagged.length})</H2>
-          <View style={{ gap: space.sm }}>
+          <H2 count={result.flagged.length}>Flagged</H2>
+          <View style={{ borderTopWidth: 1, borderTopColor: c.border }}>
             {result.flagged.map((chip) => (
-              <IngredientChip key={chip.ingredientId} chip={chip} />
+              <IngredientChip key={chip.ingredientId} chip={chip} open={openId === chip.ingredientId} onToggle={() => toggle(chip.ingredientId)} />
             ))}
           </View>
+          {result.flagged.some((f) => f.possible) ? <P muted style={{ marginTop: space.sm, fontSize: 14 }}>“Possible match” means the text was hard to read. Check it against the pack.</P> : null}
         </>
       ) : null}
 
       {result.good.length ? (
         <>
-          <H2>Good signs</H2>
-          <View style={{ gap: space.sm }}>
+          <H2 count={result.good.length}>Good signs</H2>
+          <View style={{ borderTopWidth: 1, borderTopColor: c.border }}>
             {result.good.map((chip) => (
-              <IngredientChip key={chip.ingredientId} chip={chip} />
+              <IngredientChip key={chip.ingredientId} chip={chip} open={openId === chip.ingredientId} onToggle={() => toggle(chip.ingredientId)} />
             ))}
           </View>
         </>
       ) : null}
 
-      {result.flagged.some((f) => f.possible) ? <P muted style={{ marginTop: space.sm }}>“Possible match” means the text was hard to read. Check it against the pack.</P> : null}
-
-      <Pressable
-        accessibilityRole="button"
-        accessibilityState={{ expanded: showAll }}
-        onPress={() => setShowAll(!showAll)}
-        style={{ flexDirection: 'row', alignItems: 'center', gap: space.sm, marginTop: space.xl, minHeight: 44 }}
-      >
-        <Text style={{ color: c.text, fontSize: 17, fontWeight: '600', flex: 1 }}>All ingredients ({result.items.filter((i) => !i.container).length})</Text>
-        <Ionicons name={showAll ? 'chevron-up' : 'chevron-down'} size={20} color={c.muted} />
-      </Pressable>
-      {showAll ? (
-        <Card style={{ gap: 6 }}>
-          {result.items.map((it) => {
-            const m = it.matches[0];
-            const chip = m ? [...result.flagged, ...result.good, ...result.neutral].find((x) => x.ingredientId === m.ingredientId) : undefined;
-            const ts = chip ? tierStyle(c, chip.tier) : null;
-            return (
-              <View key={it.position} style={{ flexDirection: 'row', alignItems: 'center', gap: space.sm, paddingLeft: it.depth * 16 }}>
-                <View style={{ width: 8, height: 8, borderRadius: 4, backgroundColor: ts ? ts.fg : it.container ? 'transparent' : c.border }} />
-                <Text style={{ color: it.unmatched ? c.muted : c.text, flex: 1, fontSize: 15 }}>
-                  {it.text || '(group)'}
-                  {it.unmatched ? '  · not recognised yet' : ''}
-                </Text>
-              </View>
-            );
-          })}
-        </Card>
-      ) : null}
-
-      {result.notes.length ? (
-        <>
-          <H2>Also on the label</H2>
-          <P muted>{result.notes.join('. ')}. “May contain” statements never change the verdict.</P>
-        </>
-      ) : null}
-
-      {result.unmatched.length ? (
-        <P muted style={{ marginTop: space.lg }}>
-          Not recognised yet: {result.unmatched.join(', ')}. We review new words every week.
-        </P>
-      ) : null}
-
-      <View style={{ marginTop: space.xl, gap: space.sm }}>
+      <View style={{ marginTop: space.xl, gap: space.md }}>
         {entry.reported ? (
           <P muted>You reported this verdict. Thank you.</P>
         ) : reporting ? (
           <Card style={{ gap: space.sm }}>
-            <Text style={{ color: c.text, fontWeight: '600' }}>What’s wrong?</Text>
+            <Text style={{ fontFamily: font.semi, color: c.text, fontSize: 16 }}>What’s wrong?</Text>
             {REPORT_REASONS.map((r) => (
               <Pressable
                 key={r}
@@ -299,7 +267,7 @@ export default function ResultScreen() {
                 style={{ flexDirection: 'row', alignItems: 'center', gap: space.sm, minHeight: 40 }}
               >
                 <Ionicons name={reason === r ? 'radio-button-on' : 'radio-button-off'} size={20} color={reason === r ? c.accent : c.muted} />
-                <Text style={{ color: c.text, fontSize: 15 }}>{r}</Text>
+                <Text style={{ fontFamily: font.body, color: c.text, fontSize: 15 }}>{r}</Text>
               </Pressable>
             ))}
             <TextInput accessibilityLabel="Comment (optional)" placeholder="Comment (optional)" placeholderTextColor={c.muted} value={comment} onChangeText={setComment} style={input} />
@@ -309,11 +277,12 @@ export default function ResultScreen() {
             </View>
           </Card>
         ) : (
-          <Button kind="ghost" icon="flag-outline" label="Report a wrong verdict" onPress={() => setReporting(true)} />
+          <Button kind="ghost" icon="flag-outline" label="Report a wrong verdict" style={{ alignSelf: 'flex-start' }} onPress={() => setReporting(true)} />
         )}
-        <P muted style={{ fontSize: 13 }}>
-          Checked with rules v{result.rulesVersion} · {new Date(entry.createdAt).toLocaleString()}. Verdicts reflect Mindset’s ingredient preferences, not medical advice.
-        </P>
+        <View style={{ borderTopWidth: 1, borderTopColor: c.border, paddingTop: space.sm, gap: 4 }}>
+          <Mono>RULES V{result.rulesVersion}  ·  {new Date(entry.createdAt).toLocaleString()}</Mono>
+          <P muted style={{ fontSize: 13, lineHeight: 18 }}>Verdicts reflect Mindset’s ingredient preferences, not medical advice.</P>
+        </View>
       </View>
     </Screen>
   );

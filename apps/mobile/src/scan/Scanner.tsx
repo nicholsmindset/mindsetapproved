@@ -5,7 +5,7 @@ import { Linking, Pressable, StyleSheet, Text, View } from 'react-native';
 import { Camera, useCameraDevice, useCameraPermission, usePhotoOutput } from 'react-native-vision-camera';
 import { useBarcodeScannerOutput, type Barcode } from 'react-native-vision-camera-barcode-scanner';
 import { Button, P } from '@/ui/kit';
-import { radius, space, useColors } from '@/ui/theme';
+import { font, radius, space, useColors } from '@/ui/theme';
 import type { ScannerProps } from './types';
 
 const FORMATS = ['ean-13', 'ean-8', 'upc-a', 'upc-e'] as const;
@@ -84,12 +84,19 @@ export function Scanner({ mode, active, onBarcode, onPhoto }: ScannerProps) {
         enableNativeZoomGesture
       />
       <View pointerEvents="none" style={[StyleSheet.absoluteFill, styles.center]}>
-        <View
-          style={[
-            styles.guide,
-            mode === 'barcode' ? { width: '78%', aspectRatio: 2.2 } : { width: '86%', aspectRatio: 0.9 },
-          ]}
-        />
+        <View style={mode === 'barcode' ? { width: '78%', aspectRatio: 2.2 } : { width: '86%', aspectRatio: 0.9 }}>
+          {(['tl', 'tr', 'bl', 'br'] as const).map((k) => (
+            <View
+              key={k}
+              style={[
+                styles.corner,
+                k[0] === 't' ? { top: 0, borderTopWidth: 4 } : { bottom: 0, borderBottomWidth: 4 },
+                k[1] === 'l' ? { left: 0, borderLeftWidth: 4 } : { right: 0, borderRightWidth: 4 },
+              ]}
+            />
+          ))}
+          {mode === 'barcode' ? <View style={styles.scanLine} /> : null}
+        </View>
         <Text style={styles.hint}>
           {mode === 'barcode' ? 'Point at the barcode' : 'Fit the whole ingredient list in the box'}
         </Text>
@@ -121,10 +128,11 @@ export function Scanner({ mode, active, onBarcode, onPhoto }: ScannerProps) {
 }
 
 const styles = StyleSheet.create({
-  fill: { flex: 1, backgroundColor: '#000', borderRadius: radius.lg, overflow: 'hidden' },
+  fill: { flex: 1, backgroundColor: '#000', borderRadius: radius.md, overflow: 'hidden' },
   center: { alignItems: 'center', justifyContent: 'center' },
-  guide: { borderWidth: 3, borderColor: 'rgba(255,255,255,0.9)', borderRadius: radius.md },
-  hint: { color: '#fff', marginTop: space.md, fontSize: 15, fontWeight: '600', textShadowColor: 'rgba(0,0,0,0.6)', textShadowRadius: 4 },
+  corner: { position: 'absolute', width: 28, height: 28, borderColor: '#fff' },
+  scanLine: { position: 'absolute', left: '8%', right: '8%', top: '50%', height: 2, backgroundColor: 'rgba(255,90,70,0.9)' },
+  hint: { color: '#fff', marginTop: space.lg, fontSize: 17, fontFamily: font.display, letterSpacing: 0.8, textTransform: 'uppercase', textShadowColor: 'rgba(0,0,0,0.7)', textShadowRadius: 6 },
   controls: { position: 'absolute', bottom: space.lg, left: space.lg, right: space.lg, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   round: { width: 48, height: 48, borderRadius: 24, backgroundColor: 'rgba(0,0,0,0.45)', alignItems: 'center', justifyContent: 'center' },
   shutter: { width: 72, height: 72, borderRadius: 36, backgroundColor: '#fff', borderWidth: 5, borderColor: 'rgba(255,255,255,0.45)' },

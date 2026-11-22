@@ -1,15 +1,14 @@
-import Ionicons from '@expo/vector-icons/Ionicons';
 import { router, useIsFocused } from 'expo-router';
 import { useCallback, useEffect, useState } from 'react';
-import { ActivityIndicator, AppState, Pressable, Text, View } from 'react-native';
+import { ActivityIndicator, AppState, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { consume, FREE_LIMITS } from '@/core/limits';
 import { recognizeLabel } from '@/platform/ocr';
 import { Scanner } from '@/scan/Scanner';
 import type { ScanMode } from '@/scan/types';
 import { photoByEntry, useApp } from '@/state/app';
-import { Button, P } from '@/ui/kit';
-import { MAX_WIDTH, radius, space, useColors } from '@/ui/theme';
+import { Button, Mono, Notice, P, Tabs, Title } from '@/ui/kit';
+import { font, MAX_WIDTH, radius, space, useColors } from '@/ui/theme';
 
 function useAppActive() {
   const [active, setActive] = useState(AppState.currentState === 'active');
@@ -91,40 +90,28 @@ export default function ScanScreen() {
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: c.bg }} edges={['top']}>
-      <View style={{ flex: 1, width: '100%', maxWidth: MAX_WIDTH, alignSelf: 'center', padding: space.lg, gap: space.md }}>
-        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-          <Text accessibilityRole="header" style={{ fontSize: 28, fontWeight: '700', color: c.text, letterSpacing: -0.5 }}>
-            Scan
-          </Text>
-          <Text style={{ color: c.muted, fontSize: 13 }}>Rules v{app.rules.bundle.version}{app.online ? '' : ' · offline'}</Text>
-        </View>
+      <View style={{ flex: 1, width: '100%', maxWidth: MAX_WIDTH, alignSelf: 'center', paddingHorizontal: space.lg, paddingTop: space.lg, paddingBottom: space.md, gap: space.md }}>
+        <Title aside={<Mono>RULES V{app.rules.bundle.version}{app.online ? '' : ' · OFFLINE'}</Mono>}>Scan</Title>
 
-        <View accessibilityRole="tablist" style={{ flexDirection: 'row', backgroundColor: c.surface2, borderRadius: radius.md, padding: 4 }}>
-          {(['barcode', 'label'] as const).map((m) => (
-            <Pressable
-              key={m}
-              accessibilityRole="tab"
-              accessibilityState={{ selected: mode === m }}
-              onPress={() => {
-                setMode(m);
-                setNotice(null);
-              }}
-              style={{ flex: 1, minHeight: 40, borderRadius: radius.sm, alignItems: 'center', justifyContent: 'center', flexDirection: 'row', gap: 6, backgroundColor: mode === m ? c.surface : 'transparent' }}
-            >
-              <Ionicons name={m === 'barcode' ? 'barcode-outline' : 'document-text-outline'} size={18} color={mode === m ? c.text : c.muted} />
-              <Text style={{ color: mode === m ? c.text : c.muted, fontWeight: '600' }}>{m === 'barcode' ? 'Barcode' : 'Scan label'}</Text>
-            </Pressable>
-          ))}
-        </View>
+        <Tabs
+          value={mode}
+          options={[
+            { id: 'barcode', label: 'Barcode', icon: 'barcode-outline' },
+            { id: 'label', label: 'Ingredient label', icon: 'document-text-outline' },
+          ]}
+          onChange={(m) => {
+            setMode(m);
+            setNotice(null);
+          }}
+        />
 
         {notice ? (
-          <View
-            accessibilityRole="alert"
-            style={{ padding: space.md, borderRadius: radius.md, backgroundColor: notice.tone === 'error' ? c.badBg : c.borderlineBg }}
+          <Notice
+            tone={notice.tone}
+            action={notice.premium ? <Button style={{ alignSelf: 'flex-start' }} icon="sparkles-outline" label="See Premium" onPress={() => router.push('/upgrade')} /> : undefined}
           >
-            <Text style={{ color: notice.tone === 'error' ? c.bad : c.borderline, fontWeight: '600' }}>{notice.text}</Text>
-            {notice.premium ? <Button style={{ marginTop: space.sm, alignSelf: 'flex-start' }} icon="sparkles-outline" label="See Premium" onPress={() => router.push('/upgrade')} /> : null}
-          </View>
+            {notice.text}
+          </Notice>
         ) : null}
 
         <View style={{ flex: 1, minHeight: 320 }}>
@@ -136,9 +123,9 @@ export default function ScanScreen() {
             onLabelText={(text) => runLabel(text, 1)}
           />
           {busy ? (
-            <View style={{ position: 'absolute', inset: 0, alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(0,0,0,0.35)', borderRadius: radius.lg, gap: space.sm }}>
+            <View style={{ position: 'absolute', inset: 0, alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(0,0,0,0.55)', borderRadius: radius.md, gap: space.sm }}>
               <ActivityIndicator color="#fff" size="large" />
-              <Text style={{ color: '#fff', fontWeight: '600' }}>{busy}</Text>
+              <Text style={{ color: '#fff', fontFamily: font.display, fontSize: 18, letterSpacing: 0.6, textTransform: 'uppercase' }}>{busy}</Text>
             </View>
           ) : null}
         </View>
