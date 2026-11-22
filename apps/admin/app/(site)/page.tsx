@@ -40,21 +40,11 @@ export default function Landing() {
             </Link>
           </div>
         </div>
-        <div className={styles.phone} aria-label="Example result: Not Approved, contains canola oil and Red 40">
-          <div className={`${styles.verdict} ${styles.not_approved}`}>
-            <small>Crunchy Corn Chips</small>
-            <strong>Not Approved</strong>
-            <span>Contains canola oil and Red 40.</span>
-          </div>
-          <div className={styles.chip}>
-            <b>Canola / rapeseed oil</b>
-            <em>Doesn’t meet Mindset rules</em>
-          </div>
-          <div className={styles.chip}>
-            <b>Red 40</b>
-            <em>Doesn’t meet Mindset rules</em>
-            <p>Red 40 is a synthetic dye. The EU requires a warning label on foods that contain it.</p>
-          </div>
+        <div className={styles.device}>
+          <picture>
+            <source srcSet="/app/result-dark.webp" media="(prefers-color-scheme: dark)" />
+            <img src="/app/result-light.webp" width={390} height={848} alt="The app showing Not Approved for a biscuit label, with Yellow 5, added sugar and palm oil flagged on the ingredient list" />
+          </picture>
         </div>
       </section>
 
@@ -62,8 +52,11 @@ export default function Landing() {
         <h2>Three verdicts</h2>
         <div className={styles.grid3}>
           {VERDICTS.map((v) => (
-            <article key={v.key} className={`${styles.card} ${styles[`top_${v.key}`]}`}>
-              <h3>{v.label}</h3>
+            <article key={v.key} className={styles.card}>
+              <span className={`${styles.dot} ${styles[`dot_${v.key}`]}`} aria-hidden>
+                {v.key === 'approved' ? '✓' : v.key === 'caution' ? '!' : '✕'}
+              </span>
+              <h3 className={styles[`label_${v.key}`]}>{v.label}</h3>
               <p>{v.body}</p>
               <p className={styles.example}>e.g. {v.example}</p>
             </article>

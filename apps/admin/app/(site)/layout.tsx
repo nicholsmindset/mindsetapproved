@@ -4,6 +4,7 @@ import styles from './site.module.css';
 export default function SiteLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className={styles.site}>
+      <div className={styles.headerBar}>
       <header className={styles.header}>
         <Link href="/" className={styles.logo}>
           <span className={styles.mark} aria-hidden>
@@ -18,6 +19,7 @@ export default function SiteLayout({ children }: { children: React.ReactNode }) 
           <Link href="/corrections">Corrections</Link>
         </nav>
       </header>
+      </div>
       <main className={styles.main}>{children}</main>
       <footer className={styles.footer}>
         <nav aria-label="Legal">

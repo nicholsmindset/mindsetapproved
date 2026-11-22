@@ -37,7 +37,12 @@ export default async function SharedVerdictPage({ params }: Props) {
 
       <section className={`${styles.verdict} ${styles[s.verdict]}`} aria-label={summary}>
         <p className={styles.product}>{s.product_name ? [s.product_name, s.brand].filter(Boolean).join(' · ') : 'A product scanned with Mindset Approved'}</p>
-        <h1>{VERDICT_LABEL[s.verdict]}</h1>
+        <div className={styles.headline}>
+          <span className={styles.icon} aria-hidden>
+            {s.verdict === 'approved' ? '✓' : s.verdict === 'caution' ? '!' : s.verdict === 'not_approved' ? '✕' : '?'}
+          </span>
+          <h1>{VERDICT_LABEL[s.verdict]}</h1>
+        </div>
         <p className={styles.summary}>{shareDetail(summary)}</p>
       </section>
 

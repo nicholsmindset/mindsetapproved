@@ -1,5 +1,7 @@
 # Deployment: what is live
 
+> **To finish going live, follow [go-live.md](go-live.md)**: every remaining step, in order.
+
 Last updated 22 Nov 2026.
 
 ## Supabase: live, sharing the Onnify Growth OS project

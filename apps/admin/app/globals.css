@@ -1,53 +1,59 @@
 :root {
-  --bg: #f6f5f1;
+  /* Same palette as the app (apps/mobile/src/ui/theme.ts): Apple's grouped backgrounds and system colours. */
+  --bg: #f2f2f7;
   --surface: #ffffff;
-  --surface-2: #efede6;
-  --text: #1c1b18;
-  --muted: #6a675e;
-  --border: #dcd8cc;
-  --accent: #2d5a3d;
+  --surface-2: #e9e9ee;
+  --fill: rgba(118, 118, 128, 0.12);
+  --text: #000000;
+  --muted: rgba(60, 60, 67, 0.74);
+  --border: rgba(60, 60, 67, 0.18);
+  --accent: #1f7a4c;
   --accent-text: #ffffff;
-  --focus: #2d6cdf;
+  --focus: #0a84ff;
+  --shadow: 0 1px 2px rgba(0, 0, 0, 0.04), 0 6px 20px rgba(0, 0, 0, 0.06);
 
-  --good: #1f7a4d;
-  --good-bg: #e3f2e9;
-  --neutral: #5d5a52;
-  --neutral-bg: #eceae3;
-  --borderline: #9a5b00;
-  --borderline-bg: #fbeed5;
-  --bad: #b3261e;
-  --bad-bg: #fbe3e1;
-  --grey: #5f6368;
-  --grey-bg: #e8e8e6;
+  --good: #17732f;
+  --good-bg: rgba(52, 199, 89, 0.16);
+  --neutral: rgba(60, 60, 67, 0.74);
+  --neutral-bg: rgba(118, 118, 128, 0.12);
+  --borderline: #b83000;
+  --borderline-bg: rgba(255, 149, 0, 0.2);
+  --bad: #c00012;
+  --bad-bg: rgba(255, 59, 48, 0.15);
+  --grey: #5b5b60;
+  --grey-bg: rgba(142, 142, 147, 0.18);
 
-  --radius: 10px;
-  --font: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --radius: 14px;
+  --font: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Inter', 'Segoe UI', Roboto, system-ui, sans-serif;
+  --display: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Inter Display', 'Inter', 'Segoe UI', Roboto, system-ui, sans-serif;
   --mono: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
   color-scheme: light;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --bg: #151513;
-    --surface: #1e1e1b;
-    --surface-2: #282824;
-    --text: #ecebe6;
-    --muted: #a19e94;
-    --border: #3a3934;
-    --accent: #7fbf95;
-    --accent-text: #10180f;
-    --focus: #8ab4ff;
+    --bg: #000000;
+    --surface: #1c1c1e;
+    --surface-2: #2c2c2e;
+    --fill: rgba(118, 118, 128, 0.24);
+    --text: #ffffff;
+    --muted: rgba(235, 235, 245, 0.6);
+    --border: rgba(84, 84, 88, 0.6);
+    --accent: #3ccf7e;
+    --accent-text: #00160a;
+    --focus: #409cff;
+    --shadow: none;
 
-    --good: #7fd1a2;
-    --good-bg: #183324;
-    --neutral: #c4c1b8;
-    --neutral-bg: #2c2b27;
-    --borderline: #f2bb5c;
-    --borderline-bg: #3a2a0c;
-    --bad: #ff8a80;
-    --bad-bg: #3d1714;
-    --grey: #b8b9bb;
-    --grey-bg: #2c2d2f;
+    --good: #30d158;
+    --good-bg: rgba(48, 209, 88, 0.2);
+    --neutral: rgba(235, 235, 245, 0.6);
+    --neutral-bg: rgba(118, 118, 128, 0.24);
+    --borderline: #ff9f0a;
+    --borderline-bg: rgba(255, 159, 10, 0.22);
+    --bad: #ff6961;
+    --bad-bg: rgba(255, 69, 58, 0.22);
+    --grey: #aeaeb2;
+    --grey-bg: rgba(142, 142, 147, 0.24);
     color-scheme: dark;
   }
 }
@@ -57,12 +63,13 @@ html, body { margin: 0; }
 body {
   background: var(--bg);
   color: var(--text);
-  font: 15px/1.5 var(--font);
+  font: 16px/1.5 var(--font);
+  letter-spacing: -0.01em;
   -webkit-font-smoothing: antialiased;
 }
 a { color: inherit; }
-h1 { font-size: 1.5rem; margin: 0 0 4px; letter-spacing: -0.01em; }
-h2 { font-size: 1.1rem; margin: 24px 0 8px; }
+h1 { font-family: var(--display); font-size: 1.9rem; font-weight: 700; margin: 0 0 4px; letter-spacing: -0.02em; }
+h2 { font-family: var(--display); font-size: 1.25rem; font-weight: 700; margin: 28px 0 10px; letter-spacing: -0.01em; }
 h3 { font-size: 0.95rem; margin: 16px 0 6px; }
 p { margin: 0 0 8px; }
 code, .mono { font-family: var(--mono); font-size: 0.86em; }
@@ -76,10 +83,10 @@ input, select, textarea, button {
   color: inherit;
 }
 input[type='text'], input[type='search'], input[type='email'], input[type='url'], input[type='number'], select, textarea {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 7px 10px;
+  background: var(--fill);
+  border: 1px solid transparent;
+  border-radius: 10px;
+  padding: 9px 12px;
   width: 100%;
   max-width: 100%;
   min-width: 0;
@@ -92,16 +99,18 @@ button, .button {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  border: 1px solid var(--border);
-  background: var(--surface);
-  border-radius: 8px;
-  padding: 7px 14px;
+  border: 0;
+  background: var(--fill);
+  color: var(--accent);
+  font-weight: 600;
+  border-radius: 12px;
+  padding: 9px 16px;
   cursor: pointer;
   text-decoration: none;
-  font-size: 0.9rem;
+  font-size: 0.95rem;
   white-space: nowrap;
 }
-button:hover, .button:hover { background: var(--surface-2); }
+button:hover, .button:hover { filter: brightness(0.96); }
 button.primary, .button.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-text); }
 button.primary:hover { filter: brightness(1.08); }
 button.danger { color: var(--bad); }
@@ -109,9 +118,9 @@ button:disabled { opacity: 0.5; cursor: not-allowed; }
 
 .card {
   background: var(--surface);
-  border: 1px solid var(--border);
   border-radius: var(--radius);
-  padding: 16px;
+  box-shadow: var(--shadow);
+  padding: 18px;
 }
 .stack > * + * { margin-top: 12px; }
 .row { display: flex; gap: 12px; flex-wrap: wrap; align-items: flex-end; }
@@ -121,9 +130,9 @@ button:disabled { opacity: 0.5; cursor: not-allowed; }
 table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
 th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--border); vertical-align: top; }
 th { font-weight: 600; color: var(--muted); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.03em; }
-.table-wrap { overflow-x: auto; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); }
+.table-wrap { overflow-x: auto; background: var(--surface); border-radius: var(--radius); box-shadow: var(--shadow); }
 
-.flash { padding: 10px 14px; border-radius: 8px; margin-bottom: 16px; }
+.flash { padding: 12px 16px; border-radius: 12px; margin-bottom: 16px; font-weight: 500; }
 .flash.ok { background: var(--good-bg); color: var(--good); }
 .flash.error { background: var(--bad-bg); color: var(--bad); }
 .flash.info { background: var(--surface-2); }

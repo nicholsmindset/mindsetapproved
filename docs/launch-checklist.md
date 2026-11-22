@@ -2,7 +2,7 @@
 
 Everything in the repo is built and tested locally. These are the steps that need your accounts, in order. Commands run from the repo root unless noted.
 
-> **Status:** the database and `ocr-fallback` are live in the Onnify Growth OS project. See [deployment.md](deployment.md) for what is done and the steps left. Section 1 below is for a fresh, dedicated project.
+> **Start with [go-live.md](go-live.md)**, the ordered runbook. **Status:** the database and `ocr-fallback` are live in the Onnify Growth OS project. See [deployment.md](deployment.md) for what is done and the steps left. Section 1 below is for a fresh, dedicated project.
 
 ## 1. Supabase (database, auth, storage, functions)
 1. Create a project (Pro plan, region `ap-southeast-1` Singapore for PDPA and latency).
