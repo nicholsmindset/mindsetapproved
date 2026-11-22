@@ -62,6 +62,7 @@ export default function History() {
                     accessibilityRole="button"
                     accessibilityState={{ selected: on }}
                     onPress={() => setFilter(k)}
+                    hitSlop={{ top: 5, bottom: 5 }}
                     style={{ paddingHorizontal: 14, minHeight: 34, justifyContent: 'center', borderRadius: radius.pill, backgroundColor: on ? c.accent : c.surface, boxShadow: on ? undefined : c.shadow }}
                   >
                     <Text style={[type.subhead, { fontWeight: '600', color: on ? c.onAccent : c.text }]}>{label}</Text>
@@ -121,7 +122,7 @@ export default function History() {
                   <Text style={{ color: v.fg, fontWeight: '600' }}>{v.stamp}</Text> · {sentence(e.summary)}
                 </Text>
               </View>
-              <Text style={[type.footnote, { color: c.faint }]}>{when(e.createdAt)}</Text>
+              <Text maxFontSizeMultiplier={1.4} style={[type.footnote, { color: c.muted }]}>{when(e.createdAt)}</Text>
               <Icon name="chevron.right" size={13} color={c.faint} weight="bold" />
             </Pressable>
           );

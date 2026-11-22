@@ -286,7 +286,7 @@ function Action({ symbol, label, onPress, disabled }: { symbol: IconName; label:
       style={({ pressed }) => ({ flex: 1, alignItems: 'center', gap: 6, paddingVertical: space.md, borderRadius: radius.md, borderCurve: 'continuous', backgroundColor: c.surface, boxShadow: c.shadow, opacity: disabled ? 0.4 : pressed ? 0.6 : 1 })}
     >
       <Icon name={symbol} size={20} color={c.accent} />
-      <Text numberOfLines={1} style={[type.caption, { color: c.accent, fontWeight: '600' }]}>{label}</Text>
+      <Text numberOfLines={1} maxFontSizeMultiplier={1.3} style={[type.caption, { color: c.accent, fontWeight: '600' }]}>{label}</Text>
     </Pressable>
   );
 }

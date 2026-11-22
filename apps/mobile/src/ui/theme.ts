@@ -15,21 +15,21 @@ const light = {
   surface2: '#e9e9ee', // tertiary fill
   fill: 'rgba(118,118,128,0.12)', // quaternarySystemFill (segmented track, chips)
   text: '#000000',
-  muted: 'rgba(60,60,67,0.6)', // secondaryLabel
+  muted: 'rgba(60,60,67,0.74)', // secondaryLabel, darkened to reach 4.5:1 on grouped backgrounds
   faint: 'rgba(60,60,67,0.3)', // tertiaryLabel
   border: 'rgba(60,60,67,0.18)', // separator
   rule: '#000000',
   accent: '#1f7a4c', // brand green, tuned to sit with the system palette
   onAccent: '#ffffff',
-  good: '#248a3d', // systemGreen (accessible)
+  good: '#17732f', // systemGreen, darkened for 4.5:1 on its tint
   goodBg: 'rgba(52,199,89,0.16)',
-  borderline: '#c93400', // systemOrange (accessible)
+  borderline: '#b83000', // systemOrange, darkened for 4.5:1
   borderlineBg: 'rgba(255,149,0,0.2)',
-  bad: '#d70015', // systemRed (accessible)
+  bad: '#c00012', // systemRed, darkened for 4.5:1
   badBg: 'rgba(255,59,48,0.15)',
-  grey: '#6c6c70',
+  grey: '#5b5b60',
   greyBg: 'rgba(142,142,147,0.18)',
-  neutral: 'rgba(60,60,67,0.6)',
+  neutral: 'rgba(60,60,67,0.74)',
   neutralBg: 'rgba(118,118,128,0.12)',
   shadow: '0px 1px 2px rgba(0,0,0,0.04), 0px 6px 20px rgba(0,0,0,0.06)',
 };
@@ -50,9 +50,9 @@ const dark: typeof light = {
   goodBg: 'rgba(48,209,88,0.2)',
   borderline: '#ff9f0a',
   borderlineBg: 'rgba(255,159,10,0.22)',
-  bad: '#ff453a',
+  bad: '#ff6961',
   badBg: 'rgba(255,69,58,0.22)',
-  grey: '#98989d',
+  grey: '#aeaeb2',
   greyBg: 'rgba(142,142,147,0.24)',
   neutral: 'rgba(235,235,245,0.6)',
   neutralBg: 'rgba(118,118,128,0.24)',

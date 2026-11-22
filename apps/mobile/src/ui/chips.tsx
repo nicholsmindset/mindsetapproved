@@ -23,7 +23,7 @@ export function IngredientChip({ chip, open: openProp, onToggle }: { chip: Chip;
     >
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: space.md }}>
         <View style={{ backgroundColor: t.bg, width: 34, height: 34, borderRadius: 10, borderCurve: 'continuous', alignItems: 'center', justifyContent: 'center' }}>
-          <Text style={[type.footnote, { color: t.fg, fontWeight: '700', fontVariant: ['tabular-nums'] }]}>{chip.position}</Text>
+          <Text maxFontSizeMultiplier={1.3} style={[type.footnote, { color: t.fg, fontWeight: '700', fontVariant: ['tabular-nums'] }]}>{chip.position}</Text>
         </View>
         <View style={{ flex: 1, gap: 1 }}>
           <Text style={[type.body, { color: c.text, fontWeight: '500' }]}>{chip.name}</Text>

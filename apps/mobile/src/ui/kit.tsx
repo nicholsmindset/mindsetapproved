@@ -199,9 +199,9 @@ export function VerdictBadge({ verdict }: { verdict: Verdict; size?: 'sm' | 'md'
   const c = useColors();
   const v = verdictStyle(c, verdict);
   return (
-    <View accessibilityLabel={v.label} style={{ flexDirection: 'row', alignItems: 'center', gap: 4, alignSelf: 'flex-start', backgroundColor: v.bg, paddingHorizontal: 8, paddingVertical: 3, borderRadius: radius.pill }}>
+    <View accessible accessibilityLabel={v.label} style={{ flexDirection: 'row', alignItems: 'center', gap: 4, alignSelf: 'flex-start', backgroundColor: v.bg, paddingHorizontal: 8, paddingVertical: 3, borderRadius: radius.pill }}>
       <Icon name={v.symbol} size={12} color={v.fg} />
-      <Text style={[type.caption, { color: v.fg, fontWeight: '600' }]}>{v.stamp}</Text>
+      <Text maxFontSizeMultiplier={1.4} style={[type.caption, { color: v.fg, fontWeight: '600' }]}>{v.stamp}</Text>
     </View>
   );
 }
@@ -226,7 +226,7 @@ export function VerdictHero({ verdict, summary, title, meta }: { verdict: Verdic
   const c = useColors();
   const v = verdictStyle(c, verdict);
   return (
-    <Animated.View entering={enter()} style={[styles.hero, { backgroundColor: c.surface, boxShadow: c.shadow }]}>
+    <Animated.View accessible accessibilityLabel={`${title}. ${v.label}. ${summary}`} entering={enter()} style={[styles.hero, { backgroundColor: c.surface, boxShadow: c.shadow }]}>
       <LinearGradient colors={[v.bg, 'transparent']} start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }} style={StyleSheet.absoluteFill} pointerEvents="none" />
       <View style={{ gap: 2 }}>
         <Text numberOfLines={2} style={[type.headline, { color: c.text }]}>{title}</Text>
@@ -263,7 +263,7 @@ export function Tabs<T extends string>({ value, options, onChange }: { value: T;
             style={{ flex: 1, minHeight: 36, alignItems: 'center', justifyContent: 'center', flexDirection: 'row', gap: 6, borderRadius: 8, borderCurve: 'continuous', backgroundColor: on ? c.surface : 'transparent', boxShadow: on ? '0px 3px 8px rgba(0,0,0,0.12), 0px 3px 1px rgba(0,0,0,0.04)' : undefined }}
           >
             {o.symbol ? <Icon name={o.symbol} size={15} color={c.text} /> : null}
-            <Text style={[type.subhead, { color: c.text, fontWeight: on ? '600' : '500' }]}>{o.label}</Text>
+            <Text maxFontSizeMultiplier={1.5} style={[type.subhead, { color: c.text, fontWeight: on ? '600' : '500' }]}>{o.label}</Text>
           </Pressable>
         );
       })}
