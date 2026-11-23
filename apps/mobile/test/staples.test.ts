@@ -1,6 +1,6 @@
 import { analyze, loadRules, type UserSettings } from '@mindset/rules-engine';
 import { describe, expect, it } from 'vitest';
-import { changeMessage, currentVerdict, stapleChanges } from '../src/core/staples';
+import { changeMessage, currentVerdict, milestoneLine, stapleChanges } from '../src/core/staples';
 import type { HistoryEntry } from '../src/core/store';
 import { shipped } from './helpers';
 
@@ -53,5 +53,13 @@ describe('saved products (staples)', () => {
     const relaxed = { ...normal, disabledCategories: ['sugar'] } as UserSettings;
     expect(changeMessage(stapleChanges([e], rules, relaxed))).toMatch(/^1 of your saved products now gets/);
     expect(changeMessage(stapleChanges([e, { ...e, id: 'e2' }], rules, relaxed))).toMatch(/^2 of your saved products now get /);
+  });
+});
+
+describe('milestones', () => {
+  it('says something only at round numbers', () => {
+    expect(milestoneLine(10)).toBe('That’s 10 products you’ve checked.');
+    expect(milestoneLine(100)).toBe('That’s 100 products you’ve checked.');
+    for (const n of [1, 2, 9, 11, 24, 99]) expect(milestoneLine(n)).toBeNull();
   });
 });

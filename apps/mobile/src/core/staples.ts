@@ -64,3 +64,13 @@ export function changeMessage(changes: StapleChange[]): string {
   const dir = worse === n ? 'a stricter' : worse === 0 ? 'a more relaxed' : 'a different';
   return `${noun} ${dir} verdict, because your rules changed.`;
 }
+
+const MILESTONES = [10, 25, 50, 100, 250, 500];
+
+/**
+ * A calm line for the Nth product checked ("10 products checked"). Deliberately not a streak: nothing is lost by
+ * skipping a day, and nothing is shown between milestones.
+ */
+export function milestoneLine(ordinal: number): string | null {
+  return MILESTONES.includes(ordinal) ? `That’s ${ordinal} products you’ve checked.` : null;
+}

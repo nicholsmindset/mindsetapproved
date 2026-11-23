@@ -7,6 +7,7 @@ import { ActivityIndicator, Platform, Pressable, Text, TextInput, View } from 'r
 import Animated from 'react-native-reanimated';
 import { consume, FREE_LIMITS, refund, remaining } from '@/core/limits';
 import { aiToText } from '@/core/ocr-text';
+import { milestoneLine } from '@/core/staples';
 import { aiAvailable, aiRecheck } from '@/platform/ai';
 import { prepareForAi } from '@/platform/image';
 import { canShareImage, copyLink, shareCardImage, shareLink } from '@/platform/share';
@@ -130,6 +131,8 @@ export default function ResultScreen() {
   const sourceLabel = { cache: 'Saved product', off: 'Open Food Facts', label: Platform.OS === 'web' ? 'Label text' : 'Label photo', ai: 'Label photo · read by AI' }[entry.source] ?? '';
   const meta = [entry.brand, entry.barcode, sourceLabel].filter(Boolean).join(' · ');
   const toggle = (id: string) => setOpenId(openId === id ? null : id);
+  // Position of this scan in the history (oldest = 1): only the milestone scans get a line.
+  const milestone = milestoneLine(app.history.length - app.history.findIndex((e) => e.id === entry.id));
 
   return (
     <Screen edges={[]}>
@@ -138,6 +141,8 @@ export default function ResultScreen() {
       <View testID="verdict" accessibilityLabel={`${v.label}. ${result.summary}`}>
         <VerdictHero verdict={result.verdict} title={entry.productName ?? 'Label scan'} meta={meta} summary={detail(result.summary)} />
       </View>
+
+      {milestone ? <Footnote style={{ marginTop: space.sm, textAlign: 'center' }}>{milestone}</Footnote> : null}
 
       <Animated.View entering={enter(80)} style={{ flexDirection: 'row', gap: space.sm, marginTop: space.md }}>
         <Action symbol={entry.favourite ? 'heart.fill' : 'heart'} label={entry.favourite ? 'Saved' : 'Save'} onPress={() => app.setFavourite(entry.id, !entry.favourite)} />

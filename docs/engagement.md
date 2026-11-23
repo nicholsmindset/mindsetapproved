@@ -25,9 +25,10 @@ Mindset Approved sells **trust**. The whole product says "this verdict is honest
 2. **Shop-day reminder, opt-in.** Settings → Shop-day reminder: choose a day and a time (morning, midday, after work). One local notification a week: "Heading to the shop? Check labels before they hit the basket." It comes from the phone, not a server, and turning it off cancels it. The phone app only (the web preview has no notifications).
 3. **First-week habit measure.** Admin → Stats → "First-week habit": for each week's new phones, the share that checked 3+ products in their first 7 days and the share that came back in days 8-14. A figure is withheld until its window has fully passed, so a young cohort doesn't look worse than it is. Aggregates only.
 
+4. **Quiet milestones, not streaks.** The 10th, 25th, 50th, 100th, 250th and 500th product get one calm line on the result ("That's 10 products you've checked."). Nothing in between, and no streak counter to lose.
+
 ## Still to do
 - **Read the numbers.** Once real people are scanning, check whether phones that reach three scans in week 1 come back more often. If the gap is small, the habit moment is something else (try 5 scans, or a saved product) and the measure should change.
-- **Quiet milestones, not streaks.** After a person's 10th scan, one calm line on the result ("You've checked 10 products"). No streak counter and no loss-aversion pressure.
 - **Keep the first result fast.** Barcode is one scan and a label photo is two taps. Don't put anything between the camera and the result as features are added.
 
 ## Rules for any engagement feature
