@@ -12,7 +12,7 @@ Last updated 22 Nov 2026.
 | App and website key | the **legacy anon JWT**, already in `apps/mobile/eas.json` and `apps/*/.env.example`. Edge Functions verify a JWT, so the `sb_publishable_` key won't work for them. |
 
 ### What was applied
-- **Migrations:** every file in `supabase/migrations`, from `20261120000001` to `20261128000002`, recorded in Supabase's own migration history (`supabase_migrations.schema_migrations`). That means `npx supabase db push` works normally from now on and only applies new files.
+- **Migrations:** every file in `supabase/migrations`, from `20261120000001` to `20261129000001`, recorded in Supabase's own migration history (`supabase_migrations.schema_migrations`). That means `npx supabase db push` works normally from now on and only applies new files.
 - **Seed:** `supabase/seed.sql`, with 71 rules, 2,581 ingredient names and 15 categories.
 - **How:** the database fetched each file from this repository, pinned to commit `01815d7`, and checked its SHA-256 against the local copy before running it.
 - **Corrections secret:** generated inside the database into `public.app_secrets`. It has never been in chat or in the repository.

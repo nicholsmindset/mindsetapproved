@@ -4,7 +4,7 @@ import { aiToText, estimateConfidence, ocrToText } from '../src/core/ocr-text';
 import { lookupProduct, normalizeBarcode, offIngredients } from '../src/core/product-lookup';
 import { checkForUpdate, initialRules } from '../src/core/rules-sync';
 import { recheckEdited, runScan, type ScanEffects } from '../src/core/scan-pipeline';
-import { HISTORY_CAP } from '../src/core/store';
+import { HISTORY_CAP, reminderLabel } from '../src/core/store';
 import { bumped, shipped, testStore } from './helpers';
 
 describe('store', () => {
@@ -360,5 +360,27 @@ describe('scan mode', () => {
     expect(store.getScanMode()).toBe('barcode');
     store.setScanMode('label');
     expect(store.getScanMode()).toBe('label');
+  });
+});
+
+describe('shop-day reminder', () => {
+  it('is off until chosen, and remembers day and time', () => {
+    const store = testStore();
+    expect(store.getReminder()).toEqual({ enabled: false, weekday: 7, hour: 9 });
+    store.setReminder({ enabled: true, weekday: 6, hour: 18 });
+    expect(store.getReminder()).toEqual({ enabled: true, weekday: 6, hour: 18 });
+  });
+
+  it('falls back to safe values for unreadable or out-of-range data', () => {
+    const store = testStore();
+    store.kv.set('reminder.v1', 'not json');
+    expect(store.getReminder().enabled).toBe(false);
+    store.kv.set('reminder.v1', JSON.stringify({ enabled: true, weekday: 12, hour: 3 }));
+    expect(store.getReminder()).toEqual({ enabled: true, weekday: 7, hour: 9 });
+  });
+
+  it('describes the choice in words', () => {
+    expect(reminderLabel({ enabled: true, weekday: 7, hour: 9 })).toBe('Saturdays, morning');
+    expect(reminderLabel({ enabled: true, weekday: 2, hour: 18 })).toBe('Mondays, after work');
   });
 });

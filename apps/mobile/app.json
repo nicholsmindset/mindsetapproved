@@ -119,7 +119,13 @@
         }
       ],
       "expo-sharing",
-      "@sentry/react-native"
+      "@sentry/react-native",
+      [
+        "expo-notifications",
+        {
+          "color": "#1F7A4C"
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true,

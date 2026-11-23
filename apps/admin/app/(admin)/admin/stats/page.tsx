@@ -1,4 +1,5 @@
 import { Flash } from '@/components/Flash';
+import { cohortView, overallReachedThree, type CohortRow } from '@/lib/activation';
 import { requireAdmin } from '@/lib/auth';
 import styles from './stats.module.css';
 
@@ -50,10 +51,14 @@ export default async function StatsPage({ searchParams }: { searchParams: Promis
   const sp = await searchParams;
   const days = [7, 30, 90].includes(Number(sp.days)) ? Number(sp.days) : 30;
   const { supabase } = await requireAdmin();
-  const [{ data, error }, { data: names }] = await Promise.all([
+  const [{ data, error }, { data: names }, { data: cohortData }] = await Promise.all([
     supabase.rpc('admin_stats', { p_days: days }),
     supabase.from('ingredients').select('id, display_name'),
+    supabase.rpc('activation_stats', { p_weeks: 8 }),
   ]);
+  const now = new Date();
+  const cohorts = ((cohortData ?? []) as CohortRow[]).map((r) => cohortView(r, now)).reverse();
+  const overall = overallReachedThree((cohortData ?? []) as CohortRow[], now);
   const s = data as Stats | null;
   const nameOf = new Map(((names ?? []) as Array<{ id: string; display_name: string }>).map((n) => [n.id, n.display_name]));
   const sources = s?.source_mix ?? {};
@@ -127,6 +132,44 @@ export default async function StatsPage({ searchParams }: { searchParams: Promis
               )}
             </section>
           </div>
+          <section className="card">
+            <h2 style={{ marginTop: 0 }}>First-week habit</h2>
+            <p className="muted">
+              The working guess is that people who check <strong>three products in their first week</strong> keep using the app. Each row is the phones that
+              scanned for the first time that week. A figure appears once its window has fully passed.
+            </p>
+            {overall ? (
+              <p>
+                <strong>{overall.pct}%</strong> of {overall.installs.toLocaleString('en-SG')} phones in the completed weeks reached three scans in their first week.
+              </p>
+            ) : null}
+            {cohorts.length ? (
+              <div className="table-wrap">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Week of</th>
+                      <th>New phones</th>
+                      <th>3+ scans in week 1</th>
+                      <th>Back in week 2</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {cohorts.map((c) => (
+                      <tr key={c.week}>
+                        <td>{c.week}</td>
+                        <td>{c.installs}</td>
+                        <td>{c.reachedThree === null ? <span className="muted">in progress</span> : `${c.reachedThree}%`}</td>
+                        <td>{c.returned === null ? <span className="muted">in progress</span> : `${c.returned}%`}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            ) : (
+              <p className="muted">No phones have scanned yet.</p>
+            )}
+          </section>
           <section className="card">
             <h2 style={{ marginTop: 0 }}>Scans per day</h2>
             {s.scans_per_day.length ? (

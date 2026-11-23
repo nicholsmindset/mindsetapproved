@@ -368,4 +368,33 @@ do $$ begin
   assert has_function_privilege('anon', 'public.submit_product(text, text, uuid, text, text)', 'execute'), 'anon can submit products';
   assert has_function_privilege('anon', 'public.log_unmatched(text[], text)', 'execute'), 'anon can log unmatched terms';
 end $$;
+-- first-week habit measure: one phone reaches 3 scans in week 1 and returns in week 2, another scans once
+insert into public.scans (install_id, verdict, source, created_at) values
+  ('a0000000-0000-4000-8000-0000000000a1', 'approved', 'label', date_trunc('week', now()) - interval '14 days' + interval '1 hour'),
+  ('a0000000-0000-4000-8000-0000000000a1', 'caution', 'label', date_trunc('week', now()) - interval '14 days' + interval '2 hours'),
+  ('a0000000-0000-4000-8000-0000000000a1', 'approved', 'cache', date_trunc('week', now()) - interval '13 days'),
+  ('a0000000-0000-4000-8000-0000000000a1', 'approved', 'cache', date_trunc('week', now()) - interval '5 days'),
+  ('a0000000-0000-4000-8000-0000000000b2', 'approved', 'label', date_trunc('week', now()) - interval '14 days' + interval '3 hours');
+set role authenticated;
+set request.jwt.claims = '{"sub": "00000000-0000-0000-0000-000000000002", "role": "authenticated", "app_metadata": {"role": "admin"}}';
+do $$
+declare r record;
+begin
+  select * into r from public.activation_stats(8) where cohort_week = (date_trunc('week', now()) - interval '14 days')::date;
+  assert r.installs = 2, 'cohort has both phones';
+  assert r.reached_three = 1, 'one phone reached three scans in its first week';
+  assert r.returned_week2 = 1, 'one phone came back in week two';
+end $$;
+set request.jwt.claims = '{"sub": "00000000-0000-0000-0000-000000000003", "role": "authenticated"}';
+do $$ begin
+  begin
+    perform * from public.activation_stats(8);
+    raise exception 'non-admin read activation stats';
+  exception when insufficient_privilege then null;
+  end;
+end $$;
+reset role;
+do $$ begin
+  assert not has_function_privilege('anon', 'public.activation_stats(int)', 'execute'), 'anon cannot read activation stats';
+end $$;
 \echo 'All SQL checks passed'

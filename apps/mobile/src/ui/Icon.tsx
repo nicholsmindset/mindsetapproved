@@ -55,6 +55,7 @@ const FALLBACK = {
   'pawprint.fill': 'paw',
   'bolt.fill': 'flash',
   'xmark': 'close',
+  'bell.fill': 'notifications',
   'moon.fill': 'moon',
   'sun.max.fill': 'sunny',
   'circle.lefthalf.filled': 'contrast',

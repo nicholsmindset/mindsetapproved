@@ -8,6 +8,8 @@ import { resolveOnSignIn, toRow, type SettingsRow } from '@/core/settings-sync';
 import { checkForUpdate, initialRules, type LatestVersion } from '@/core/rules-sync';
 import { recheckEdited, runScan, type ScanEffects, type ScanInput, type ScanOutcome } from '@/core/scan-pipeline';
 import { createOutbox, isPermanent, PermanentError, type Job } from '@/core/outbox';
+import { currentVerdict, stapleChanges } from '@/core/staples';
+import { syncReminder } from '@/platform/reminders';
 import { createStore, type HistoryEntry, type Store } from '@/core/store';
 import starter from '@/data/starter-bundle.json';
 import { downloadBundle } from '@/platform/gunzip';
@@ -38,6 +40,8 @@ interface AppCtx {
   verifyCode(email: string, code: string): Promise<{ ok: boolean; error?: string }>;
   signOut(): Promise<void>;
   setFavourite(entryId: string, favourite: boolean): void;
+  /** Resets the baseline of every saved product to today's verdict ("Got it"). */
+  acknowledgeStaples(): void;
   /** Pulls the account's scans from other devices into local history. */
   pullHistory(): Promise<number>;
   /** Server share code for a scan (creates it once). */
@@ -120,6 +124,10 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [onboarded, setOnboarded] = useState(() => store.isOnboarded());
   const [history, setHistory] = useState<HistoryEntry[]>(() => store.getHistory());
   const refreshHistory = useCallback(() => setHistory(store.getHistory()), []);
+  // A saved shop-day reminder is re-scheduled on start (the OS can drop them after an update or restore).
+  useEffect(() => {
+    void syncReminder(store.getReminder()).catch(() => {});
+  }, []);
   const [account, setAccount] = useState<string | null>(null);
   const userId = useRef<string | null>(null);
 
@@ -257,12 +265,17 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         return out;
       },
       setFavourite(entryId, favourite) {
-        store.updateEntry(entryId, { favourite });
+        const entry = store.getEntry(entryId);
+        store.updateEntry(entryId, { favourite, savedVerdict: favourite && entry ? currentVerdict(entry, rules, settings) : undefined });
         refreshHistory();
         const remoteId = store.getEntry(entryId)?.remoteScanId;
         if (remoteId && supabase && userId.current) {
           void outbox.enqueue({ kind: 'scanUpdate', scanId: remoteId, favourite });
         }
+      },
+      acknowledgeStaples() {
+        for (const c of stapleChanges(store.getHistory(), rules, settings)) store.updateEntry(c.entry.id, { savedVerdict: c.now });
+        refreshHistory();
       },
       pullHistory,
       lookup: (barcode) =>

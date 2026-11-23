@@ -1,10 +1,12 @@
 import type { Verdict } from '@mindset/rules-engine';
+import type { HistoryEntry } from '@/core/store';
 import { router } from 'expo-router';
-import { useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { FlatList, Pressable, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { cachedCurrent, changeMessage, stapleChanges } from '@/core/staples';
 import { useApp } from '@/state/app';
-import { Button, IconTile, Title } from '@/ui/kit';
+import { Button, IconTile, Notice, Title } from '@/ui/kit';
 import { Icon } from '@/ui/Icon';
 import { MAX_WIDTH, radius, space, type, useColors, verdictStyle } from '@/ui/theme';
 
@@ -27,12 +29,16 @@ export default function History() {
   const app = useApp();
   const c = useColors();
   const [filter, setFilter] = useState<Filter>('all');
+  // Rows show what each product gets under today's rules, not the verdict it got at scan time.
+  const verdictOf = useCallback((e: HistoryEntry) => cachedCurrent(e, app.rules, app.settings), [app.rules, app.settings]);
+  const changes = useMemo(() => stapleChanges(app.history, app.rules, app.settings), [app.history, app.rules, app.settings]);
+  const changeById = useMemo(() => new Map(changes.map((ch) => [ch.entry.id, ch])), [changes]);
   const list = useMemo(() => {
     const all = app.history;
     if (filter === 'all') return all;
     if (filter === 'favourites') return all.filter((e) => e.favourite);
-    return all.filter((e) => e.verdict === filter);
-  }, [app.history, filter]);
+    return all.filter((e) => verdictOf(e).verdict === filter);
+  }, [app.history, filter, verdictOf]);
 
   const today = new Date().toDateString();
   const when = (iso: string) => {
@@ -49,6 +55,11 @@ export default function History() {
         ListHeaderComponent={
           <View style={{ gap: space.md, marginBottom: space.lg }}>
             <Title sub={`${app.history.length} ${app.history.length === 1 ? 'scan' : 'scans'}, kept on this phone`}>History</Title>
+            {changes.length ? (
+              <Notice tone="info" action={<Button kind="secondary" label="Got it" onPress={() => app.acknowledgeStaples()} style={{ alignSelf: 'flex-start' }} />}>
+                {changeMessage(changes)}
+              </Notice>
+            ) : null}
             <FlatList
               horizontal
               data={FILTERS}
@@ -88,7 +99,9 @@ export default function History() {
           </View>
         )}
         renderItem={({ item: e, index }) => {
-          const v = verdictStyle(c, e.verdict);
+          const now = verdictOf(e);
+          const v = verdictStyle(c, now.verdict);
+          const change = changeById.get(e.id);
           const first = index === 0;
           const last = index === list.length - 1;
           return (
@@ -120,8 +133,9 @@ export default function History() {
                   {e.favourite ? <Icon name="heart.fill" size={12} color={c.bad} /> : null}
                 </View>
                 <Text numberOfLines={1} style={[type.subhead, { color: c.muted }]}>
-                  <Text style={{ color: v.fg, fontWeight: '600' }}>{v.stamp}</Text> · {sentence(e.summary)}
+                  <Text style={{ color: v.fg, fontWeight: '600' }}>{v.stamp}</Text> · {sentence(now.summary)}
                 </Text>
+                {change ? <Text style={[type.footnote, { color: c.muted }]}>Was {verdictStyle(c, change.was).stamp} when you saved it</Text> : null}
               </View>
               <Text maxFontSizeMultiplier={1.4} style={[type.footnote, { color: c.muted }]}>{when(e.createdAt)}</Text>
               <Icon name="chevron.right" size={13} color={c.faint} weight="bold" />

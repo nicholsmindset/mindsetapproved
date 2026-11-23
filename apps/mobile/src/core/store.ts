@@ -18,6 +18,8 @@ export interface HistoryEntry {
   summary: string;
   rulesVersion: number;
   favourite: boolean;
+  /** The verdict when the person saved it (or last pressed "Got it"); a different verdict today means a staple changed. */
+  savedVerdict?: Verdict;
   /** scans.id on the server, for reports. */
   remoteScanId?: string;
   reported?: boolean;
@@ -46,7 +48,52 @@ const K = {
   labelScript: 'label-script.v1',
   appearance: 'appearance.v1',
   scanMode: 'scan-mode.v1',
+  reminder: 'reminder.v1',
 } as const;
+
+/** The opt-in weekly "shop day" reminder. Weekday follows the notification API: 1 = Sunday … 7 = Saturday. */
+export interface ReminderPref {
+  enabled: boolean;
+  weekday: number;
+  hour: number;
+}
+export const REMINDER_DAYS: { id: number; short: string; long: string }[] = [
+  { id: 2, short: 'Mon', long: 'Mondays' },
+  { id: 3, short: 'Tue', long: 'Tuesdays' },
+  { id: 4, short: 'Wed', long: 'Wednesdays' },
+  { id: 5, short: 'Thu', long: 'Thursdays' },
+  { id: 6, short: 'Fri', long: 'Fridays' },
+  { id: 7, short: 'Sat', long: 'Saturdays' },
+  { id: 1, short: 'Sun', long: 'Sundays' },
+];
+export const REMINDER_TIMES: { hour: number; label: string }[] = [
+  { hour: 9, label: 'Morning' },
+  { hour: 12, label: 'Midday' },
+  { hour: 18, label: 'After work' },
+];
+export const DEFAULT_REMINDER: ReminderPref = { enabled: false, weekday: 7, hour: 9 };
+
+/** Anything unreadable or out of range falls back to the default (off). */
+export function readReminder(kv: KV): ReminderPref {
+  try {
+    const r = JSON.parse(kv.getString(K.reminder) ?? 'null') as Partial<ReminderPref> | null;
+    if (!r) return DEFAULT_REMINDER;
+    return {
+      enabled: r.enabled === true,
+      weekday: REMINDER_DAYS.some((d) => d.id === r.weekday) ? (r.weekday as number) : DEFAULT_REMINDER.weekday,
+      hour: REMINDER_TIMES.some((t) => t.hour === r.hour) ? (r.hour as number) : DEFAULT_REMINDER.hour,
+    };
+  } catch {
+    return DEFAULT_REMINDER;
+  }
+}
+
+/** "Saturdays, morning" */
+export function reminderLabel(p: ReminderPref): string {
+  const day = REMINDER_DAYS.find((d) => d.id === p.weekday)?.long ?? '';
+  const time = REMINDER_TIMES.find((t) => t.hour === p.hour)?.label.toLowerCase() ?? '';
+  return `${day}, ${time}`;
+}
 
 /** Which scan tab opens first: the one the person used last. */
 export type ScanModePref = 'barcode' | 'label';
@@ -150,6 +197,8 @@ export function createStore(kv: KV, newId: () => string) {
       return LABEL_SCRIPTS.some((x) => x.id === v) ? (v as LabelScript) : 'latin';
     },
     setLabelScript: (v: LabelScript) => kv.set(K.labelScript, v),
+    getReminder: (): ReminderPref => readReminder(kv),
+    setReminder: (p: ReminderPref) => kv.set(K.reminder, JSON.stringify(p)),
     getScanMode: (): ScanModePref => (kv.getString(K.scanMode) === 'label' ? 'label' : 'barcode'),
     setScanMode: (v: ScanModePref) => kv.set(K.scanMode, v),
     getAppearance: (): AppearancePref => readAppearance(kv),

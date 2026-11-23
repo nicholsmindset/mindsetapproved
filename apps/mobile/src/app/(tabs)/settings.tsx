@@ -1,16 +1,17 @@
 import { router } from 'expo-router';
 import { useState } from 'react';
-import { Alert, Linking, Platform, Text, View } from 'react-native';
+import { Alert, Linking, Platform, Pressable, Text, View } from 'react-native';
 import { useApp } from '@/state/app';
 import { AccountCard } from '@/ui/AccountCard';
 import { DISCLAIMER, OFF_ATTRIBUTION } from '@/ui/copy';
 import { historyToCsv } from '@/core/export';
 import { exportCsv } from '@/platform/export';
 import { SHARE_BASE_URL, supabase } from '@/platform/supabase';
-import { H2, IconTile, Notice, Row, Screen, Section, Title } from '@/ui/kit';
+import { H2, IconTile, Notice, Row, Screen, Section, Title, ToggleRow } from '@/ui/kit';
 import { Icon } from '@/ui/Icon';
 import { space, type, useColors } from '@/ui/theme';
-import { APPEARANCES, LABEL_SCRIPTS, type LabelScript } from '@/core/store';
+import { APPEARANCES, LABEL_SCRIPTS, type LabelScript, REMINDER_DAYS, REMINDER_TIMES, type ReminderPref, reminderLabel } from '@/core/store';
+import { disableReminder, enableReminder, remindersAvailable } from '@/platform/reminders';
 import { setAppearance, useAppearance } from '@/state/appearance';
 
 function confirm(title: string, message: string): Promise<boolean> {
@@ -30,6 +31,19 @@ export default function Settings() {
   const [checking, setChecking] = useState(false);
   const [script, setScript] = useState<LabelScript>(() => app.store.getLabelScript());
   const appearance = useAppearance();
+  const [reminder, setReminderState] = useState<ReminderPref>(() => app.store.getReminder());
+
+  async function changeReminder(next: ReminderPref) {
+    app.store.setReminder(next);
+    setReminderState(next);
+    if (!next.enabled) return void (await disableReminder());
+    if ((await enableReminder(next)) === 'denied') {
+      const off = { ...next, enabled: false };
+      app.store.setReminder(off);
+      setReminderState(off);
+      setMsg('Notifications are off for Mindset Approved. Turn them on in your phone’s Settings, then try again.');
+    }
+  }
   const open = (path: string) => void Linking.openURL(`${SHARE_BASE_URL}${path}`);
 
   return (
@@ -52,6 +66,36 @@ export default function Settings() {
           <AccountCard />
         </>
       ) : null}
+
+      <Section
+        header="Shop-day reminder"
+        footer={remindersAvailable ? 'One notification a week, on the day you choose. It comes from your phone, not a server, and you can turn it off any time.' : 'Reminders are notifications on your phone, so they’re in the iPhone and Android app.'}
+      >
+        <ToggleRow
+          label="Remind me on shop day"
+          hint={reminder.enabled ? reminderLabel(reminder) : 'Off'}
+          tile={{ symbol: 'bell.fill', color: '#ff9f0a' }}
+          value={reminder.enabled && remindersAvailable}
+          disabled={!remindersAvailable}
+          onChange={(on) => void changeReminder({ ...reminder, enabled: on })}
+        />
+        {reminder.enabled && remindersAvailable ? (
+          <View style={{ padding: space.lg, gap: space.md }}>
+            <Choices
+              label="Day"
+              options={REMINDER_DAYS.map((d) => ({ id: d.id, text: d.short }))}
+              value={reminder.weekday}
+              onChange={(weekday) => void changeReminder({ ...reminder, weekday })}
+            />
+            <Choices
+              label="Time"
+              options={REMINDER_TIMES.map((t) => ({ id: t.hour, text: t.label }))}
+              value={reminder.hour}
+              onChange={(hour) => void changeReminder({ ...reminder, hour })}
+            />
+          </View>
+        ) : null}
+      </Section>
 
       <Section header="Appearance">
         {APPEARANCES.map((a) => (
@@ -143,5 +187,33 @@ export default function Settings() {
         <Row title="Data sources" subtitle={OFF_ATTRIBUTION} tile={{ symbol: 'globe', color: '#007aff' }} />
       </Section>
     </Screen>
+  );
+}
+
+/** A row of pill choices (day of week, time of day). */
+function Choices({ label, options, value, onChange }: { label: string; options: { id: number; text: string }[]; value: number; onChange: (id: number) => void }) {
+  const c = useColors();
+  return (
+    <View style={{ gap: space.sm }}>
+      <Text style={[type.footnote, { color: c.muted, fontWeight: '600', textTransform: 'uppercase' }]}>{label}</Text>
+      <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: space.sm }}>
+        {options.map((o) => {
+          const on = o.id === value;
+          return (
+            <Pressable
+              key={o.id}
+              accessibilityRole="radio"
+              accessibilityState={{ selected: on }}
+              accessibilityLabel={`${label}: ${o.text}`}
+              onPress={() => onChange(o.id)}
+              hitSlop={{ top: 4, bottom: 4 }}
+              style={{ paddingHorizontal: 14, minHeight: 36, justifyContent: 'center', borderRadius: 999, backgroundColor: on ? c.accent : c.fill }}
+            >
+              <Text style={[type.subhead, { fontWeight: '600', color: on ? c.onAccent : c.text }]}>{o.text}</Text>
+            </Pressable>
+          );
+        })}
+      </View>
+    </View>
   );
 }
